@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const EmployeeRouter = require("./Components/Employees/EmployeeRouter");
+const CategoriesRouter = require("./Components/Categories/CategoriesRouter");
 const app = express();
 const v1Router = express.Router();
 // MiddleWares
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // V1 Routes
 v1Router.use("/employees", EmployeeRouter);
+v1Router.use("/categories", CategoriesRouter);
 
 // versioning Routes
 app.use("/api/v1", v1Router);

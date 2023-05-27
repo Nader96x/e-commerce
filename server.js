@@ -10,16 +10,20 @@ const db = process.env.DATABASE.replace(
 const port = process.env.PORT;
 
 mongoose
-  .createConnection(db)
-  .asPromise()
-  .then(() => {
-    console.log("DB Connected Succesffully");
+    .connect(db,{
+        useUnifiedTopology: true,
+        useCreateIndex: true,
+        useNewUrlParser:true,
+        useFindAndModify:false
+    })
+    .then(() => {
+        console.log("DB Connected Successfully");
 
-    // Run The Server
-    app.listen(port, () => {
-      console.log(`App Running on port ${port}`);
+        // Run The Server
+        app.listen(port, () => {
+            console.log(`App Running on port ${port}`);
+        });
     });
-  });
 
 // Handle Unhandled Rejections
 process.on("unhandledRejection", (err) => {
