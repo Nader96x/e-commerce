@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+/*const mongoose = require("mongoose");
 
 interface Employee {
   _id: mongoose.Schema.Types.ObjectId;
@@ -11,4 +11,4 @@ interface Employee {
   password_reset_token_expires_at: Date | null;
 }
 
-module.exports = Employee;
+module.exports = Employee;*/

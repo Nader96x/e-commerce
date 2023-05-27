@@ -14,7 +14,16 @@ const EmployeeSchema = mongoose.Schema(
       type: String,
       required: [true, "Employee must have an email."],
       unique: [true, "Employee's email must be unique."],
-      format: ["email", "Employee's email must be in email format"],
+      trim: true,
+      lowercase: true,
+      validate: {
+        validator: function (value) {
+          // Regular expression to check if the email is valid
+          const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+          return emailRegex.test(value);
+        },
+        message: "Email must be valid",
+      },
     },
     phone: {
       type: String,
