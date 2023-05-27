@@ -10,15 +10,13 @@ const db = process.env.DATABASE.replace(
 const port = process.env.PORT;
 
 mongoose
-  .connect(db, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then(() => console.log("DB Connected Succesffully"));
+  .createConnection(db)
+  .asPromise()
+  .then(() => {
+    console.log("DB Connected Succesffully");
+    app.listen(port, () => {
+      console.log(`App Running on port ${port}`);
+    });
+  });
 
 // Run The Server
-app.listen(port, () => {
-  console.log(`App Running on port ${port}`);
-});
