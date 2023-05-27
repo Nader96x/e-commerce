@@ -14,9 +14,22 @@ mongoose
   .asPromise()
   .then(() => {
     console.log("DB Connected Succesffully");
+
+    // Run The Server
     app.listen(port, () => {
       console.log(`App Running on port ${port}`);
     });
   });
 
-// Run The Server
+// Handle Unhandled Rejections
+process.on("unhandledRejection", (err) => {
+  console.log("UNHANDLED REJECTION! 💥 Shutting Down...");
+  console.log(err.name, err.message);
+  process.exit(1);
+});
+// Handle uncaught exceptions
+process.on("uncaughtException", (err) => {
+  console.log("UNCAUGHT EXCEPTION! 💥 Shutting Down...");
+  console.log(err.name, err.message);
+  process.exit(1);
+});
