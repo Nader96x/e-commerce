@@ -16,7 +16,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "mongoose": "^7.2.1",
+    "mongoose": "^5.13.17",
     "nodemailer": "^6.9.2",
     "slugify": "^1.6.6"
   },
