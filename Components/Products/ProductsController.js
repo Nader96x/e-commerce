@@ -72,9 +72,11 @@ exports.updateProduct = async (req, res, next) => {
 exports.deleteProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
-    // console.log(product.total_orders);
     if (product.total_orders > 0) {
-      throw new Error("Product Cannot Be Deleted");
+      return res.status(400).json({
+        status: "fail",
+        message: "Product Cannot Be Deleted",
+      });
     }
     await Product.findByIdAndDelete(req.params.id);
     res.status(204).json({

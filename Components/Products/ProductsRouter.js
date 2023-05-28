@@ -3,10 +3,6 @@ const productController = require("./ProductsController");
 const upload = require("../../helpers/upload.helper");
 
 const router = express.Router();
-const assignImage = (req, res, next) => {
-  req.body.image = req.file.location;
-  next();
-};
 
 const assignImages = (req, res, next) => {
   // eslint-disable-next-line array-callback-return
@@ -38,7 +34,14 @@ router
 router
   .route("/:id")
   .get(productController.getOneProduct)
-  .patch(productController.updateProduct)
+  .patch(
+    upload.fields([
+      { name: "image", maxCount: 1 },
+      { name: "images", maxCount: 6 },
+    ]),
+    assignImages,
+    productController.updateProduct
+  )
   .delete(productController.deleteProduct);
 
 module.exports = router;
