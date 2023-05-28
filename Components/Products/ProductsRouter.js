@@ -10,7 +10,7 @@ const assignImage = (req, res, next) => {
 
 const assignImages = (req, res, next) => {
   // eslint-disable-next-line array-callback-return
-  console.log(req.files, "files");
+  // console.log(req.files, "files");
   if (req.files.image && req.files.image.length)
     req.body.image = req.files.image[0].location;
   req.body.images = [];
