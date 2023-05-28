@@ -33,7 +33,6 @@ module.exports.updateEmployee = async (req, res, next) => {
   try {
     const employee = await Employee.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true,
     }).exec();
     res.status(200).json({ status: "success", data: employee });
   } catch (error) {
@@ -44,6 +43,40 @@ module.exports.updateEmployee = async (req, res, next) => {
 module.exports.deleteEmployee = async (req, res, next) => {
   try {
     const employee = await Employee.findByIdAndDelete(req.params.id).exec();
+    res.status(200).json({ status: "success", data: employee });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error });
+  }
+};
+
+module.exports.ban = async (req, res, next) => {
+  try {
+    const employee = await Employee.findByIdAndUpdate(
+      req.params.id,
+      {
+        is_banned: true,
+      },
+      {
+        new: true,
+      }
+    ).exec();
+    res.status(200).json({ status: "success", data: employee });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error });
+  }
+};
+
+module.exports.unban = async (req, res, next) => {
+  try {
+    const employee = await Employee.findByIdAndUpdate(
+      req.params.id,
+      {
+        is_banned: false,
+      },
+      {
+        new: true,
+      }
+    ).exec();
     res.status(200).json({ status: "success", data: employee });
   } catch (error) {
     res.status(400).json({ status: "fail", error });
