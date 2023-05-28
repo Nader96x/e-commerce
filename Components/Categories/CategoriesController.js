@@ -1,7 +1,4 @@
 const Category = require("./Category");
-const upload = require('../../helpers/upload.helper');
-const util = require('util');
-
 
 exports.getAllCategories = async (req, res, next) => {
   try {
@@ -9,9 +6,7 @@ exports.getAllCategories = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       results: categories.length,
-      data: {
-        categories,
-      },
+      data: categories,
     });
   } catch (err) {
     res.status(400).json({
@@ -26,9 +21,7 @@ exports.getOneCategory = async (req, res, next) => {
     const category = await Category.findById(req.params.id);
     res.status(200).json({
       status: "success",
-      data: {
-        category,
-      },
+      data: category,
     });
   } catch (err) {
     res.status(404).json({
@@ -38,18 +31,12 @@ exports.getOneCategory = async (req, res, next) => {
   }
 };
 
-
 exports.createCategory = async (req, res, next) => {
   try {
-    const uploadFile = util.promisify(upload.single('image'));
-    await uploadFile(req, res);
-    req.body.image = req.file.location;
     const newCategory = await Category.create(req.body);
     res.status(201).json({
       status: "success",
-      data: {
-        categories: newCategory,
-      },
+      data: newCategory,
     });
   } catch (err) {
     res.status(400).json({
@@ -67,9 +54,7 @@ exports.updateCategory = async (req, res, next) => {
     });
     res.status(200).json({
       status: "success",
-      data: {
-        category,
-      },
+      data: category,
     });
   } catch (err) {
     res.status(404).json({
@@ -84,9 +69,7 @@ exports.deleteCategory = async (req, res, next) => {
     const category = await Category.findByIdAndDelete(req.params.id);
     res.status(204).json({
       status: "success",
-      data: {
-        category: null,
-      },
+      data: category,
     });
   } catch (err) {
     res.status(400).json({
@@ -101,9 +84,7 @@ exports.deleteAllCategories = async (req, res, next) => {
     const categories = await Category.deleteMany();
     res.status(204).json({
       status: "success",
-      data: {
-        categories: categories,
-      },
+      data: categories,
     });
   } catch (err) {
     res.status(400).json({

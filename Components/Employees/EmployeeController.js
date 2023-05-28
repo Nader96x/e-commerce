@@ -33,6 +33,7 @@ module.exports.updateEmployee = async (req, res, next) => {
   try {
     const employee = await Employee.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
+      runValidators: true,
     }).exec();
     res.status(200).json({ status: "success", data: employee });
   } catch (error) {
