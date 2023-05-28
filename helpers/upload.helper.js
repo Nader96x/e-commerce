@@ -11,8 +11,11 @@ const upload = multer({
     acl: "public-read",
     bucket: process.env.AWS_BUCKET_NAME,
     contentType: multerS3.AUTO_CONTENT_TYPE,
+    cacheControl: "max-age=31536000",
     key: (req, file, cb) => {
-      const fileName = `${Date.now()}_${Math.round(Math.random() * 1e9)}`;
+      const fileName = `categories/${Date.now()}_${Math.round(
+        Math.random() * 1e9
+      )}`;
       cb(null, `${fileName}${path.extname(file.originalname)}`);
     },
   }),
