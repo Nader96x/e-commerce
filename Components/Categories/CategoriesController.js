@@ -1,4 +1,5 @@
 const Category = require("./Category");
+const { uploadImage } = require('../../Utils/uploadImage');
 
 exports.getAllCategories = async (req, res, next) => {
   try {
