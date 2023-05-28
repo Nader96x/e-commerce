@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const EmployeeRouter = require("./Components/Employees/EmployeeRouter");
 const CategoriesRouter = require("./Components/Categories/CategoriesRouter");
+const SettingsRouter = require("./Components/Setting/SettingRouter");
 
 const app = express();
 const v1Router = express.Router();
@@ -14,6 +15,9 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use("/settings", SettingsRouter);
 
 // Dashboard Route
 app.use("/admin", AuthRouter);

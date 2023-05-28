@@ -31,7 +31,7 @@ mongoose
 process.on("unhandledRejection", (err) => {
   // app.exit();
   console.log("UNHANDLED REJECTION! 💥 Shutting Down...");
-  console.log(err.name, err.message);
+  console.log(err.name, err.stack, err.message);
   process.exit(1);
 });
 

@@ -59,7 +59,7 @@ const SettingsSchema = mongoose.Schema({
   name: {
     type: String,
     required: [true, "Employee must have a name."],
-    unique: [true, "Employee's name must be unique."],
+    // unique: [true, "Employee's name must be unique."],
     default: "setting",
   },
   setting: SettingSchema,
@@ -68,13 +68,11 @@ const SettingsSchema = mongoose.Schema({
 // Static Methods
 SettingsSchema.statics = {
   toJSON() {
-    return {
-      setting: this.setting,
-    };
+    return this.setting;
   },
-  find() {
+  /*find() {
     return this.findOne({ name: "setting" });
-  },
+  },*/
   update(args) {
     delete args._id;
     return this.findOneAndUpdate({ name: "setting" }, args, {
@@ -90,8 +88,8 @@ SettingsSchema.statics = {
       runValidators: true,
     });
   },
-  setting() {
-    return this.findOne({ name: "setting" });
+  async setting() {
+    return await this.findOne({ name: "setting" });
   },
 };
 
