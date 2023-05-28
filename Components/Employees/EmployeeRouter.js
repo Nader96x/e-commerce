@@ -3,15 +3,17 @@ const EmployeeController = require("./EmployeeController");
 
 const EmployeeRouter = Router();
 
-EmployeeRouter.get("/", EmployeeController.getAllEmployees).post(
-  "/",
-  EmployeeController.createEmployee
-);
+EmployeeRouter.route("/")
+  .get(EmployeeController.getAllEmployees)
+  .post(EmployeeController.createEmployee);
 
-EmployeeRouter.get("/:id", EmployeeController.getEmployeeById)
-  .patch("/:id", EmployeeController.updateEmployee)
-  .delete("/:id", EmployeeController.deleteEmployee)
-  .post("/:id/ban", EmployeeController.ban)
-  .post("/:id/unban", EmployeeController.unban);
+EmployeeRouter.route("/:id")
+  .get(EmployeeController.getEmployeeById)
+  .patch(EmployeeController.updateEmployee)
+  .delete(EmployeeController.deleteEmployee);
+EmployeeRouter.post("/ban", EmployeeController.ban).post(
+  "/unban",
+  EmployeeController.unban
+);
 
 module.exports = EmployeeRouter;

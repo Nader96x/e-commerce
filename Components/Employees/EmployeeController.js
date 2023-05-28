@@ -43,7 +43,7 @@ module.exports.updateEmployee = async (req, res, next) => {
 module.exports.deleteEmployee = async (req, res, next) => {
   try {
     const employee = await Employee.findByIdAndDelete(req.params.id).exec();
-    res.status(200).json({ status: "success", data: employee });
+    res.status(200).json({ status: "success", data: null });
   } catch (error) {
     res.status(400).json({ status: "fail", error });
   }
