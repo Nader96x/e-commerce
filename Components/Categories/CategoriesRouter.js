@@ -1,7 +1,7 @@
 const express = require("express");
 const categoryController = require("./CategoriesController");
-
 const router = express.Router();
+
 
 router
   .route("/")

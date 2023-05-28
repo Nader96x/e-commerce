@@ -1,5 +1,7 @@
 const Category = require("./Category");
-const { uploadImage } = require('../../Utils/uploadImage');
+const upload = require('../../helpers/upload.helper');
+const util = require('util');
+
 
 exports.getAllCategories = async (req, res, next) => {
   try {
@@ -36,8 +38,12 @@ exports.getOneCategory = async (req, res, next) => {
   }
 };
 
+
 exports.createCategory = async (req, res, next) => {
   try {
+    const uploadFile = util.promisify(upload.single('image'));
+    await uploadFile(req, res);
+    req.body.image = req.file.location;
     const newCategory = await Category.create(req.body);
     res.status(201).json({
       status: "success",
