@@ -1,8 +1,5 @@
 /* eslint-disable node/no-unsupported-features/es-syntax */
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
-const crypto = require("crypto");
-const jwt = require("jsonwebtoken");
 
 const EmployeeSchema = mongoose.Schema(
   {
@@ -46,59 +43,31 @@ const EmployeeSchema = mongoose.Schema(
       required: [true, "Employee must have a password."],
       minLength: [8, "Employee's password can't be less than 8 characters."],
       maxLength: [32, "Employee's password can't be more than 32 characters."],
-      // select: false,
+      select: false,
     },
     role_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",
       required: [true, "Employee must have a role."],
     },
-    is_banned: {
-      type: Boolean,
-      default: false,
-    },
-    password_changed_at: {
-      type: Date,
-      default: null,
-      // select: false,
-    },
     password_reset_token: {
       type: String,
       default: null,
-      // select: false,
+      select: false,
     },
     password_reset_token_expires_at: {
       type: Date,
       default: null,
-      // select: false,
+      select: false,
     },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 // Virtual Properties
-EmployeeSchema.virtual("role").get(function () {
+EmployeeSchema.virtual("id").get(function () {
   return this._id.toHexString();
 });
-
-// Document Middleware
-EmployeeSchema.pre("save", async function (next) {
-  if (!this.isModified("password") && this.isNew) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
-});
-
-EmployeeSchema.pre("save", async function (next) {
-  if (!this.isModified("password") || this.isNew) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  this.password_changed_at = Date.now() - 1000;
-  next();
-});
-// Query Middleware
-/*EmployeeSchema.pre(/^find/, function (next) {
-  this.populate("role_id");
-  next();
-});*/
 
 // Methods
 EmployeeSchema.methods = {
@@ -108,67 +77,13 @@ EmployeeSchema.methods = {
       name: this.name,
       email: this.email,
       phone: this.phone,
-      role: this.role,
-      is_banned: this.is_banned,
+      role_id: this.role_id,
       createdAt: this.createdAt,
-      // updatedAt: this.updatedAt,
-      // role: this.role,
+      updatedAt: this.updatedAt,
     };
   },
-  async ban() {
-    this.is_banned = true;
-    await this.save();
-  },
-  async unban() {
-    this.is_banned = false;
-    await this.save();
-  },
-  async checkPassword(password) {
-    console.log(password, this.password);
-    return await bcrypt.compare(password, this.password);
-  },
-  async createResetPassword() {
-    this.password_reset_token = crypto.randomBytes(32).toString("hex");
-    this.password_reset_token_expires_at = Date.now() + 30 * 60 * 1000;
-    await this.save();
-  },
-  checkResetToken(token) {
-    return (
-      token === this.password_reset_token &&
-      Date.now() < this.password_reset_token_expires_at
-    );
-  },
-  async changePassword(password) {
-    // this.password = await bcrypt.hash(password, 10);
-    this.password = password;
-    // this.password_changed_at = Date.now() - 1000;
-    this.password_reset_token = null;
-    this.password_reset_token_expires_at = null;
-    await this.save();
-  },
-  async generateToken() {
-    return await jwt.sign(
-      { id: this._id.toHexString(), role: this.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      }
-    );
-  },
-  passwordChangedAfter(JWTTimestamp) {
-    if (this.password_changed_at) {
-      const changedTimestamp = parseInt(
-        this.password_changed_at.getTime() / 1000,
-        10
-      );
-      return JWTTimestamp < changedTimestamp;
-    }
-    return false;
-  },
 };
-
-// Export Model
-/*// Statics
+// Statics
 EmployeeSchema.statics = {
   createEmployee(args) {
     return this.create({
@@ -193,5 +108,6 @@ EmployeeSchema.statics = {
   deleteEmployee(id) {
     return this.findByIdAndDelete(id);
   },
-};*/
+};
+// Export Model
 module.exports = mongoose.model("Employee", EmployeeSchema);
