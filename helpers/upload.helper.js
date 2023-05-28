@@ -13,7 +13,7 @@ const upload = multer({
     contentType: multerS3.AUTO_CONTENT_TYPE,
     cacheControl: "max-age=31536000",
     key: (req, file, cb) => {
-      const fileName = `categories/${Date.now()}_${Math.round(
+      const fileName = `Ecommerce/${Date.now()}_${Math.round(
         Math.random() * 1e9
       )}`;
       cb(null, `${fileName}${path.extname(file.originalname)}`);
