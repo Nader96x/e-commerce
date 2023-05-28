@@ -5,6 +5,7 @@ const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const EmployeeRouter = require("./Components/Employees/EmployeeRouter");
 const CategoriesRouter = require("./Components/Categories/CategoriesRouter");
 const SettingsRouter = require("./Components/Setting/SettingRouter");
+const ProductsRouter = require("./Components/Products/ProductsRouter");
 
 const app = express();
 const v1Router = express.Router();
@@ -25,6 +26,7 @@ app.use("/admin", AuthRouter);
 // V1 Routes
 v1Router.use("/employees", EmployeeRouter);
 v1Router.use("/categories", CategoriesRouter);
+v1Router.use("/products", ProductsRouter);
 
 // versioning Routes
 app.use("/api/v1", v1Router);
