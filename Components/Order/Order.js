@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const product = mongoose.Schema({
   _id: {
     type: mongoose.Types.Schema.Types.ObjectId,
@@ -8,11 +9,11 @@ const product = mongoose.Schema({
   quantity: {
     type: Number,
     require: [true, "quantity  is requires"],
-    min:[1, " minimum quantity should be  1 "]
+    min: [1, " minimum quantity should be  1 "],
   },
   price: {
     Type: Number,
-    min:[1, " invaild price should be positive number"],
+    min: [1, " invaild price should be positive number"],
     require: [true, "price  is requires"],
   },
 });
@@ -27,7 +28,7 @@ const address = mongoose.Schema({
   country: { type: String, require: [true, "country is requires"] },
 });
 
-const OrderSchema =  mongoose.Schema(
+const OrderSchema = mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
@@ -65,5 +66,5 @@ const OrderSchema =  mongoose.Schema(
   },
   { timestamps: true }
 );
-const OrderModel = mongoose.Model("Order",OrderSchema)
+const OrderModel = mongoose.Model("Order", OrderSchema);
 module.exports = OrderModel;
