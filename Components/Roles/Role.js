@@ -1,16 +1,29 @@
 const mongoose = require("mongoose");
-mongoose.Schema(
+Permission = mongoose.Schema({
+  entity :{
+    type :String,
+    enum:["category","product","user","role","employee","order"]
+  },
+  access:{
+    canRead:Boolean,
+    canWrite:Boolean,
+    canUpdate:Boolean,
+    canDelete:Boolean
+  }
+});
+const RoleSchema = mongoose.Schema(
   {
     name: {
       type: "string",
       trim: true,
       required: [true, " role name  is required"],
     },
-    slug: {
-      type: "string",
-      trim: true,
-      lowercase: true,
-    },
+    permissions: {
+      type: [Permission],
+      required: [true, " permissions  is required"],
+    }
   },
   { timestamps: true }
 );
+const RoleModel = mongoose.model("Role",RoleSchema)
+module.exports = RoleModel;

@@ -7,32 +7,32 @@ const Factory = require("../../Utils/Factory")
  * @access private[admin]
  */
 
-module.exports.getOrders = Factory.getAll(RoleModel)
+module.exports.getRoles = Factory.getAll(RoleModel)
 
 /*
- * @description get specific role by orderID
+ * @description get specific role by RoleID
  * @route GET /api/v1/roles/:id
- * @access private[ user - admin ]
+ * @access private[ admin ]
  */
-module.exports.getOrder = Factory.getOne(RoleModel)
+module.exports.getRole = Factory.getOne(RoleModel)
 /*
- * @description auth user Create new order
+ * @description auth user Create new Role
  * @route POST /api/v1/roles
- * @access private[user]
+ * @access private[admin]
  */
-module.exports.createOrder = Factory.createOne(RoleModel)
+module.exports.createRole = Factory.createOne(RoleModel)
 
 /*
- * @description update specific order by orderID / admin can edit order status  only
+ * @description update specific Role by RoleID / admin can edit Role status  only
  * @route PATCH /api/v1/roles/:id
- * @access private[user - admin ]
+ * @access private[admin ]
  */
 
-module.exports.updateOrder = Factory.updateOne(RoleModel)
+module.exports.updateRole = Factory.updateOne(RoleModel)
 
 /*
- * @description delete specific order by orderID
+ * @description delete specific Role by RoleID
  * @route DELETE /api/v1/roles/:id
- * @access private[user]
+ * @access private[admin]
  */
-module.exports.deleteOrder = Factory.deleteOne(RoleModel)
+module.exports.deleteRole = Factory.deleteOne(RoleModel)
