@@ -21,6 +21,9 @@ exports.getAllUsers = async (req, res, next) => {
 exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
+    if (!user) {
+      return next(new Error("User Not Found"));
+    }
     res.status(200).json({
       status: "success",
       data: {
@@ -52,7 +55,10 @@ exports.createUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
+      return next(new Error("User Not Found"));
+    }
     res.status(204).json({
       status: "success",
       data: null,
