@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
-const ApiError = require("../Utils/ApiError");
-const ApiFeatures = require("../Utils/ApiFeatures");
+const ApiError = require("./ApiError");
+const ApiFeatures = require("./ApiFeatures");
 
 module.exports.getAll = (Model) =>
   asyncHandler(async ({ body, query }, res, next) => {
