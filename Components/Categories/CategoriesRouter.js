@@ -5,7 +5,15 @@ const upload = require("../../helpers/upload.helper");
 const router = express.Router();
 
 const assignImage = (req, res, next) => {
-  req.body.image = req.file.location;
+  console.log(req.file.image);
+  // if (req.file.image && req.file.image.length) {
+  //   req.body.image = req.file.location;
+  // }
+  next();
+};
+
+const imageUpdate = (req, res, next) => {
+  // if (req.file.image && req.file.image.length) upload.single("image");
   next();
 };
 
@@ -18,7 +26,7 @@ router
 router
   .route("/:id")
   .get(categoryController.getOneCategory)
-  .patch(upload.single("image"), assignImage, categoryController.updateCategory)
+  .patch(imageUpdate, assignImage, categoryController.updateCategory)
   .delete(categoryController.deleteCategory);
 
 module.exports = router;

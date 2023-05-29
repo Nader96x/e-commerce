@@ -140,5 +140,6 @@ userSchema.pre("save", async function (next) {
 });
 
 const User = mongoose.model("User", userSchema);
+const Address = mongoose.model("Address", AddressSchema);
 
-module.exports = User;
+module.exports = { User, Address };
