@@ -7,6 +7,8 @@ const CategoriesRouter = require("./Components/Categories/CategoriesRouter");
 const SettingsRouter = require("./Components/Setting/SettingRouter");
 const ProductsRouter = require("./Components/Products/ProductsRouter");
 const UsersRouter = require("./Components/Users/UsersRouter");
+const OrderRouter = require("./Components/Order/OrdersRouter")
+const RolesRouter = require("./Components/Roles/RolesRouter")
 
 const app = express();
 const v1Router = express.Router();
@@ -29,6 +31,8 @@ v1Router.use("/employees", EmployeeRouter);
 v1Router.use("/categories", CategoriesRouter);
 v1Router.use("/products", ProductsRouter);
 v1Router.use("/users", UsersRouter);
+v1Router.use("/orders", OrderRouter);
+v1Router.use("/roles", RolesRouter);
 
 // versioning Routes
 app.use("/api/v1", v1Router);
