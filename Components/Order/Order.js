@@ -31,7 +31,7 @@ const address = mongoose.Schema({
 const OrderSchema = mongoose.Schema(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.SchemaTypes.ObjectId,
       ref: "User",
       require: [true, "user requires"],
     },
@@ -64,7 +64,7 @@ const OrderSchema = mongoose.Schema(
     payment_method: String,
     payment_id: Number,
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  { timestamps: true }
 );
 const OrderModel = mongoose.model("Order", OrderSchema);
 module.exports = OrderModel;

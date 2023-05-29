@@ -4,7 +4,6 @@ const ApiFeatures = require("./ApiFeatures");
 
 module.exports.getAll = (Model) =>
   asyncHandler(async ({ body, query }, res, next) => {
-
     let filter = {};
     if (body.filterObject) filter = body.filterObject;
 
@@ -20,6 +19,7 @@ module.exports.getAll = (Model) =>
       .status(200)
       .json({ result: documents.length, paginationResult, data: documents });
   });
+
 /*
  get one document handler for endpoint
   @param {Model} model
@@ -36,12 +36,12 @@ module.exports.getOne = (Model, populateOption) =>
 
     res.status(200).json({ data: document });
   });
+
 /*
  create one handler for endpoint
  @param {Model} model
  @return {response} response {document<model>}
 */
-
 module.exports.createOne = (Model) =>
   asyncHandler(async ({ body }, res, next) => {
     const document = await Model.create(body);
@@ -55,7 +55,6 @@ module.exports.createOne = (Model) =>
  @param {Model} model
  @return {response} response {document<model>}
 */
-
 module.exports.updateOne = (Model) =>
   asyncHandler(async ({ body, params }, res, next) => {
     const { id } = params;
