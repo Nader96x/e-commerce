@@ -53,7 +53,7 @@ const OrderSchema =  mongoose.Schema(
         type: Date,
         require: [true, "status update date = is requires"],
       },
-      addresses: [address],
+      address: address,
     },
     payment_status: {
       type: String,
