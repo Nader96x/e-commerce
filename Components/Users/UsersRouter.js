@@ -7,20 +7,17 @@ const router = express.Router();
 
 const assignImage = (req, res, next) => {
   if (req.file) {
-    req.body.image = req.file.location;
+    if (req.file.image) {
+      req.body.image = req.file.location;
+    }
   }
-  next();
-};
-
-const imageUpload = (req, res, next) => {
-  if (req.file) upload.single("image");
   next();
 };
 
 router
   .route("/")
   .get(usersController.getAllUsers)
-  .post(imageUpload, assignImage, usersController.createUser);
+  .post(upload.single("image"), assignImage, usersController.createUser);
 router
   .route("/:id")
   .get(usersController.getUser)
