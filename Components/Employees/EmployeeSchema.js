@@ -49,7 +49,7 @@ const EmployeeSchema = mongoose.Schema(
       // select: false,
     },
     role_id: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.SchemaTypes.ObjectId,
       ref: "Role",
       required: [true, "Employee must have a role."],
     },
