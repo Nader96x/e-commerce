@@ -45,7 +45,7 @@ const EmployeeSchema = mongoose.Schema(
       type: String,
       required: [true, "Employee must have a password."],
       minLength: [8, "Employee's password can't be less than 8 characters."],
-      maxLength: [32, "Employee's password can't be more than 32 characters."],
+      // maxLength: [32, "Employee's password can't be more than 32 characters."],
       // select: false,
     },
     role_id: {
@@ -78,20 +78,27 @@ const EmployeeSchema = mongoose.Schema(
 
 // Virtual Properties
 EmployeeSchema.virtual("role").get(function () {
-  return this._id.toHexString();
+  return this.role_id;
 });
 
 // Document Middleware
-EmployeeSchema.pre("save", async function (next) {
-  if (!this.isModified("password") && this.isNew) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+EmployeeSchema.pre(/^find/, async (next) => {
+  // this.populate("role_id");
   next();
 });
 
 EmployeeSchema.pre("save", async function (next) {
-  if (!this.isModified("password") || this.isNew) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  this.password_changed_at = Date.now() - 1000;
+  console.log(
+    "pre save",
+    this.password,
+    this.isModified("password"),
+    this.isNew
+  );
+  if (this.isModified("password") || this.isNew) {
+    this.password = await bcrypt.hash(this.password, 10);
+    this.password_changed_at = Date.now() - 1000;
+    console.log(this.password_changed_at);
+  }
   next();
 });
 // Query Middleware
@@ -112,7 +119,7 @@ EmployeeSchema.methods = {
       is_banned: this.is_banned,
       createdAt: this.createdAt,
       // updatedAt: this.updatedAt,
-      // role: this.role,
+      role_id: this.role_id,
     };
   },
   async ban() {
@@ -124,13 +131,16 @@ EmployeeSchema.methods = {
     await this.save();
   },
   async checkPassword(password) {
-    console.log(password, this.password);
+    // console.log(password, this.password);
     return await bcrypt.compare(password, this.password);
   },
-  async createResetPassword() {
+  async createResetPasswordToken() {
+    // console.log("createResetPasswordToken");
+    // console.log(this);
     this.password_reset_token = crypto.randomBytes(32).toString("hex");
     this.password_reset_token_expires_at = Date.now() + 30 * 60 * 1000;
     await this.save();
+    return this.password_reset_token;
   },
   checkResetToken(token) {
     return (
@@ -144,7 +154,7 @@ EmployeeSchema.methods = {
     // this.password_changed_at = Date.now() - 1000;
     this.password_reset_token = null;
     this.password_reset_token_expires_at = null;
-    await this.save();
+    await this.save({ ValidateBeforeSave: true });
   },
   async generateToken() {
     return await jwt.sign(
@@ -168,30 +178,11 @@ EmployeeSchema.methods = {
 };
 
 // Export Model
-/*// Statics
+// Statics
+
 EmployeeSchema.statics = {
-  createEmployee(args) {
-    return this.create({
-      ...args,
-    });
+  async findByEmail(email) {
+    return this.findOne({ email });
   },
-  getEmployeeById(id) {
-    return this.findById(id).populate("role_id");
-  },
-  getEmployeeByEmail(email) {
-    return this.findOne({ email }).populate("role_id");
-  },
-  getEmployeeByPhone(phone) {
-    return this.findOne({ phone }).populate("role_id");
-  },
-  getEmployees() {
-    return this.find().populate("role_id");
-  },
-  updateEmployee(id, args) {
-    return this.findByIdAndUpdate(id, { $set: args });
-  },
-  deleteEmployee(id) {
-    return this.findByIdAndDelete(id);
-  },
-};*/
+};
 module.exports = mongoose.model("Employee", EmployeeSchema);

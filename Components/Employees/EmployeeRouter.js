@@ -11,9 +11,9 @@ EmployeeRouter.route("/:id")
   .get(EmployeeController.getEmployeeById)
   .patch(EmployeeController.updateEmployee)
   .delete(EmployeeController.deleteEmployee);
-EmployeeRouter.post("/ban", EmployeeController.ban).post(
-  "/unban",
-  EmployeeController.unban
-);
+//
+EmployeeRouter.post("/:id/ban", EmployeeController.ban)
+  .post("/:id/unban", EmployeeController.unban)
+  .patch("/:id/update-password", EmployeeController.updatePassword);
 
 module.exports = EmployeeRouter;

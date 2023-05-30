@@ -6,22 +6,24 @@ module.exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     const employee = await Employee.findOne({ email }).exec();
     if (!employee) {
+      if (process.env.NODE_ENV === "development")
+        console.log("Email not found");
       return res
         .status(400)
-        .json({ status: "fail", message: "Invalid Credentials1" });
+        .json({ status: "fail", message: "Invalid Credentials" });
     }
-    console.log(employee);
     const isMatch = await employee.checkPassword(password);
     if (!isMatch) {
+      if (process.env.NODE_ENV === "development")
+        console.log("Password not correct");
       return res
         .status(400)
         .json({ status: "fail", message: "Invalid Credentials2" });
     }
     const token = await employee.generateToken();
-    // const token = "await employee.generateToken()";
     res
       .status(200)
-      .json({ status: "success", data: { ...employee.toJSON(), token } });
+      .json({ status: "success", data: { user: employee, token } });
   } catch (error) {
     res.status(400).json({ status: "fail", error });
   }
@@ -66,6 +68,43 @@ module.exports.protect = async (req, res, next) => {
     }
     req.user = employee;
     next();
+  } catch (error) {
+    res.status(400).json({ status: "fail", error });
+  }
+};
+
+module.exports.resetPasswordToken = async (req, res, next) => {
+  const user = await Employee.findByEmail(req.body.email);
+  if (!user) {
+    return res.status(404).json({ status: "fail", message: "No user found" });
+  }
+  // console.log(req.body);
+  const token = await user.createResetPasswordToken();
+  if (process.env.NODE_ENV === "development")
+    res.status(200).json({ status: "success", data: token });
+  else res.status(200).json({ status: "success", data: null });
+};
+
+module.exports.resetPassword = async (req, res, next) => {
+  try {
+    const { token: rest_token, password, password_confirm } = req.body;
+    if (password !== password_confirm) {
+      return res
+        .status(400)
+        .json({ status: "fail", message: "Passwords do not match" });
+    }
+    const user = await Employee.findByEmail(req.body.email);
+    if (!user) {
+      return res.status(404).json({ status: "fail", message: "No user found" });
+    }
+    if (!user.checkResetToken(rest_token)) {
+      return res.status(401).json({ status: "fail", message: "Invalid token" });
+    }
+
+    await user.changePassword(password);
+    await user.save();
+    const token = await user.generateToken();
+    res.status(200).json({ status: "success", data: { user, token } });
   } catch (error) {
     res.status(400).json({ status: "fail", error });
   }
