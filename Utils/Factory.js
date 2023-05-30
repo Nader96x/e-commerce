@@ -45,7 +45,7 @@ module.exports.getOne = (Model, populateOption) =>
 module.exports.createOne = (Model) =>
   asyncHandler(async ({ body }, res, next) => {
     const document = await Model.create(body);
-    if (!document) return next(new ApiError(` bas request`, 400));
+    if (!document) return next(new ApiError(` bad request`, 400));
 
     res.status(201).json({ data: document });
   });

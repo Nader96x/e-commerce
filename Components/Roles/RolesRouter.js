@@ -9,7 +9,7 @@ const {
 
 const router = express.Router();
 
-router.route("/").get(getRoles).post(getRole);
-router.route("/:id").get(createRole).patch(updateRole).delete(deleteRole);
+router.route("/").get(getRoles).post(createRole);
+router.route("/:id").get(getRole).patch(updateRole).delete(deleteRole);
 
 module.exports = router;
