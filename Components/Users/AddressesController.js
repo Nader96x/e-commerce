@@ -7,7 +7,6 @@ exports.getAllAddresses = async (req, res, next) => {
       return next(new Error("User Not Found"));
     }
     const addresses = user.address;
-    console.log(addresses);
     res.status(200).json({
       status: "success",
       data: {
@@ -55,7 +54,7 @@ exports.addAddress = async (req, res, next) => {
       return next(new Error("User Not Found"));
     }
     await user.address.push(await Address.create(req.body));
-    await user.save();
+    await user.update(user);
     res.status(201).json({
       status: "success",
       data: {
@@ -70,15 +69,54 @@ exports.addAddress = async (req, res, next) => {
   }
 };
 
-exports.deleteAddress = async (req, res, next) => {
+exports.updateAddress = async (req, res, next) => {
+  const userId = req.params.id;
+  const addressId = req.params.address;
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(userId);
     if (!user) {
       return next(new Error("User Not Found"));
     }
-    const address = await user.address.filter(
-      (el) => el._id == req.params.address
+    const address = await user.address.filter((el) => el._id == addressId);
+    if (address.length === 0) {
+      return next(new Error("Address Not Found"));
+    }
+    const addressIndex = await user.address.findIndex(
+      ({ _id }) => _id == addressId
     );
+    const newAddress = await Address.findByIdAndUpdate(
+      req.params.address,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    await user.address.splice(addressIndex, 1, newAddress);
+    await user.update(user);
+    res.status(200).json({
+      status: "success",
+      data: {
+        newAddress,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: "fail",
+      message: err.message,
+    });
+  }
+};
+
+exports.deleteAddress = async (req, res, next) => {
+  const userId = req.params.id;
+  const addressId = req.params.address;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return next(new Error("User Not Found"));
+    }
+    const address = await user.address.filter((el) => el._id == addressId);
     if (address.length === 0) {
       return next(new Error("Address Not Found"));
     }
@@ -86,10 +124,11 @@ exports.deleteAddress = async (req, res, next) => {
       return next(new Error("Cannot Delete your only address"));
     }
     const addressIndex = await user.address.findIndex(
-      ({ _id }) => _id == req.params.address
+      ({ _id }) => _id == addressId
     );
     await user.address.splice(addressIndex, 1);
-    user.save();
+    await user.update(user);
+    await Address.findByIdAndDelete(addressId);
     res.status(200).json({
       status: "success",
       data: {
