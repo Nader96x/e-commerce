@@ -23,7 +23,7 @@ exports.addAddress = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     await user.address.push(await Address.create(req.body));
-    await user.update(user);
+    await user.save();
     res.status(201).json({
       status: "success",
       data: {
