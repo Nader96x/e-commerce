@@ -6,9 +6,7 @@ const router = express.Router();
 
 const assignImage = (req, res, next) => {
   if (req.file) {
-    if (req.file.image) {
-      req.body.image = req.file.location;
-    }
+    req.body.image = req.file.location;
   }
   next();
 };
