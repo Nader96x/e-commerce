@@ -1,4 +1,4 @@
-const { User } = require("./User");
+const { User, Address } = require("./User");
 
 exports.getAllUsers = async (req, res, next) => {
   try {
@@ -41,9 +41,10 @@ exports.getUser = async (req, res, next) => {
 exports.createUser = async (req, res, next) => {
   try {
     const newUser = await User.create(req.body);
+    const mainAddress = await Address.create(req.body.address);
     res.status(201).json({
       status: "success",
-      data: newUser,
+      data: { newUser, mainAddress },
     });
   } catch (err) {
     res.status(400).json({
@@ -55,6 +56,9 @@ exports.createUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
+    const userAddresses = User.findById(req.params.id).address.map(
+      (address) => address._id
+    );
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       return next(new Error("User Not Found"));

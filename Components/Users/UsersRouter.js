@@ -29,6 +29,7 @@ router
 router
   .route("/:id/address/:address")
   .get(addressesController.getAddress)
+  .patch(addressesController.updateAddress)
   .delete(addressesController.deleteAddress);
 
 module.exports = router;
