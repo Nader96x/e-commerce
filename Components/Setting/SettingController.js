@@ -3,34 +3,9 @@ const Setting = require("./SettingSchema");
 module.exports.getSettings = async (req, res) => {
   try {
     // console.log("getSettings");
-    let settings = await Setting.setting();
+    const settings = await Setting.setting();
     // console.log("settings", settings);
-    if (!settings) {
-      settings = await Setting.create({
-        name: "setting",
-        setting: {
-          logo: "",
-          email: "",
-          locations: [],
-          // phone: "",
-          terms_and_conditions: "",
-          about_us: "",
-          social_media: {
-            facebook: "",
-            twitter: "",
-            instagram: "",
-            linkedin: "",
-          },
-          /*address: {
-            street: "",
-            city: "",
-            state: "",
-            country: "",
-          },*/
-          banners: [],
-        },
-      });
-    }
+
     res.status(200).json({ status: "success", data: settings.setting });
   } catch (error) {
     res.status(400).json({ status: "fail", error });

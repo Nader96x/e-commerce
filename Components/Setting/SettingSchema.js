@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const BannerSchema = mongoose.Schema({
+  _id: false,
   image: {
     type: String,
     required: [true, "Banner must have an image."],
@@ -16,32 +17,39 @@ const BannerSchema = mongoose.Schema({
 });
 
 const AddressSchema = mongoose.Schema({
+  _id: false,
   street: {
     type: String,
-    required: [true, "Address must have a street."],
+    // required: [true, "Address must have a street."],
   },
   city: {
     type: String,
-    required: [true, "Address must have a city."],
+    // required: [true, "Address must have a city."],
   },
   state: {
     type: String,
-    required: [true, "Address must have a state."],
+    // required: [true, "Address must have a state."],
   },
   country: {
     type: String,
-    required: [true, "Address must have a country."],
+    // required: [true, "Address must have a country."],
   },
 });
 
 const SettingSchema = mongoose.Schema({
+  _id: false,
   logo: String,
   email: String,
   locations: [Object],
   phone: {
     type: String,
-    minLength: [10, "Setting's phone number can't be less than 10 characters"],
-    maxLength: [10, "Setting's phone number can't be more than 10 characters"],
+    validate: {
+      validator: function (value) {
+        const egyptianRegex = /^01[0125][0-9]{8}$/;
+        return egyptianRegex.test(value);
+      },
+      message: "Please enter Valid phone number",
+    },
   },
   terms_and_conditions: String,
   about_us: String,
@@ -51,7 +59,10 @@ const SettingSchema = mongoose.Schema({
     instagram: String,
     linkedin: String,
   },
-  address: AddressSchema,
+  address: {
+    type: AddressSchema,
+    required: [true, "Setting must have an address."],
+  },
   banners: [BannerSchema],
 });
 
@@ -89,7 +100,34 @@ SettingsSchema.statics = {
     });
   },
   async setting() {
-    return await this.findOne({ name: "setting" });
+    let setting = await this.findOne({ name: "setting" });
+    if (!setting) {
+      setting = await this.create({
+        name: "setting",
+        setting: {
+          logo: "",
+          email: "",
+          locations: [],
+          // phone: "",
+          terms_and_conditions: "",
+          about_us: "",
+          social_media: {
+            facebook: "",
+            twitter: "",
+            instagram: "",
+            linkedin: "",
+          },
+          address: {
+            street: "",
+            city: "",
+            state: "",
+            country: "",
+          },
+          banners: [],
+        },
+      });
+    }
+    return setting;
   },
 };
 

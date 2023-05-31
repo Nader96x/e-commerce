@@ -31,14 +31,13 @@ const EmployeeSchema = mongoose.Schema(
     phone: {
       type: String,
       required: [true, "Employee must have a phone number."],
-      minLength: [
-        10,
-        "Employee's phone number can't be less than 10 characters",
-      ],
-      maxLength: [
-        12,
-        "Employee's phone number can't be more than 10 characters",
-      ],
+      validate: {
+        validator: function (value) {
+          const egyptianRegex = /^01[0125][0-9]{8}$/;
+          return egyptianRegex.test(value);
+        },
+        message: "Please enter Valid phone number",
+      },
       unique: [true, "Employee's phone number must be unique."],
     },
     password: {
