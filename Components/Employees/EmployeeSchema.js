@@ -79,7 +79,12 @@ const EmployeeSchema = mongoose.Schema(
       // select: false,
     },
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    skipVersioning: { dontVersionMe: true },
+  }
 );
 
 // Virtual Properties
@@ -123,6 +128,35 @@ EmployeeSchema.methods = {
       // updatedAt: this.updatedAt,
       // role_id: this.role_id._id,
     };
+  },
+  async isAuthorized(method, routes) {
+    // console.log("isAuthorized");
+    // console.log(method, routes);
+    // console.log(this.role_id);
+    if (!this.role_id || routes.length < 3) return false;
+    const entityObj = this.role_id.permissions.find(
+      (perm) =>
+        // console.log(perm.entity, routes[2]);
+        perm.entity == routes[2]
+    );
+    // console.log(entityObj);
+    if (!entityObj || !entityObj.access) return false;
+    if (
+      routes.length == 5 &&
+      method == "POST" &&
+      (routes[4] == "ban" || routes[4] == "ban")
+    ) {
+      // console.log("ban");
+      if (
+        (routes[4] == "ban" && entityObj.access.ban) ||
+        routes[4] == "unban" ||
+        entityObj.access.unban
+      )
+        return true;
+    } else if (entityObj.access.all || entityObj.access[method.toLowerCase()]) {
+      return true;
+    }
+    return false;
   },
   async ban() {
     this.is_banned = true;

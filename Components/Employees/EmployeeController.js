@@ -11,7 +11,7 @@ module.exports.getAllEmployees = async (req, res, next) => {
 
 module.exports.getEmployeeById = async (req, res, next) => {
   try {
-    console.log(req.params.id);
+    // console.log(req.params.id);
     const employee = await Employee.findById(req.params.id).exec();
     res.status(200).json({ status: "success", data: employee });
   } catch (error) {
@@ -21,7 +21,7 @@ module.exports.getEmployeeById = async (req, res, next) => {
 
 module.exports.createEmployee = async (req, res, next) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const employee = await Employee.create(req.body);
     res.status(201).json({ status: "success", data: employee });
   } catch (error) {
@@ -89,7 +89,9 @@ module.exports.updatePassword = async (req, res, next) => {
       return res
         .status(400)
         .json({ status: "fail", message: "Passwords do not match" });
-    const employee = await Employee.findById(req.params.id).exec();
+    // const employee = await Employee.findById(req.params.id).exec();
+    const employee = req.user;
+    console.log(employee);
     await employee.changePassword(req.body.password);
     const token = await employee.generateToken();
 

@@ -1,17 +1,23 @@
 const mongoose = require("mongoose");
 
 const Permission = mongoose.Schema({
+  _id: false,
   entity: {
     type: String,
-    enum: ["category", "product", "user", "role", "employee", "order"],
+    enum: ["categories", "products", "users", "roles", "employees", "orders"],
   },
   access: {
-    canRead: Boolean,
+    /*canRead: Boolean,
     canWrite: Boolean,
     canUpdate: Boolean,
     canDelete: Boolean,
     canBan: Boolean,
-    canUnban: Boolean,
+    canUnban: Boolean,*/
+    get: Boolean,
+    post: Boolean,
+    patch: Boolean,
+    delete: Boolean,
+    ban: Boolean,
   },
 });
 const RoleSchema = mongoose.Schema(

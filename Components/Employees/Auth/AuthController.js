@@ -78,6 +78,22 @@ module.exports.protect = async (req, res, next) => {
   }
 };
 
+module.exports.authorized = async (req, res, next) => {
+  const employee = req.user;
+  const { method } = req;
+  // const route = req.route.path;
+  // get full array of all resources in the url
+  const routes = req.originalUrl.split("/").slice(1);
+  // console.log(method, routes, employee.role, employee.role_id, req.originalUrl);
+  const isAuthorized = await employee.isAuthorized(method, routes);
+  if (!isAuthorized) {
+    return res
+      .status(401)
+      .json({ status: "fail", message: "You are not authorized" });
+  }
+  next();
+};
+
 module.exports.resetPasswordToken = async (req, res, next) => {
   const user = await Employee.findByEmail(req.body.email);
   if (!user) {
