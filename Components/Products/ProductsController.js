@@ -1,4 +1,5 @@
 const Product = require("./Product");
+const User = require("../Users/User");
 
 exports.getAllProducts = async (req, res, next) => {
   try {
@@ -83,6 +84,28 @@ exports.deleteProduct = async (req, res, next) => {
     res.status(404).json({
       status: "fail",
       message: err,
+    });
+  }
+};
+
+exports.searchProductByName = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    const regex = new RegExp(name, "i");
+    const products = await Product.find({
+      $or: [{ name_en: regex }, { name_ar: regex }],
+    });
+    if (products.length <= 0) {
+      return next(new Error("Products not Found"));
+    }
+    res.status(200).json({
+      status: "success",
+      data: products,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: "Products not Found",
     });
   }
 };

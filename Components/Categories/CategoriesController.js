@@ -1,4 +1,5 @@
 const Category = require("./Category");
+const Product = require("../Products/Product");
 
 exports.getAllCategories = async (req, res, next) => {
   try {
@@ -90,6 +91,28 @@ exports.deleteAllCategories = async (req, res, next) => {
     res.status(400).json({
       status: "fail",
       message: `Error: ${err}`,
+    });
+  }
+};
+
+exports.searchCategoryByName = async (req, res, next) => {
+  try {
+    const { name } = req.body;
+    const regex = new RegExp(name, "i");
+    const products = await Category.find({
+      $or: [{ name_en: regex }, { name_ar: regex }],
+    });
+    if (products.length <= 0) {
+      return next(new Error("Categories not Found"));
+    }
+    res.status(200).json({
+      status: "success",
+      data: products,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: "Categories not Found",
     });
   }
 };

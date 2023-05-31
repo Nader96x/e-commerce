@@ -1,6 +1,7 @@
 const express = require("express");
 const categoryController = require("./CategoriesController");
 const upload = require("../../helpers/upload.helper");
+const productController = require("../Products/ProductsController");
 
 const router = express.Router();
 
@@ -22,5 +23,7 @@ router
   .get(categoryController.getOneCategory)
   .patch(upload.single("image"), assignImage, categoryController.updateCategory)
   .delete(categoryController.deleteCategory);
+
+router.post("/search", categoryController.searchCategoryByName);
 
 module.exports = router;
