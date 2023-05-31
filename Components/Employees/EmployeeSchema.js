@@ -36,7 +36,7 @@ const EmployeeSchema = mongoose.Schema(
         "Employee's phone number can't be less than 10 characters",
       ],
       maxLength: [
-        10,
+        12,
         "Employee's phone number can't be more than 10 characters",
       ],
       unique: [true, "Employee's phone number must be unique."],
@@ -51,6 +51,13 @@ const EmployeeSchema = mongoose.Schema(
     role_id: {
       type: mongoose.SchemaTypes.ObjectId,
       ref: "Role",
+      validate: {
+        validator: async function (value) {
+          const role = await mongoose.model("Role").findById(value);
+          return role;
+        },
+        message: "Role doesn't exist.",
+      },
       required: [true, "Employee must have a role."],
     },
     is_banned: {
@@ -78,12 +85,12 @@ const EmployeeSchema = mongoose.Schema(
 
 // Virtual Properties
 EmployeeSchema.virtual("role").get(function () {
-  return this.role_id;
+  return this.role_id.name;
 });
 
-// Document Middleware
-EmployeeSchema.pre(/^find/, async (next) => {
-  // this.populate("role_id");
+// Query Middleware
+EmployeeSchema.pre(/^find/, function (next) {
+  this.populate("role_id");
   next();
 });
 
@@ -101,11 +108,6 @@ EmployeeSchema.pre("save", async function (next) {
   }
   next();
 });
-// Query Middleware
-/*EmployeeSchema.pre(/^find/, function (next) {
-  this.populate("role_id");
-  next();
-});*/
 
 // Methods
 EmployeeSchema.methods = {
@@ -118,8 +120,9 @@ EmployeeSchema.methods = {
       role: this.role,
       is_banned: this.is_banned,
       createdAt: this.createdAt,
+      last_password_changed_at: this.password_changed_at,
       // updatedAt: this.updatedAt,
-      role_id: this.role_id,
+      // role_id: this.role_id._id,
     };
   },
   async ban() {
