@@ -1,9 +1,11 @@
 const { Router } = require("express");
 const EmployeeController = require("./EmployeeController");
+const { protect } = require("./Auth/AuthController");
 
 const EmployeeRouter = Router();
 
 EmployeeRouter.route("/")
+  .all(protect)
   .get(EmployeeController.getAllEmployees)
   .post(EmployeeController.createEmployee);
 

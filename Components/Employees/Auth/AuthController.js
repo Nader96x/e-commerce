@@ -66,6 +66,11 @@ module.exports.protect = async (req, res, next) => {
         .status(401)
         .json({ status: "fail", message: "Password changed recently" });
     }
+    if (employee.is_banned) {
+      return res
+        .status(401)
+        .json({ status: "fail", message: "You are banned" });
+    }
     req.user = employee;
     next();
   } catch (error) {
