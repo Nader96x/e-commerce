@@ -5,7 +5,7 @@ const { protect } = require("./Auth/AuthController");
 const EmployeeRouter = Router();
 
 EmployeeRouter.route("/")
-  .all(protect)
+  // .all(protect)
   .get(EmployeeController.getAllEmployees)
   .post(EmployeeController.createEmployee);
 
