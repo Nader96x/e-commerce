@@ -45,4 +45,6 @@ router
   )
   .delete(productController.deleteProduct);
 
+router.post("/search", productController.searchProductByName);
+
 module.exports = router;
