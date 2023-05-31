@@ -20,6 +20,7 @@ const RoleSchema = mongoose.Schema(
       type: "string",
       trim: true,
       required: [true, "role name is required"],
+      unique: true,
     },
     permissions: {
       type: [Permission],
