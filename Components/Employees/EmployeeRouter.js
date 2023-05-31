@@ -5,7 +5,7 @@ const { protect, authorized } = require("./Auth/AuthController");
 const EmployeeRouter = Router();
 EmployeeRouter.all(protect, authorized);
 EmployeeRouter.route("/")
-  .all(protect, authorized)
+  // .all(protect, authorized)
   .get(EmployeeController.getAllEmployees)
   .post(EmployeeController.createEmployee);
 
@@ -16,7 +16,7 @@ EmployeeRouter.patch(
 );
 
 EmployeeRouter.route("/:id")
-  .all(protect, authorized)
+  // .all(protect, authorized)
   .get(EmployeeController.getEmployeeById)
   .patch(EmployeeController.updateEmployee)
   .delete(EmployeeController.deleteEmployee);

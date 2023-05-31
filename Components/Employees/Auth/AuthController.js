@@ -1,5 +1,6 @@
 const { verify } = require("jsonwebtoken");
 const Employee = require("../EmployeeSchema");
+const Email = require("../../../utils/emailSender");
 
 module.exports.login = async (req, res, next) => {
   try {
@@ -101,6 +102,12 @@ module.exports.resetPasswordToken = async (req, res, next) => {
   }
   // console.log(req.body);
   const token = await user.createResetPasswordToken();
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/employees/reset-password/${token}`;
+
+  const email = new Email(user, resetURL);
+  await email.sendPasswordReset();
   if (process.env.NODE_ENV === "development")
     res.status(200).json({ status: "success", data: token });
   else res.status(200).json({ status: "success", data: null });
