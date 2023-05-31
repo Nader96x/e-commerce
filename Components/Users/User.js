@@ -3,6 +3,7 @@ const slugify = require("slugify");
 const bcrypt = require("bcryptjs");
 
 const AddressSchema = new mongoose.Schema({
+  _id: { type: mongoose.SchemaTypes.ObjectId, auto: true },
   area: {
     type: String,
     required: [true, "Please Enter Your Area"],
@@ -35,7 +36,7 @@ const cartProductsSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Product Quantity is required"],
   },
-});
+}); // Schema For the Cart
 
 const userSchema = mongoose.Schema(
   {
@@ -96,18 +97,24 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    address: [
-      {
-        type: AddressSchema,
-        required: [true, "User Must Have an Address"],
+    address: {
+      type: [
+        {
+          type: AddressSchema,
+        },
+      ],
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: "User must have at least One Address",
       },
-    ],
-    cart: [
-      {
-        type: cartProductsSchema,
-        required: false,
-      },
-    ],
+    },
+    cart: {
+      type: [
+        {
+          type: cartProductsSchema,
+        },
+      ],
+    },
     reset_password_token: {
       type: String,
       default: null,
@@ -118,6 +125,10 @@ const userSchema = mongoose.Schema(
     },
     email_token: {
       type: String,
+      default: null,
+    },
+    verified_at: {
+      type: Date,
       default: null,
     },
   },
@@ -140,6 +151,5 @@ userSchema.pre("save", async function (next) {
 });
 
 const User = mongoose.model("User", userSchema);
-const Address = mongoose.model("Address", AddressSchema);
 
-module.exports = { User, Address };
+module.exports = User;

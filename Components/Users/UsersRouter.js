@@ -11,7 +11,7 @@ const assignImage = (req, res, next) => {
   }
   next();
 };
-
+// User CRUD Routes
 router
   .route("/")
   .get(usersController.getAllUsers)
@@ -21,6 +21,12 @@ router
   .get(usersController.getUser)
   .delete(usersController.deleteUser);
 
+// User Status Routes
+router.post("/:id/activate", usersController.activateUser);
+router.post("/:id/deactivate", usersController.deActivateUser);
+router.post("/search", usersController.searchUserByName);
+
+// Addresses Route
 router
   .route("/:id/address")
   .get(addressesController.getAllAddresses)

@@ -56,8 +56,6 @@ categorySchema.pre("save", function (next) {
   next();
 });
 
-const Category = mongoose.model("Category", categorySchema); // tour model
+const Category = mongoose.model("Category", categorySchema);
 
 module.exports = Category;
-
-//فثسف

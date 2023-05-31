@@ -5,9 +5,7 @@ exports.getAllProducts = async (req, res, next) => {
     const products = await Product.find().populate("category_id");
     res.status(200).json({
       status: "success",
-      data: {
-        products,
-      },
+      data: products,
     });
   } catch (err) {
     res.status(404).json({
@@ -39,9 +37,7 @@ exports.addProduct = async (req, res, next) => {
     const product = await Product.create(req.body);
     res.status(201).json({
       status: "success",
-      data: {
-        product,
-      },
+      data: product,
     });
   } catch (err) {
     res.status(404).json({
