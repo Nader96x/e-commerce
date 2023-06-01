@@ -1,6 +1,6 @@
 const { verify } = require("jsonwebtoken");
 const Employee = require("../EmployeeSchema");
-const Email = require("../../../utils/emailSender");
+const Email = require("../../../Utils/emailSender");
 
 module.exports.login = async (req, res, next) => {
   try {

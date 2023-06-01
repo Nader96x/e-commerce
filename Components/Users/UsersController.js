@@ -1,4 +1,5 @@
 const User = require("./User");
+const Order = require("../Order/Order");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -51,6 +52,10 @@ exports.createUser = async (req, res) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
+    const orders = await Order.find({ user: req.params.id });
+    if (orders.length > 0) {
+      return next(new Error("Cannot delete User with Orders"));
+    }
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       return next(new Error("User Not Found"));
