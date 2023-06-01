@@ -10,7 +10,7 @@ const recaptcha = new Recaptcha(
 );
 const recaptchaMW = (req, res, next) => {
   console.log("recaptchaMW");
-  // if (process.env.NODE_ENV === "development") return next();
+  if (process.env.NODE_ENV === "development") return next();
   if (req.recaptcha.error) {
     console.log("recaptchaMW error");
     return res.status(400).json({ status: "fail", message: "Invalid Captcha" });
