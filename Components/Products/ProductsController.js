@@ -1,5 +1,4 @@
 const Product = require("./Product");
-const User = require("../Users/User");
 
 exports.getAllProducts = async (req, res, next) => {
   try {

@@ -1,7 +1,6 @@
 const express = require("express");
 const categoryController = require("./CategoriesController");
 const upload = require("../../helpers/upload.helper");
-const productController = require("../Products/ProductsController");
 
 const router = express.Router();
 
