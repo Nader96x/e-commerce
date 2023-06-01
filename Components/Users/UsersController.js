@@ -1,6 +1,7 @@
 const User = require("./User");
+const Order = require("../Order/Order");
 
-exports.getAllUsers = async (req, res, next) => {
+exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
     res.status(200).json({
@@ -34,7 +35,7 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
-exports.createUser = async (req, res, next) => {
+exports.createUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
     res.status(201).json({
@@ -51,6 +52,10 @@ exports.createUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   try {
+    const orders = await Order.find({ user: req.params.id });
+    if (orders.length > 0) {
+      return next(new Error("Cannot delete User with Orders"));
+    }
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) {
       return next(new Error("User Not Found"));
@@ -67,7 +72,7 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-exports.activateUser = async (req, res, next) => {
+exports.activateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -89,7 +94,7 @@ exports.activateUser = async (req, res, next) => {
   }
 };
 
-exports.deActivateUser = async (req, res, next) => {
+exports.deActivateUser = async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,

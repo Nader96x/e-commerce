@@ -67,6 +67,10 @@ exports.updateCategory = async (req, res, next) => {
 
 exports.deleteCategory = async (req, res, next) => {
   try {
+    const products = await Product.find({ category_id: req.params.id });
+    if (products.length > 0) {
+      return next(new Error("Cannot delete category with products"));
+    }
     const category = await Category.findByIdAndDelete(req.params.id);
     res.status(204).json({
       status: "success",
@@ -99,15 +103,15 @@ exports.searchCategoryByName = async (req, res, next) => {
   try {
     const { name } = req.body;
     const regex = new RegExp(name, "i");
-    const products = await Category.find({
+    const categories = await Category.find({
       $or: [{ name_en: regex }, { name_ar: regex }],
     });
-    if (products.length <= 0) {
+    if (categories.length <= 0) {
       return next(new Error("Categories not Found"));
     }
     res.status(200).json({
       status: "success",
-      data: products,
+      data: categories,
     });
   } catch (err) {
     res.status(404).json({
