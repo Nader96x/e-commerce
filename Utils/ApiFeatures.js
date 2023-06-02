@@ -32,7 +32,6 @@ class ApiFeatures {
   limitFields() {
     if (this.query.fields) {
       const fields = this.query.fields.split(",").join(" ");
-      console.log(fields);
       this.mongooseQuery = this.mongooseQuery.select(fields.toString());
     } else this.mongooseQuery = this.mongooseQuery.select("-__v");
     this.mongooseQuery.select(this.query.fields);
@@ -41,8 +40,10 @@ class ApiFeatures {
 
   search() {
     if (this.query.keyword) {
-      let query = {};
+      const query = {};
       query.$or = [
+        { name_en: { $regex: this.query.keyword, $options: "i" } },
+        { name_ar: { $regex: this.query.keyword, $options: "i" } },
         { name: { $regex: this.query.keyword, $options: "i" } },
         { description: { $regex: this.query.keyword, $options: "i" } },
       ];

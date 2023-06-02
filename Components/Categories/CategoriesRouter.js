@@ -14,15 +14,12 @@ const assignImage = (req, res, next) => {
 router
   .route("/")
   .get(categoryController.getAllCategories)
-  .post(upload.single("image"), assignImage, categoryController.createCategory)
-  .delete(categoryController.deleteAllCategories);
+  .post(upload.single("image"), assignImage, categoryController.createCategory);
 
 router
   .route("/:id")
   .get(categoryController.getOneCategory)
   .patch(upload.single("image"), assignImage, categoryController.updateCategory)
   .delete(categoryController.deleteCategory);
-
-router.post("/search", categoryController.searchCategoryByName);
 
 module.exports = router;

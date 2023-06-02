@@ -5,8 +5,6 @@ const upload = require("../../helpers/upload.helper");
 const router = express.Router();
 
 const assignImages = (req, res, next) => {
-  // eslint-disable-next-line array-callback-return
-  // console.log(req.files, "files");
   if (req.files) {
     if (req.files.image && req.files.image.length)
       req.body.image = req.files.image[0].location;
@@ -44,7 +42,5 @@ router
     productController.updateProduct
   )
   .delete(productController.deleteProduct);
-
-router.post("/search", productController.searchProductByName);
 
 module.exports = router;
