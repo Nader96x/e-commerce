@@ -94,12 +94,10 @@ const productSchema = mongoose.Schema(
     },
     is_active: {
       type: Boolean,
-      // required: [true, "Product status must be Assigned"],
       default: true,
     },
     total_orders: {
       type: Number,
-      // required: [true, "Product Total orders is required"],
       default: 0,
     },
     category_id: {

@@ -1,9 +1,9 @@
 /** @description this class for optional error  */
 class ApiError extends Error {
-  constructor(massage, statusCode) {
-    super(massage);
+  constructor(message, statusCode) {
+    super(message);
     this.statusCode = statusCode;
-    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
+    this.status = `${this.statusCode}`.startsWith(4) ? "fail" : "error";
   }
 }
 
