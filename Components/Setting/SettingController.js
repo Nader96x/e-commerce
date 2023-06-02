@@ -15,7 +15,7 @@ module.exports.getSettings = async (req, res) => {
 module.exports.updateSetting = async (req, res) => {
   try {
     const settings = await Setting.setting();
-    // console.log("settings", settings.setting);
+    console.log("settings", settings.setting);
     console.log({ ...settings.setting._doc, ...req.body });
     settings.setting = { ...settings.setting._doc, ...req.body };
     await settings.save();

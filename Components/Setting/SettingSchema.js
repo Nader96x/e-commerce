@@ -6,13 +6,13 @@ const BannerSchema = mongoose.Schema({
     type: String,
     required: [true, "Banner must have an image."],
   },
-  url: {
+  link: {
     type: String,
-    required: [true, "Banner must have a url."],
+    required: [true, "Banner must have a link."],
   },
   alt: {
     type: String,
-    required: [true, "Banner must have an alt."],
+    // required: [true, "Banner must have an alt."],
   },
 });
 
@@ -36,11 +36,22 @@ const AddressSchema = mongoose.Schema({
   },
 });
 
+const SocialMedia = mongoose.Schema({
+  _id: false,
+  url: {
+    type: String,
+    required: [true, "Social Media must have a url."],
+  },
+  name: {
+    type: String,
+    required: [true, "Social Media must have a name."],
+  },
+});
 const SettingSchema = mongoose.Schema({
   _id: false,
   logo: String,
   email: String,
-  locations: [Object],
+  locations: [String],
   phone: {
     type: String,
     validate: {
@@ -53,16 +64,18 @@ const SettingSchema = mongoose.Schema({
   },
   terms_and_conditions: String,
   about_us: String,
-  social_media: {
+  contact_us: String,
+  social_media: [SocialMedia],
+  /* social_media: {
     facebook: String,
     twitter: String,
     instagram: String,
     linkedin: String,
-  },
-  address: {
+  }, */
+  /* address: {
     type: AddressSchema,
-    required: [true, "Setting must have an address."],
-  },
+    // required: [true, "Setting must have an address."],
+  }, */
   banners: [BannerSchema],
 });
 
@@ -108,21 +121,11 @@ SettingsSchema.statics = {
           logo: "",
           email: "",
           locations: [],
-          // phone: "",
+          phone: "01000000000",
           terms_and_conditions: "",
           about_us: "",
-          social_media: {
-            facebook: "",
-            twitter: "",
-            instagram: "",
-            linkedin: "",
-          },
-          address: {
-            street: "",
-            city: "",
-            state: "",
-            country: "",
-          },
+          contact_us: "",
+          social_media: [],
           banners: [],
         },
       });
