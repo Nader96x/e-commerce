@@ -25,7 +25,6 @@ router
 // User Status Routes
 router.post("/:id/activate", usersController.activateUser);
 router.post("/:id/deactivate", usersController.deActivateUser);
-router.post("/search", usersController.searchUserByName);
 
 // Addresses Route
 router

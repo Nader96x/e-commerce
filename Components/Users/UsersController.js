@@ -1,158 +1,116 @@
+const AsyncHandler = require("express-async-handler");
 const User = require("./User");
 const Order = require("../Order/Order");
+const ApiError = require("../../Utils/ApiError");
+const ApiFeatures = require("../../Utils/ApiFeatures");
 
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json({
-      status: "success",
-      results: users.length,
-      data: users,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: err,
-    });
-  }
-};
+exports.getAllUsers = AsyncHandler(async (req, res) => {
+  const documentsCount = await User.countDocuments();
+  const apiFeatures = new ApiFeatures(req.query, User.find());
+  apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
+  const { mongooseQuery, paginationResult } = apiFeatures;
+  const users = await mongooseQuery;
+  res.status(200).json({
+    status: "success",
+    results: users.length,
+    pages: paginationResult,
+    data: users,
+  });
+});
 
-exports.getUser = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return next(new Error("User Not Found"));
-    }
-    res.status(200).json({
-      status: "success",
-      data: user,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: err,
-    });
+exports.getUser = AsyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return next(new ApiError("User Not Found", 404));
   }
-};
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+});
 
-exports.createUser = async (req, res) => {
-  try {
-    const user = await User.create(req.body);
-    res.status(201).json({
-      status: "success",
-      data: user,
-    });
-  } catch (err) {
-    res.status(400).json({
-      status: "fail",
-      message: err,
-    });
+exports.createUser = AsyncHandler(async (req, res, next) => {
+  const user = await User.create(req.body);
+  if (!user) {
+    return next(new ApiError("Something went wrong", 400));
   }
-};
+  res.status(201).json({
+    status: "success",
+    data: user,
+  });
+});
 
 exports.updateUser = async (req, res, next) => {
   try {
+    if (req.body.address) {
+      delete req.body.address;
+    }
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
+      new: true,
+      runValidators: true,
+    });
+    if (!user) {
+      return next(new Error("User Not Found"));
+    }
+    res.status(200).json({
+      status: "success",
+      data: user,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: "User not Found",
+    });
+  }
+};
+
+exports.deleteUser = AsyncHandler(async (req, res, next) => {
+  const orders = await Order.find({ user: req.params.id });
+  if (orders.length > 0) {
+    return next(new ApiError("Cannot delete User with Orders", 400));
+  }
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) {
+    return next(new ApiError("User Not Found", 404));
+  }
+  res.status(204).json({
+    status: "success",
+    data: null,
   });
-    if (!user) {
-      return next(new Error("User Not Found"));
-    }
-    res.status(200).json({
-      status: "success",
-      data: user,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: "User not Found",
-    });
-  }
-};
+});
 
-exports.deleteUser = async (req, res, next) => {
-  try {
-    const orders = await Order.find({ user: req.params.id });
-    if (orders.length > 0) {
-      return next(new Error("Cannot delete User with Orders"));
+exports.activateUser = AsyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { is_active: true },
+    {
+      new: true,
+      runValidators: true,
     }
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) {
-      return next(new Error("User Not Found"));
+  );
+  if (!user) {
+    return next(new ApiError("something went wrong", 400));
+  }
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+});
+
+exports.deActivateUser = AsyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { is_active: false },
+    {
+      new: true,
+      runValidators: true,
     }
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: "User not Found",
-    });
+  );
+  if (!user) {
+    return next(new ApiError("something went wrong", 400));
   }
-};
-
-exports.activateUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { is_active: true },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-    res.status(200).json({
-      status: "success",
-      data: user,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: err,
-    });
-  }
-};
-
-exports.deActivateUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { is_active: false },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-    res.status(200).json({
-      status: "success",
-      data: user,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: err,
-    });
-  }
-};
-
-exports.searchUserByName = async (req, res, next) => {
-  try {
-    const { name } = req.body;
-    const regex = new RegExp(name, "i");
-    const users = await User.find({ name: regex });
-    if (users.length <= 0) {
-      return next(new Error("Users not Found"));
-    }
-    res.status(200).json({
-      status: "success",
-      data: users,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: "Users not Found",
-    });
-  }
-};
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+});
