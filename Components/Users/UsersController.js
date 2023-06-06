@@ -52,7 +52,10 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id);
+    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
     if (!user) {
       return next(new Error("User Not Found"));
     }

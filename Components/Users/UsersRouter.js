@@ -19,7 +19,7 @@ router
 router
   .route("/:id")
   .get(usersController.getUser)
-  .patch(usersController.updateUser)
+  .patch(upload.single("image"), assignImage, usersController.updateUser)
   .delete(usersController.deleteUser);
 
 // User Status Routes
