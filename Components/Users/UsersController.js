@@ -40,29 +40,22 @@ exports.createUser = AsyncHandler(async (req, res, next) => {
   });
 });
 
-exports.updateUser = async (req, res, next) => {
-  try {
-    if (req.body.address) {
-      delete req.body.address;
-    }
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!user) {
-      return next(new Error("User Not Found"));
-    }
-    res.status(200).json({
-      status: "success",
-      data: user,
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      message: "User not Found",
-    });
+exports.updateUser = AsyncHandler(async (req, res, next) => {
+  if (req.body.address) {
+    delete req.body.address;
   }
-};
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!user) {
+    return next(new ApiError("something went wrong", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+});
 
 exports.deleteUser = AsyncHandler(async (req, res, next) => {
   const orders = await Order.find({ user: req.params.id });
