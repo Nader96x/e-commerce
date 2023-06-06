@@ -154,21 +154,21 @@ userSchema.pre("save", async function (next) {
 });
 
 // Middleware to validate password and confirm password match
-userSchema
-  .virtual("confirmPassword")
-  .get(function () {
-    return this._confirmPassword;
-  })
-  .set(function (value) {
-    this._confirmPassword = value;
-  });
-
-userSchema.pre("validate", function (next) {
-  if (this.password !== this.confirmPassword) {
-    this.invalidate(new Error("Password and confirm password must match"));
-  }
-  next();
-});
+//userSchema
+//  .virtual("confirmPassword")
+//  .get(function () {
+//    return this._confirmPassword;
+//  })
+//  .set(function (value) {
+//    this._confirmPassword = value;
+//  });
+//
+//userSchema.pre("validate", function (next) {
+//  if (this.password !== this.confirmPassword) {
+//    this.invalidate(new Error("Password and confirm password must match"));
+//  }
+//  next();
+//});
 
 const User = mongoose.model("User", userSchema);
 

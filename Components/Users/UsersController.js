@@ -50,6 +50,24 @@ exports.createUser = async (req, res) => {
   }
 };
 
+exports.updateUser = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id);
+    if (!user) {
+      return next(new Error("User Not Found"));
+    }
+    res.status(200).json({
+      status: "success",
+      data: user,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: "User not Found",
+    });
+  }
+};
+
 exports.deleteUser = async (req, res, next) => {
   try {
     const orders = await Order.find({ user: req.params.id });
