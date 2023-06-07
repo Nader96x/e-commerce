@@ -1,34 +1,50 @@
 const { Router } = require("express");
 const EmployeeController = require("./EmployeeController");
 const { protect, authorized } = require("./Auth/AuthController");
-const { getEmployeeById } = require("./EmployeeValidation");
+const {
+  validateGetEmployeeById,
+  validateUpdateEmployee,
+  validateGetAllEmployees,
+  validateCreateEmployee,
+  validateUpdatePassword,
+  va,
+} = require("./EmployeeValidation");
 
 const EmployeeRouter = Router();
 EmployeeRouter.all(protect, authorized);
 EmployeeRouter.route("/")
   // .all(protect, authorized)
-  .get(EmployeeController.getAllEmployees)
-  .post(EmployeeController.createEmployee);
+  .get(validateGetAllEmployees, EmployeeController.getAllEmployees)
+  .post(validateCreateEmployee, EmployeeController.createEmployee);
 
 EmployeeRouter.patch(
   "/update-password",
   protect,
+  validateUpdatePassword,
   EmployeeController.updatePassword
 );
 
 EmployeeRouter.route("/:id")
   // .all(protect, authorized)
-  .all(getEmployeeById)
+  .all(validateGetEmployeeById)
   .get(EmployeeController.getEmployeeById)
-  .patch(EmployeeController.updateEmployee)
+  .patch(validateUpdateEmployee, EmployeeController.updateEmployee)
   .delete(EmployeeController.deleteEmployee);
 //
 EmployeeRouter.post(
   "/:id/ban",
   protect,
   authorized,
+  validateGetEmployeeById,
   EmployeeController.ban
-).post("/:id/unban", protect, authorized, EmployeeController.unban);
+);
+EmployeeRouter.post(
+  "/:id/unban",
+  protect,
+  authorized,
+  validateGetEmployeeById,
+  EmployeeController.unban
+);
 // .patch("/:id/update-password", EmployeeController.updatePassword);
 
 module.exports = EmployeeRouter;
