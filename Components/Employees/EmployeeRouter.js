@@ -7,7 +7,6 @@ const {
   validateGetAllEmployees,
   validateCreateEmployee,
   validateUpdatePassword,
-  va,
 } = require("./EmployeeValidation");
 
 const EmployeeRouter = Router();
