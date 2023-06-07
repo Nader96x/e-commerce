@@ -68,28 +68,5 @@ module.exports.getAllEmployees = customJoi.object({
   limit: customJoi.number().min(1).default(10),
 });
 
-const validate = (schema) => async (req, res, next) => {
-  const { error, value } = schema.validate(
-    { ...req.body, ...req.params },
-    {
-      abortEarly: false,
-      // allowUnknown: true,
-    }
-  );
-
-  req.body = value;
-  if (error) {
-    const errors = {};
-    error.details.forEach((err) => {
-      errors[err.path[0]] = err.message;
-    });
-    return res.status(400).json({
-      status: "fail",
-      errors,
-    });
-  }
-  next();
-};
-
 module.exports.validateLogin = validateSchema(module.exports.Login);
 module.exports.getEmployeeById = validateSchema(module.exports.getEmployeeById);
