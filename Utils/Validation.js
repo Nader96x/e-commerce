@@ -14,7 +14,7 @@ function validateSchema(schema) {
     req.body = value;
     if (error) {
       const errors = { errors: error.details.map((err) => err.message) };
-      // eslint-disable-next-line no-console
+
       if (process.env.NODE_ENV === "development") console.log(errors);
       return next(new ApiError(errors), 422);
     }
@@ -23,7 +23,6 @@ function validateSchema(schema) {
 }
 
 module.exports = { validateSchema };
-// change Joi Default error message globaly
 
 //{#label}
 const JoiMessages = {
@@ -43,14 +42,12 @@ const JoiMessages = {
   "any.ref": `does not match`,
   "any.only": `does not match`,
 };
-const mongoID = Joi.string().hex().length(24);
+
 const customJoi = Joi.defaults((schema) => {
-  //assign mongoID to all joi.string().hex().length(24)
-  // schema.mongoID = () => mongoID;
   return schema.options({
     messages: JoiMessages,
   });
 });
-customJoi.objectId = () => mongoID;
+customJoi.objectId = () => Joi.string().hex().length(24);
 module.exports = customJoi;
 module.exports.validateSchema = validateSchema;
