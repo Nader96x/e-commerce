@@ -12,7 +12,7 @@ const {
 const EmployeeRouter = Router();
 EmployeeRouter.all(protect, authorized);
 EmployeeRouter.route("/")
-  // .all(protect, authorized)
+  .all(protect, authorized)
   .get(validateGetAllEmployees, EmployeeController.getAllEmployees)
   .post(validateCreateEmployee, EmployeeController.createEmployee);
 
@@ -24,7 +24,7 @@ EmployeeRouter.patch(
 );
 
 EmployeeRouter.route("/:id")
-  // .all(protect, authorized)
+  .all(protect, authorized)
   .all(validateGetEmployeeById)
   .get(EmployeeController.getEmployeeById)
   .patch(validateUpdateEmployee, EmployeeController.updateEmployee)
