@@ -6,6 +6,7 @@ module.exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const employee = await Employee.findOne({ email }).exec();
+    console.log(process.env.NODE_ENV);
     if (!employee) {
       if (process.env.NODE_ENV === "development")
         console.log("Email not found");
@@ -19,7 +20,7 @@ module.exports.login = async (req, res, next) => {
         console.log("Password not correct");
       return res
         .status(400)
-        .json({ status: "fail", message: "Invalid Credentials2" });
+        .json({ status: "fail", message: "Invalid Credentials" });
     }
     const token = await employee.generateToken();
     res

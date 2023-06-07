@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const AuthController = require("./AuthController");
 const Recaptcha = require("express-recaptcha").RecaptchaV3;
+const { validateLogin } = require("../EmployeeValidation");
 
 const AuthRouter = Router();
 
@@ -20,7 +21,7 @@ const recaptchaMW = (req, res, next) => {
   next();
 };
 
-AuthRouter.post("/auth", AuthController.login);
+AuthRouter.post("/auth", validateLogin, AuthController.login);
 AuthRouter.post(
   "/reset-password-token",
   recaptcha.middleware.verify,

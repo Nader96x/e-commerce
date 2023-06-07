@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const EmployeeController = require("./EmployeeController");
 const { protect, authorized } = require("./Auth/AuthController");
+const { getEmployeeById } = require("./EmployeeValidation");
 
 const EmployeeRouter = Router();
 EmployeeRouter.all(protect, authorized);
@@ -17,6 +18,7 @@ EmployeeRouter.patch(
 
 EmployeeRouter.route("/:id")
   // .all(protect, authorized)
+  .all(getEmployeeById)
   .get(EmployeeController.getEmployeeById)
   .patch(EmployeeController.updateEmployee)
   .delete(EmployeeController.deleteEmployee);
