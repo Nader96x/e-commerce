@@ -1,5 +1,7 @@
+const AsyncHandler = require("express-async-handler");
 const Joi = require("../../Utils/Validation");
 const RoleModel = require("./Role");
+const ApiError = require("../../Utils/ApiError");
 
 async function isUnique(value) {
   const existingRole = await RoleModel.findOne({ name: value });
@@ -22,6 +24,14 @@ const permissionSchema = Joi.object({
     delete: Joi.boolean(),
     ban: Joi.boolean(),
   }),
+});
+
+const validateUniqueRoleName = AsyncHandler(async (value, helpers) => {
+  console.log(value);
+  const existingRole = await RoleModel.findOne({ name: value });
+  console.log(existingRole);
+
+  if (existingRole) return helpers.error("any.unique");
 });
 
 const roleSchema = Joi.object({

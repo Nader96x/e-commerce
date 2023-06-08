@@ -11,7 +11,7 @@ function validateSchema(schema) {
         // allowUnknown: true,
       }
     );
-    req.body = value;
+    //req.body = value;
     if (error) {
       const errorMessages = error.details.map((detail) => detail.message);
       if (process.env.NODE_ENV === "development") console.log(errorMessages);
