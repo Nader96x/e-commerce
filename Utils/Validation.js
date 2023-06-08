@@ -13,10 +13,9 @@ function validateSchema(schema) {
     );
     req.body = value;
     if (error) {
-      const errors = { errors: error.details.map((err) => err.message) };
-
-      if (process.env.NODE_ENV === "development") console.log(errors);
-      return next(new ApiError(errors), 422);
+      const errorMessages = error.details.map((detail) => detail.message);
+      if (process.env.NODE_ENV === "development") console.log(errorMessages);
+      return next(new ApiError(errorMessages, 422));
     }
     next();
   });
@@ -43,11 +42,11 @@ const JoiMessages = {
   "any.only": `does not match`,
 };
 
-const customJoi = Joi.defaults((schema) => {
-  return schema.options({
+const customJoi = Joi.defaults((schema) =>
+  schema.options({
     messages: JoiMessages,
-  });
-});
+  })
+);
 customJoi.objectId = () => Joi.string().hex().length(24);
 module.exports = customJoi;
 module.exports.validateSchema = validateSchema;

@@ -7,12 +7,6 @@ const Permission = mongoose.Schema({
     enum: ["categories", "products", "users", "roles", "employees", "orders"],
   },
   access: {
-    /*canRead: Boolean,
-    canWrite: Boolean,
-    canUpdate: Boolean,
-    canDelete: Boolean,
-    canBan: Boolean,
-    canUnban: Boolean,*/
     get: Boolean,
     post: Boolean,
     patch: Boolean,

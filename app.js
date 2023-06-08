@@ -49,7 +49,8 @@ app.use((req, res, next) => {
 
 // Error Handler
 app.use((err, req, res, next) => {
-  res.status(500).json({ status: "fail", error: err.message });
+  const statusCode = err.statusCode || 500;
+  res.status(statusCode).json({ status: "fail", error: err.message });
 });
 
 module.exports = app;
