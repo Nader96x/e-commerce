@@ -25,7 +25,7 @@ module.exports = class Email {
   async send(template, subject) {
     // console.log(`${__dirname}/../../views/${template}.html`);
     const html = fs
-      .readFileSync(`${__dirname}/../views/${template}.html`, "utf-8")
+      .readFileSync(`${__dirname}/../Views/${template}.html`, "utf-8")
       .replaceAll("{{name}}", this.name)
       .replaceAll("{{url}}", this.url);
 
