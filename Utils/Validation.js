@@ -2,10 +2,10 @@ const Joi = require("joi");
 const AsyncHandler = require("express-async-handler");
 const ApiError = require("./ApiError");
 
-function validateSchema(schema, property = `body`) {
+function validateSchema(schema) {
   return AsyncHandler((req, res, next) => {
     const { error, value } = schema.validate(
-      { ...req[property] },
+      { ...req.body, ...req.params },
       {
         abortEarly: false,
         // allowUnknown: true,
