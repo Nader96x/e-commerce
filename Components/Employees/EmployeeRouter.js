@@ -4,16 +4,14 @@ const { protect, authorized } = require("./Auth/AuthController");
 const {
   validateGetEmployeeById,
   validateUpdateEmployee,
-  validateGetAllEmployees,
   validateCreateEmployee,
   validateUpdatePassword,
 } = require("./EmployeeValidation");
 
 const EmployeeRouter = Router();
-EmployeeRouter.all(protect, authorized);
 EmployeeRouter.route("/")
   .all(protect, authorized)
-  .get(validateGetAllEmployees, EmployeeController.getAllEmployees)
+  .get(EmployeeController.getAllEmployees)
   .post(validateCreateEmployee, EmployeeController.createEmployee);
 
 EmployeeRouter.patch(

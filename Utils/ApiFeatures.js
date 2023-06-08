@@ -60,9 +60,10 @@ class ApiFeatures {
 
     //  pagination result
     const paginationResult = {};
-    paginationResult.currntPage = page;
+    paginationResult.currnt_page = page;
     paginationResult.limit = limit;
-    paginationResult.totalPages = Math.ceil(countDocuments / limit);
+    paginationResult.total_pages = Math.ceil(countDocuments / limit);
+    paginationResult.total = countDocuments;
     // next page
     if (lastPage < countDocuments) paginationResult.next = page + 1;
     //prev  page
@@ -73,4 +74,5 @@ class ApiFeatures {
     return this;
   }
 }
+
 module.exports = ApiFeatures;

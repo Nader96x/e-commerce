@@ -12,12 +12,12 @@ module.exports.getAll = (Model) =>
     const apiFeatures = new ApiFeatures(query, Model.find(filter));
     apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
 
-    const { mongooseQuery, paginationResult } = apiFeatures;
+    const { mongooseQuery, paginationResult: pagination } = apiFeatures;
     /** execute query  */
     const documents = await mongooseQuery;
     res
       .status(200)
-      .json({ result: documents.length, paginationResult, data: documents });
+      .json({ result: documents.length, pagination, data: documents });
   });
 
 /*
@@ -32,9 +32,9 @@ module.exports.getOne = (Model, populateOption) =>
     if (populateOption) query = query.populate(populateOption);
     const document = await query;
     if (!document)
-      return next(new ApiError(` no brand for this id ${id}`, 404));
+      return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
 
-    res.status(200).json({ data: document });
+    res.status(200).json({ status: "success", data: document });
   });
 
 /*
@@ -46,8 +46,10 @@ module.exports.createOne = (Model) =>
   asyncHandler(async ({ body }, res, next) => {
     const document = await Model.create(body);
     if (!document) return next(new ApiError(` bad request`, 400));
-
-    res.status(201).json({ data: document });
+    res.status(201).json({
+      status: "success",
+      data: await Model.findById(document.toJSON().id),
+    });
   });
 
 /*
@@ -60,13 +62,15 @@ module.exports.updateOne = (Model) =>
     const { id } = params;
     const document = await Model.findByIdAndUpdate(id, body, {
       new: true,
+      runValidators: true,
+      skipInvalidation: true,
     });
     if (!document)
-      return next(new ApiError(` no ${Model} for this id ${id}`, 404));
+      return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
     // tiger save event in mongoose to call handler
     document.save();
 
-    res.status(200).json({ data: document });
+    res.status(200).json({ status: "success", data: document });
   });
 
 /*
@@ -78,9 +82,49 @@ module.exports.deleteOne = (Model) =>
     const { id } = params;
     const document = await Model.findByIdAndDelete(id);
     if (!document)
-      return next(new ApiError(` no ${Model} for this id ${id}`, 404));
+      return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
 
     // tiger remove event in mongoose to call handler
     document.remove();
-    res.status(204).json({});
+    res.status(204).json({ status: "success", data: null });
+  });
+
+module.exports.ban = (Model) =>
+  asyncHandler(async ({ params, user }, res, next) => {
+    const { id } = params;
+    if (id === user._id)
+      return next(new ApiError(`you can't ban yourself`, 400));
+    const document = await Model.findByIdAndUpdate(
+      id,
+      {
+        is_banned: true,
+      },
+      {
+        new: true,
+      }
+    ).exec();
+    if (!document)
+      return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
+
+    res.status(200).json({ status: "success", data: document });
+  });
+
+module.exports.unban = (Model) =>
+  asyncHandler(async ({ params, user }, res, next) => {
+    const { id } = params;
+    if (id === user._id)
+      return next(new ApiError(`you can't unban yourself`, 400));
+    const document = await Model.findByIdAndUpdate(
+      id,
+      {
+        is_banned: false,
+      },
+      {
+        new: true,
+      }
+    ).exec();
+    if (!document)
+      return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
+
+    res.status(200).json({ status: "success", data: document });
   });

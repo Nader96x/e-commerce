@@ -98,6 +98,7 @@ EmployeeSchema.pre(/^find/, function (next) {
   next();
 });
 
+// Document Middleware
 EmployeeSchema.pre("save", async function (next) {
   console.log(
     "pre save",

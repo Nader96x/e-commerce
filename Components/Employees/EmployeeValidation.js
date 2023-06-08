@@ -28,23 +28,21 @@ const CreateEmployee = customJoi.object({
     .min(8)
     .required()
     .valid(customJoi.ref("password")),
-  // role: customJoi.objectId().required(),
-  phone: customJoi.string().required(),
-  address: customJoi.string().required(),
-  salary: customJoi.number().required(),
-  image: customJoi.string().required(),
+  role_id: customJoi.objectId().required(),
+  phone: customJoi
+    .string()
+    .required()
+    .regex(/^01[0125][0-9]{8}$/),
 });
 
 const UpdateEmployee = customJoi.object({
   name: customJoi.string(),
   email: customJoi.string().email(),
-  password: customJoi.string().min(8),
-  passwordConfirm: customJoi.string().min(8).valid(customJoi.ref("password")),
-  // role: customJoi.objectId().required(),
-  phone: customJoi.string(),
-  address: customJoi.string(),
-  salary: customJoi.number(),
-  image: customJoi.string(),
+  phone: customJoi.string().regex(/^01[0125][0-9]{8}$/),
+  // password: customJoi.string().min(8),
+  // passwordConfirm: customJoi.string().min(8).valid(customJoi.ref("password")),
+  role: customJoi.objectId(),
+  // is_banned: customJoi.boolean(),
 });
 
 const UpdatePassword = customJoi.object({
@@ -71,5 +69,7 @@ module.exports.validateResetPassword = validateSchema(ResetPassword);
 module.exports.validateCreateEmployee = validateSchema(CreateEmployee);
 module.exports.validateUpdateEmployee = validateSchema(UpdateEmployee);
 module.exports.validateUpdatePassword = validateSchema(UpdatePassword);
-module.exports.validateGetEmployeeById = validateSchema(getEmployeeById);
-module.exports.validateGetAllEmployees = validateSchema(getAllEmployees);
+module.exports.validateGetEmployeeById = validateSchema(
+  getEmployeeById,
+  "params"
+);
