@@ -10,7 +10,15 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.updateMe = AsyncHandler(async (req, res, next) => {
+exports.getUser = AsyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  res.status(200).json({
+    status: "success",
+    data: user,
+  });
+});
+
+exports.update = AsyncHandler(async (req, res, next) => {
   if (req.body.address) {
     return next(new ApiError("You cannot update your Address from here", 400));
   }
@@ -25,12 +33,31 @@ exports.updateMe = AsyncHandler(async (req, res, next) => {
     "image",
     "bio"
   );
-  const user = User.findByIdAndUpdate(req.user.id, filteredBody, {
+  const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,
   });
+  const token = req.headers.authorization.split(" ")[1];
   res.status(200).json({
     status: "success",
-    data: user,
+    data: { user, token },
+  });
+});
+
+exports.delete = AsyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.user.id,
+    { is_active: false },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  if (!user) {
+    return next(new ApiError("something went wrong", 400));
+  }
+  res.status(204).json({
+    status: "success",
+    data: null,
   });
 });

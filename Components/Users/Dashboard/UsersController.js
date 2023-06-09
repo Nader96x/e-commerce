@@ -6,7 +6,10 @@ const ApiFeatures = require("../../../Utils/ApiFeatures");
 
 exports.getAllUsers = AsyncHandler(async (req, res) => {
   const documentsCount = await User.countDocuments();
-  const apiFeatures = new ApiFeatures(req.query, User.find());
+  const apiFeatures = new ApiFeatures(
+    req.query,
+    User.find().select("+is_active")
+  );
   apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
   const { mongooseQuery, paginationResult } = apiFeatures;
   const users = await mongooseQuery;
@@ -19,7 +22,7 @@ exports.getAllUsers = AsyncHandler(async (req, res) => {
 });
 
 exports.getUser = AsyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id).select("+is_active");
   if (!user) {
     return next(new ApiError("User Not Found", 404));
   }
@@ -83,7 +86,7 @@ exports.activateUser = AsyncHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  );
+  ).select("+is_active");
   if (!user) {
     return next(new ApiError("something went wrong", 400));
   }
@@ -101,7 +104,7 @@ exports.deActivateUser = AsyncHandler(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  );
+  ).select("+is_active");
   if (!user) {
     return next(new ApiError("something went wrong", 400));
   }

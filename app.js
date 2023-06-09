@@ -33,7 +33,7 @@ app.use("/settings", SettingsRouter);
 // Dashboard Route
 app.use("/admin", AuthRouter);
 app.use("/", UserAuthRouter);
-app.use("/user", WebUsersRouter);
+app.use("/profile", WebUsersRouter);
 
 // V1 Routes
 v1Router.use("/employees", EmployeeRouter);

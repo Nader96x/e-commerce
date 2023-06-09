@@ -108,6 +108,7 @@ const userSchema = mongoose.Schema(
     is_active: {
       type: Boolean,
       default: true,
+      select: false,
     },
     address: {
       type: [

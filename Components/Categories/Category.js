@@ -9,14 +9,14 @@ const categorySchema = mongoose.Schema(
       unique: [true, "Category name Already Exists"],
       minLength: [3, "Category name cannot be less than 3 characters"],
       maxLength: [50, "Category name must be less than 50 characters"],
-      validate: {
-        validator: function (value) {
-          // Regular expression to check if the name is written in Arabic
-          const arabicRegex = /^[\u0600-\u06FF\s]+$/;
-          return arabicRegex.test(value);
-        },
-        message: "Name must be written in Arabic",
-      },
+      // validate: {
+      //   validator: function (value) {
+      //     // Regular expression to check if the name is written in Arabic
+      //     const arabicRegex = /^[\u0600-\u06FF\s]+$/;
+      //     return arabicRegex.test(value);
+      //   },
+      //   message: "Name must be written in Arabic",
+      // },
       trim: true,
     },
     name_en: {

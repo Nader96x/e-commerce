@@ -1,6 +1,6 @@
 const express = require("express");
 const usersController = require("./UsersController");
-const addressesController = require("../AddressesController");
+const addressesController = require("./AddressesController");
 const upload = require("../../../helpers/upload.helper");
 
 const router = express.Router();
@@ -28,15 +28,13 @@ router.post("/:id/activate", usersController.activateUser);
 router.post("/:id/deactivate", usersController.deActivateUser);
 
 // Addresses Route
-router
-  .route("/:id/address")
-  .get(addressesController.getAllAddresses)
-  .post(addressesController.addAddress);
-
-router
-  .route("/:id/address/:address")
-  .get(addressesController.getAddress)
-  .patch(addressesController.updateAddress)
-  .delete(addressesController.deleteAddress);
+router.route("/:id/address").get(addressesController.getAllAddresses);
+// .post(addressesController.addAddress);
+//
+// router
+//   .route("/:id/address/:address")
+//   .get(addressesController.getAddress)
+//   .patch(addressesController.updateAddress)
+//   .delete(addressesController.deleteAddress);
 
 module.exports = router;
