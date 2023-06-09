@@ -1,8 +1,8 @@
 const AsyncHandler = require("express-async-handler");
-const User = require("./User");
-const Order = require("../Order/Order");
-const ApiError = require("../../Utils/ApiError");
-const ApiFeatures = require("../../Utils/ApiFeatures");
+const User = require("../User");
+const Order = require("../../Order/Order");
+const ApiError = require("../../../Utils/ApiError");
+const ApiFeatures = require("../../../Utils/ApiFeatures");
 
 exports.getAllUsers = AsyncHandler(async (req, res) => {
   const documentsCount = await User.countDocuments();
@@ -42,7 +42,10 @@ exports.createUser = AsyncHandler(async (req, res, next) => {
 
 exports.updateUser = AsyncHandler(async (req, res, next) => {
   if (req.body.address) {
-    delete req.body.address;
+    return next(new ApiError("Admin Cannot Update Users Address", 400));
+  }
+  if (req.body.password || req.body.confirmPassword) {
+    return next(new ApiError("Admin Cannot Update Users password", 400));
   }
   const user = await User.findByIdAndUpdate(req.params.id, req.body, {
     new: true,

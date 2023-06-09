@@ -11,6 +11,17 @@ const createToken = (id) =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const createSendToken = (user, statusCode, res, next) => {
+  const token = createToken(user._id);
+  if (!token) {
+    return next(new ApiError("Error creating JWT token", 500));
+  }
+  res.status(statusCode).json({
+    status: "success",
+    token,
+  });
+};
+
 exports.signup = AsyncHandler(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -22,12 +33,7 @@ exports.signup = AsyncHandler(async (req, res, next) => {
     address: req.body.address,
     image: req.body.image,
   });
-  const token = createToken(newUser._id);
-  res.status(201).json({
-    status: "success",
-    token,
-    data: newUser,
-  });
+  createSendToken(newUser, 201, res, next);
 });
 
 exports.login = AsyncHandler(async (req, res, next) => {
@@ -39,19 +45,14 @@ exports.login = AsyncHandler(async (req, res, next) => {
   if (!user || !(await user.checkPassword(password, user.password))) {
     return next(new ApiError("Incorrect email or password", 401));
   }
-  const token = createToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-    data: user,
-  });
+  createSendToken(user, 200, res, next);
 });
 
 exports.protect = AsyncHandler(async (req, res, next) => {
   let token;
   if (
     req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer ")
+    req.headers.authorization.startsWith("Bearer")
   ) {
     token = req.headers.authorization.split(" ")[1];
   }
@@ -79,7 +80,7 @@ exports.forgotPassword = AsyncHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
   const resetURL = `${req.protocol}://${req.get(
     "host"
-  )}/api/v1/users/reset-password/${token}`;
+  )}/reset-password/${token}`;
   const email = new Email(user, resetURL);
   try {
     await email.sendPasswordReset();
@@ -88,8 +89,8 @@ exports.forgotPassword = AsyncHandler(async (req, res, next) => {
       message: "Please check your email",
     });
   } catch (err) {
-    user.reset_password_token = null;
-    user.reset_password_token_expire = null;
+    user.reset_password_token = undefined;
+    user.reset_password_token_expire = undefined;
     await user.save({ validateBeforeSave: false });
     return next(new ApiError("Failed to send email", 500));
   }
@@ -109,12 +110,19 @@ exports.resetPassword = AsyncHandler(async (req, res, next) => {
   }
   user.password = req.body.password;
   user.confirmPassword = req.body.confirmPassword;
-  user.reset_password_token = null;
-  user.reset_password_token_expire = null;
+  user.reset_password_token = undefined;
+  user.reset_password_token_expire = undefined;
   await user.save();
-  const token = createToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token,
-  });
+  createSendToken(user, 200, res, next);
+});
+
+exports.updatePassword = AsyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  if (!(await user.checkPassword(req.body.currentPassword, user.password))) {
+    return next(new ApiError("Incorrect Password", 401));
+  }
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  await user.save();
+  createSendToken(user, 200, res, next);
 });

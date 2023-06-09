@@ -129,21 +129,24 @@ const userSchema = mongoose.Schema(
     },
     reset_password_token: {
       type: String,
-      default: null,
+      default: undefined,
     },
     reset_password_token_expire: {
       type: Date,
-      default: null,
+      default: undefined,
     },
     email_token: {
       type: String,
-      default: null,
+      default: undefined,
     },
     verified_at: {
       type: Date,
-      default: null,
+      default: undefined,
     },
-    passwordChangedAt: Date,
+    passwordChangedAt: {
+      type: Date,
+      default: undefined,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
@@ -171,12 +174,9 @@ userSchema.pre("save", function (next) {
   next();
 }); // update Changed At password after reset success
 
-userSchema.methods.checkPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-}; // compare password in login
+userSchema.methods.checkPassword = function (candidatePassword, userPassword) {
+  return bcrypt.compare(candidatePassword, userPassword);
+}; // compare passwords
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {

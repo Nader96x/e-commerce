@@ -3,11 +3,13 @@ const cors = require("cors");
 const morgan = require("morgan");
 const refresh = require("./Components/github_refresh/refresh");
 const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
+const UserAuthRouter = require("./Components/Users/Auth/AuthRouter");
 const EmployeeRouter = require("./Components/Employees/EmployeeRouter");
 const CategoriesRouter = require("./Components/Categories/CategoriesRouter");
 const SettingsRouter = require("./Components/Setting/SettingRouter");
 const ProductsRouter = require("./Components/Products/ProductsRouter");
-const UsersRouter = require("./Components/Users/UsersRouter");
+const DashUsersRouter = require("./Components/Users/Dashboard/UsersRouter");
+const WebUsersRouter = require("./Components/Users/Website/UsersRouter");
 const OrderRouter = require("./Components/Order/OrdersRouter");
 const RolesRouter = require("./Components/Roles/RolesRouter");
 
@@ -30,12 +32,14 @@ app.use("/settings", SettingsRouter);
 
 // Dashboard Route
 app.use("/admin", AuthRouter);
+app.use("/", UserAuthRouter);
+app.use("/user", WebUsersRouter);
 
 // V1 Routes
 v1Router.use("/employees", EmployeeRouter);
 v1Router.use("/categories", CategoriesRouter);
 v1Router.use("/products", ProductsRouter);
-v1Router.use("/users", UsersRouter);
+v1Router.use("/users", DashUsersRouter);
 v1Router.use("/orders", OrderRouter);
 v1Router.use("/roles", RolesRouter);
 

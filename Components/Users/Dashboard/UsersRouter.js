@@ -1,8 +1,7 @@
 const express = require("express");
 const usersController = require("./UsersController");
-const addressesController = require("./AddressesController");
-const authController = require("./Auth/AuthController");
-const upload = require("../../helpers/upload.helper");
+const addressesController = require("../AddressesController");
+const upload = require("../../../helpers/upload.helper");
 
 const router = express.Router();
 
@@ -13,21 +12,10 @@ const assignImage = (req, res, next) => {
   next();
 };
 
-router.post(
-  "/register",
-  upload.single("image"),
-  assignImage,
-  authController.signup
-);
-
-router.post("/login", authController.login);
-router.post("/forgot-password", authController.forgotPassword);
-router.patch("/reset-password/:token", authController.resetPassword);
-
 // User CRUD Routes
 router
   .route("/")
-  .get(authController.protect, usersController.getAllUsers)
+  .get(usersController.getAllUsers)
   .post(upload.single("image"), assignImage, usersController.createUser);
 router
   .route("/:id")
