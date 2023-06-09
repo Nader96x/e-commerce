@@ -56,6 +56,11 @@ categorySchema.pre("save", function (next) {
   next();
 });
 
+categorySchema.pre("update", function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
 const Category = mongoose.model("Category", categorySchema);
 
 module.exports = Category;

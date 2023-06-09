@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const slugify = require("slugify");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
@@ -55,8 +54,8 @@ const userSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, "Email is Required"],
+      unique: [true, "This email Already Exists"],
       validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in English
@@ -111,11 +110,7 @@ const userSchema = mongoose.Schema(
       select: false,
     },
     address: {
-      type: [
-        {
-          type: AddressSchema,
-        },
-      ],
+      type: [AddressSchema],
       validate: {
         validator: (v) => Array.isArray(v) && v.length > 0,
         message: "User must have at least One Address",
@@ -152,13 +147,8 @@ const userSchema = mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-userSchema.pre("save", function (next) {
-  this.slug = slugify(this.name, {
-    lower: true,
-    replacement: "-",
-    remove: /[*+~.()'"!:@]/g,
-    strict: true,
-  });
+userSchema.pre("update", function (next) {
+  this.updatedAt = Date.now();
   next();
 });
 

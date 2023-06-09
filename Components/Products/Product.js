@@ -121,5 +121,10 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+productSchema.pre("update", function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
+
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;

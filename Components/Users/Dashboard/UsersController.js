@@ -55,7 +55,7 @@ exports.updateUser = AsyncHandler(async (req, res, next) => {
     runValidators: true,
   });
   if (!user) {
-    return next(new ApiError("something went wrong", 404));
+    return next(new ApiError("something went wrong", 400));
   }
   res.status(200).json({
     status: "success",
