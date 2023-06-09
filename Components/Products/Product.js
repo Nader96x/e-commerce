@@ -26,7 +26,7 @@ const productSchema = mongoose.Schema(
       validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in Arabic
-          const arabicRegex = /^[\u0600-\u06FF\s]+$/;
+          const arabicRegex = /^[\u0600-\u06ff\s]+$/;
           return arabicRegex.test(value);
         },
         message: "Product Name must be written in Arabic",
@@ -64,7 +64,7 @@ const productSchema = mongoose.Schema(
       validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in Arabic
-          const arabicRegex = /^[\u0600-\u06FF\s]+$/;
+          const arabicRegex = /^[\u0600-\u06ff\s]+$/;
           return arabicRegex.test(value);
         },
         message: "Product Arabic Description must be written in Arabic",
@@ -91,6 +91,7 @@ const productSchema = mongoose.Schema(
       type: Number,
       required: [true, "Product Quantity is Required"],
       trim: true,
+      min: 0,
     },
     is_active: {
       type: Boolean,
