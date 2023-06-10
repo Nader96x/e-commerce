@@ -2,14 +2,6 @@ const AsyncHandler = require("express-async-handler");
 const User = require("../User");
 const ApiError = require("../../../Utils/ApiError");
 
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-};
-
 exports.getUser = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   res.status(200).json({

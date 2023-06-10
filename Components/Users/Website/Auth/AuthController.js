@@ -2,9 +2,9 @@ const AsyncHandler = require("express-async-handler");
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const crypto = require("crypto");
-const User = require("../User");
-const ApiError = require("../../../Utils/ApiError");
-const Email = require("../../../Utils/emailSender");
+const User = require("../../User");
+const ApiError = require("../../../../Utils/ApiError");
+const Email = require("../../../../Utils/emailSender");
 
 const createToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -23,24 +23,12 @@ const createSendToken = (user, statusCode, res, next) => {
 };
 
 exports.signup = AsyncHandler(async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    confirmPassword: req.body.confirmPassword,
-    phone: req.body.phone,
-    bio: req.body.bio,
-    address: req.body.address,
-    image: req.body.image,
-  });
+  const newUser = await User.create(req.body);
   createSendToken(newUser, 201, res, next);
 });
 
 exports.login = AsyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return next(new ApiError("Please enter your data", 400));
-  }
   const user = await User.findOne({ email }).select("+password");
   if (!user || !(await user.checkPassword(password, user.password))) {
     return next(new ApiError("Incorrect email or password", 401));

@@ -1,6 +1,6 @@
 const express = require("express");
 const usersController = require("./UsersController");
-const { protect } = require("../Auth/AuthController");
+const { protect } = require("./Auth/AuthController");
 const upload = require("../../../helpers/upload.helper");
 const addressController = require("./AddressesController");
 const { validateUpdateProfile } = require("./UsersValidation");
