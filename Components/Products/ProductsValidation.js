@@ -67,7 +67,7 @@ const updateProduct = customJoi
     image: customJoi.string().optional(),
     images: customJoi.array().items(customJoi.string().optional()).optional(),
     quantity: customJoi.number().optional().greater(-1),
-    category_id: customJoi.objectId().optional(),
+    // category_id: customJoi.objectId().optional(),
     is_active: customJoi.boolean().optional(),
     total_orders: customJoi.number().optional(),
   })
