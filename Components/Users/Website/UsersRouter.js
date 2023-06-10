@@ -10,7 +10,7 @@ const {
   validateAddAddress,
   validateUpdateAddress,
 } = require("./AddressesValidation");
-const { validateAddProductToCart } = require("./CartValidation");
+const { validateProductToCart } = require("./CartValidation");
 
 const router = express.Router();
 
@@ -58,9 +58,14 @@ router
 router.patch(
   "/cart/add",
   protect,
-  validateAddProductToCart,
+  validateProductToCart,
   cartController.addProduct
 );
-router.patch("/cart/remove", protect, cartController.removeProduct);
+router.patch(
+  "/cart/remove",
+  protect,
+  validateProductToCart,
+  cartController.removeProduct
+);
 
 module.exports = router;
