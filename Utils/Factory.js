@@ -1,15 +1,22 @@
 const asyncHandler = require("express-async-handler");
 const ApiError = require("./ApiError");
 const ApiFeatures = require("./ApiFeatures");
+const Category = require("../Components/Categories/Category");
 
-module.exports.getAll = (Model) =>
+module.exports.getAll = (Model, populateOption) =>
   asyncHandler(async ({ body, query }, res, next) => {
     let filter = {};
     if (body.filterObject) filter = body.filterObject;
 
     /** BUILD query*/
     const documentsCount = await Model.countDocuments();
-    const apiFeatures = new ApiFeatures(query, Model.find(filter));
+    // let apiFeatures = "";
+    // if (populateOption)
+    const apiFeatures = new ApiFeatures(
+      query,
+      Model.find(filter).populate(populateOption)
+    );
+    // else apiFeatures = new ApiFeatures(query, Model.find(filter));
     apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
 
     const { mongooseQuery, paginationResult: pagination } = apiFeatures;
@@ -42,8 +49,20 @@ module.exports.getOne = (Model, populateOption) =>
  @param {Model} model
  @return {response} response {document<model>}
 */
-module.exports.createOne = (Model) =>
+module.exports.createOne = (Model, subModel, conditionKey) =>
   asyncHandler(async ({ body }, res, next) => {
+    if (subModel && conditionKey) {
+      const id = body[conditionKey];
+      const subDocument = await subModel.findById(id);
+      if (!subDocument) {
+        return next(
+          new ApiError(
+            `No ${subModel.modelName} was Found for this ID ${id}`,
+            404
+          )
+        );
+      }
+    }
     const document = await Model.create(body);
     if (!document) return next(new ApiError(` bad request`, 400));
     res.status(201).json({
@@ -57,18 +76,18 @@ module.exports.createOne = (Model) =>
  @param {Model} model
  @return {response} response {document<model>}
 */
-module.exports.updateOne = (Model) =>
+module.exports.updateOne = (Model, populateOption) =>
   asyncHandler(async ({ body, params }, res, next) => {
     const { id } = params;
     const document = await Model.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
       skipInvalidation: true,
-    });
+    }).populate(populateOption);
     if (!document)
       return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
     // tiger save event in mongoose to call handler
-    document.save();
+    document.save({ validateBeforeSave: false });
 
     res.status(200).json({ status: "success", data: document });
   });
@@ -77,9 +96,20 @@ module.exports.updateOne = (Model) =>
  Delete one handler for api endpoint
   @param {Model} model
 */
-module.exports.deleteOne = (Model) =>
+module.exports.deleteOne = (Model, subModel, conditionKey) =>
   asyncHandler(async ({ params }, res, next) => {
     const { id } = params;
+    if (subModel && conditionKey) {
+      const condition = await subModel.find({ [conditionKey]: id });
+      if (condition.length > 0) {
+        return next(
+          new ApiError(
+            `Cannot delete ${Model.modelName} with ${subModel.modelName}`,
+            400
+          )
+        );
+      }
+    }
     const document = await Model.findByIdAndDelete(id);
     if (!document)
       return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));

@@ -1,6 +1,11 @@
 const express = require("express");
 const categoryController = require("./CategoriesController");
 const upload = require("../../helpers/upload.helper");
+const {
+  validateCategoryId,
+  validateCreateCategory,
+  validateUpdateCategory,
+} = require("./CategoriesValidation");
 
 const router = express.Router();
 
@@ -14,12 +19,23 @@ const assignImage = (req, res, next) => {
 router
   .route("/")
   .get(categoryController.getAllCategories)
-  .post(upload.single("image"), assignImage, categoryController.createCategory);
+  .post(
+    upload.single("image"),
+    assignImage,
+    validateCreateCategory,
+    categoryController.createCategory
+  );
 
 router
   .route("/:id")
+  .all(validateCategoryId)
   .get(categoryController.getOneCategory)
-  .patch(upload.single("image"), assignImage, categoryController.updateCategory)
+  .patch(
+    upload.single("image"),
+    assignImage,
+    validateUpdateCategory,
+    categoryController.updateCategory
+  )
   .delete(categoryController.deleteCategory);
 
 module.exports = router;

@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+const Product = require("../Products/Product");
+const ApiError = require("../../Utils/ApiError");
+
+const updateSlug = function () {};
 
 const categorySchema = mongoose.Schema(
   {
@@ -12,7 +16,7 @@ const categorySchema = mongoose.Schema(
       validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in Arabic
-          const arabicRegex = /^[\u0600-\u06FF\s]+$/;
+          const arabicRegex = /^[\u0600-\u06ff\s]+$/;
           return arabicRegex.test(value);
         },
         message: "Name must be written in Arabic",
@@ -44,7 +48,7 @@ const categorySchema = mongoose.Schema(
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-
+let slug;
 // Document MiddleWare: runs before save(), create()
 categorySchema.pre("save", function (next) {
   this.slug = slugify(this.name_en, {
@@ -53,6 +57,17 @@ categorySchema.pre("save", function (next) {
     remove: /[*+~.()'"!:@]/g,
     strict: true,
   });
+  next();
+});
+
+categorySchema.pre("update", function (next) {
+  this.slug = slugify(this.name_en, {
+    lower: true,
+    replacement: "-",
+    remove: /[*+~.()'"!:@]/g,
+    strict: true,
+  });
+  this.updatedAt = Date.now();
   next();
 });
 

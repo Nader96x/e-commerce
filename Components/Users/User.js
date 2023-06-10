@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const slugify = require("slugify");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
@@ -35,7 +34,7 @@ const cartProductsSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
-    required: [true, "Product Quantity is required"],
+    default: 1,
   },
 }); // Schema For the Cart
 
@@ -55,8 +54,8 @@ const userSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, "Email is Required"],
+      unique: [true, "This email Already Exists"],
       validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in English
@@ -108,53 +107,44 @@ const userSchema = mongoose.Schema(
     is_active: {
       type: Boolean,
       default: true,
+      select: false,
     },
     address: {
-      type: [
-        {
-          type: AddressSchema,
-        },
-      ],
+      type: [AddressSchema],
       validate: {
         validator: (v) => Array.isArray(v) && v.length > 0,
         message: "User must have at least One Address",
       },
     },
     cart: {
-      type: [
-        {
-          type: cartProductsSchema,
-        },
-      ],
+      type: [cartProductsSchema],
     },
     reset_password_token: {
       type: String,
-      default: null,
+      default: undefined,
     },
     reset_password_token_expire: {
       type: Date,
-      default: null,
+      default: undefined,
     },
     email_token: {
       type: String,
-      default: null,
+      default: undefined,
     },
     verified_at: {
       type: Date,
-      default: null,
+      default: undefined,
     },
-    passwordChangedAt: Date,
+    passwordChangedAt: {
+      type: Date,
+      default: undefined,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-userSchema.pre("save", function (next) {
-  this.slug = slugify(this.name, {
-    lower: true,
-    replacement: "-",
-    remove: /[*+~.()'"!:@]/g,
-    strict: true,
-  });
+userSchema.pre("update", function (next) {
+  this.updatedAt = Date.now();
   next();
 });
 
@@ -171,12 +161,9 @@ userSchema.pre("save", function (next) {
   next();
 }); // update Changed At password after reset success
 
-userSchema.methods.checkPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-}; // compare password in login
+userSchema.methods.checkPassword = function (candidatePassword, userPassword) {
+  return bcrypt.compare(candidatePassword, userPassword);
+}; // compare passwords
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
