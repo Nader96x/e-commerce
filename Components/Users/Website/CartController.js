@@ -59,31 +59,19 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
 });
 
 exports.removeProduct = AsyncHandler(async (req, res, next) => {
+  const { product_id } = req.body;
+
   const user = await User.findById(req.user.id);
   const { cart } = user;
-  if (req.body.quantity <= 0)
-    return next(new ApiError(`Invalid Quantity number`, 400));
-  if (!req.body.quantity) req.body.quantity = 1;
-  const { product_id, quantity } = req.body;
-  const product = await Product.findById(product_id);
-  if (!product) {
-    return next(new ApiError("Product Not Found", 404));
-  }
-  const index = cart.findIndex((item) => item.product_id == product_id);
+  /*const index = cart.findIndex((item) => item.product_id == product_id);
   if (index === -1) {
     return next(new ApiError("Product not found in cart", 400));
   }
-  const item = cart[index];
-  if (quantity > item.quantity) {
-    return next(
-      new ApiError(`Cannot remove more than ${item.quantity} from cart`, 400)
-    );
-  }
-  item.quantity -= quantity;
-  if (item.quantity <= 0) {
-    cart.splice(index, 1);
-  }
-  user.cart = cart;
+  cart.splice(index, 1);
+  user.cart = cart;*/
+
+  user.cart = cart.filter((item) => item.product_id != product_id);
+
   await user.save({ validateBeforeSave: false });
   res.status(200).json({
     status: "success",

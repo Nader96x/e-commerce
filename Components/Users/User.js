@@ -27,6 +27,7 @@ const AddressSchema = new mongoose.Schema({
 }); // Schema For the Full Address
 
 const cartProductsSchema = new mongoose.Schema({
+  _id: false,
   product_id: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Product",

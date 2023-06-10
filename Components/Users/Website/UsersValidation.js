@@ -7,7 +7,7 @@ const updateProfile = customJoi.object({
     .string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ["com", "net", "org", "edu", "gov"] },
+      tlds: { allow: ["com", "net", "org"] },
     })
     .optional(),
   phone: customJoi
@@ -24,7 +24,7 @@ const register = customJoi.object({
     .string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ["com", "net", "org", "edu", "gov"] },
+      tlds: { allow: ["com", "net", "org"] },
     })
     .required(),
   password: customJoi.string().required().min(8),

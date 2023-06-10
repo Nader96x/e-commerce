@@ -50,7 +50,6 @@ const UpdatePassword = customJoi.object({
   passwordConfirm: customJoi
     .string()
     .required()
-    .min(8)
     .valid(customJoi.ref("password")),
 });
 
