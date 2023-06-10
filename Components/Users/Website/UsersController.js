@@ -19,21 +19,7 @@ exports.getUser = AsyncHandler(async (req, res, next) => {
 });
 
 exports.update = AsyncHandler(async (req, res, next) => {
-  if (req.body.address) {
-    return next(new ApiError("You cannot update your Address from here", 400));
-  }
-  if (req.body.password || req.body.confirmPassword) {
-    return next(new ApiError("You cannot update your Password from here", 400));
-  }
-  const filteredBody = filterObj(
-    req.body,
-    "name",
-    "email",
-    "phone",
-    "image",
-    "bio"
-  );
-  const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+  const user = await User.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
     runValidators: true,
   });

@@ -2,14 +2,6 @@ const AsyncHandler = require("express-async-handler");
 const User = require("../User");
 const ApiError = require("../../../Utils/ApiError");
 
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-};
-
 exports.getAllAddresses = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   const addresses = user.address;
@@ -32,23 +24,8 @@ exports.getAddress = AsyncHandler(async (req, res, next) => {
 });
 
 exports.addAddress = AsyncHandler(async (req, res, next) => {
-  if (
-    !req.body.city ||
-    !req.body.area ||
-    !req.body.country ||
-    !req.body.governorate
-  ) {
-    return next(new ApiError("Please Fill in All The Data", 400));
-  }
   const user = await User.findById(req.user.id);
-  const filtredObject = filterObj(
-    req.body,
-    "city",
-    "area",
-    "country",
-    "governorate"
-  );
-  await user.address.push(filtredObject);
+  await user.address.push(req.body);
   await user.save({ validateBeforeSave: false });
   res.status(201).json({
     status: "success",
@@ -64,14 +41,7 @@ exports.updateAddress = AsyncHandler(async (req, res, next) => {
   if (!userAddress) {
     return next(new ApiError("Address Not Found", 404));
   }
-  const filtredObject = filterObj(
-    req.body,
-    "city",
-    "area",
-    "country",
-    "governorate"
-  );
-  Object.assign(userAddress, filtredObject);
+  Object.assign(userAddress, req.body);
   await user.save({ validateBeforeSave: false });
   res.status(200).json({
     status: "success",
