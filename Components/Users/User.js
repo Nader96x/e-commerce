@@ -34,7 +34,7 @@ const cartProductsSchema = new mongoose.Schema({
   },
   quantity: {
     type: Number,
-    required: [true, "Product Quantity is required"],
+    default: 1,
   },
 }); // Schema For the Cart
 
@@ -117,11 +117,7 @@ const userSchema = mongoose.Schema(
       },
     },
     cart: {
-      type: [
-        {
-          type: cartProductsSchema,
-        },
-      ],
+      type: [cartProductsSchema],
     },
     reset_password_token: {
       type: String,
