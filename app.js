@@ -54,6 +54,7 @@ app.use((req, res, next) => {
 // Error Handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
+  // if (err?.keyPattern?.email) err.message = "Email already exists";
   res
     .status(statusCode)
     .json({ status: "fail", error: err.message, stack: err.stack });

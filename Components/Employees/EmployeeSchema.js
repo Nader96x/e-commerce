@@ -15,8 +15,8 @@ const EmployeeSchema = mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "Employee must have an email."],
       unique: [true, "Employee's email must be unique."],
+      required: [true, "Employee must have an email."],
       trim: true,
       lowercase: true,
       validate: {
@@ -117,6 +117,15 @@ EmployeeSchema.pre("save", async function (next) {
     console.log(this.password_changed_at);
   }
   next();
+});
+
+EmployeeSchema.post("save", (err, doc, next) => {
+  // console.log("post save", err);
+  if (err.name === "MongoError" && err.code === 11000) {
+    next(new Error("Email already exists"));
+  } else {
+    next(err);
+  }
 });
 
 // Methods
