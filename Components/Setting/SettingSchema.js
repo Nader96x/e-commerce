@@ -66,16 +66,7 @@ const SettingSchema = mongoose.Schema({
   about_us: String,
   contact_us: String,
   social_media: [SocialMedia],
-  /* social_media: {
-    facebook: String,
-    twitter: String,
-    instagram: String,
-    linkedin: String,
-  }, */
-  /* address: {
-    type: AddressSchema,
-    // required: [true, "Setting must have an address."],
-  }, */
+
   banners: [BannerSchema],
 });
 

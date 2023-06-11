@@ -7,7 +7,7 @@ const assignImage = (req, res, next) => {
   console.log("body", req.body);
   console.log("req.files", req.files);
 
-  if (req.files.logo) {
+  if (req.files?.logo) {
     req.body.logo = req.files.logo[0].location;
   }
   if (req.files.banners) {
