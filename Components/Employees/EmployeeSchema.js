@@ -89,7 +89,12 @@ const EmployeeSchema = mongoose.Schema(
 
 // Virtual Properties
 EmployeeSchema.virtual("role").get(function () {
+  // console.log("virtual role", this.role_id.name);
+  // console.log("virtual role", this.role_id.permissions);
   return this.role_id.name;
+});
+EmployeeSchema.virtual("permissions").get(function () {
+  return this.role_id.permissions;
 });
 
 // Query Middleware
@@ -123,6 +128,7 @@ EmployeeSchema.methods = {
       email: this.email,
       phone: this.phone,
       role: this.role,
+      permissions: this.permissions,
       is_banned: this.is_banned,
       createdAt: this.createdAt,
       last_password_changed_at: this.password_changed_at,
