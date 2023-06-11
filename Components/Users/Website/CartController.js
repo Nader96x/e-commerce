@@ -20,8 +20,6 @@ exports.getCartProducts = AsyncHandler(async (req, res, next) => {
 exports.addProduct = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   const { cart } = user;
-  if (req.body.quantity <= 0)
-    return next(new ApiError(`Cannot add ${req.body.quantity} amount`, 400));
   if (!req.body.quantity) req.body.quantity = 1;
   // eslint-disable-next-line camelcase
   const { product_id, quantity } = req.body;
@@ -58,20 +56,34 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
   });
 });
 
-exports.removeProduct = AsyncHandler(async (req, res, next) => {
-  const { product_id } = req.body;
-
+exports.updateQuantity = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   const { cart } = user;
-  /*const index = cart.findIndex((item) => item.product_id == product_id);
-  if (index === -1) {
-    return next(new ApiError("Product not found in cart", 400));
+  const { product_id, quantity } = req.body;
+  const product = await Product.findById(product_id);
+  if (!product) return next(new ApiError("Product Not Found", 404));
+  if (quantity > product.quantity) {
+    return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
-  cart.splice(index, 1);
-  user.cart = cart;*/
+  const updatedCart = await cart.map((item) => {
+    if (item.product_id == product_id) {
+      item.quantity = quantity;
+    }
+    return item;
+  });
+  user.cart = updatedCart;
+  await user.save({ validateBeforeSave: false });
+  res.status(200).json({
+    status: "success",
+    data: user.cart,
+  });
+});
 
+exports.removeProduct = AsyncHandler(async (req, res, next) => {
+  const { product_id } = req.body;
+  const user = await User.findById(req.user.id);
+  const { cart } = user;
   user.cart = cart.filter((item) => item.product_id != product_id);
-
   await user.save({ validateBeforeSave: false });
   res.status(200).json({
     status: "success",
