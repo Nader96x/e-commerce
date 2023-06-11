@@ -118,6 +118,30 @@ OrderSchema.pre("findOneAndUpdate", function (next) {
   }
   next();
 });
+// validate if ordrer is not empty
+OrderSchema.pre("save", function (next) {
+  if (this.products.length === 0) {
+    return next(new Error("order is empty"));
+  }
+  next();
+});
+// validate if ordrer is not complete or cancelled
+OrderSchema.pre("save", function (next) {
+  if (this.status === "Complete" || this.status === "Cancelled") {
+    return next(new Error("order is complete or cancelled"));
+  }
+  next();
+});
+// validate if ordrer is not complete or cancelled
+OrderSchema.pre("findOneAndUpdate", function (next) {
+  if (
+    this._update.status === "Complete" ||
+    this._update.status === "Cancelled"
+  ) {
+    return next(new Error("order is complete or cancelled"));
+  }
+  next();
+});
 
 const OrderModel = mongoose.model("Order", OrderSchema);
 module.exports = OrderModel;
