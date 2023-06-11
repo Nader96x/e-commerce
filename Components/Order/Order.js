@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Product = require("../Products/Product");
 
 const product = mongoose.Schema({
   product_id: {
@@ -142,6 +143,19 @@ OrderSchema.pre("findOneAndUpdate", function (next) {
   }
   next();
 });
-
+// increase total_orders by quantity for each product and decrease quantity
+OrderSchema.pre("save", async function (next) {
+  try {
+    for (let i = 0; i < this.products.length; i++) {
+      const product = await Product.findById(this.products[i].product_id);
+      product.total_orders += this.products[i].quantity;
+      product.quantity -= this.products[i].quantity;
+      await product.save();
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 const OrderModel = mongoose.model("Order", OrderSchema);
 module.exports = OrderModel;

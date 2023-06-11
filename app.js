@@ -53,8 +53,20 @@ app.use((req, res, next) => {
 
 // Error Handler
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
   // if (err?.keyPattern?.email) err.message = "Email already exists";
+  if (err.name === "ValidationError") {
+    err.message = {};
+    Object.values(err.errors).forEach((e) => {
+      err.message[e.path] = e.message;
+    });
+    err.statusCode = 422;
+  }
+  if (err.name === "CastError") {
+    err.message = `Invalid ${err.path}: ${err.value}`;
+    err.statusCode = 422;
+  }
+
+  const statusCode = err.statusCode || 500;
   res
     .status(statusCode)
     .json({ status: "fail", error: err.message, stack: err.stack });
