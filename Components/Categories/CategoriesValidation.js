@@ -21,24 +21,22 @@ const createCategory = customJoi.object({
   image: customJoi.string().required(),
 });
 
-const updateCategory = customJoi
-  .object({
-    name_ar: customJoi
-      .string()
-      .min(3)
-      .max(50)
-      .regex(/^[\u0600-\u06ff\s]+$/)
-      .optional(),
-    name_en: customJoi
-      .string()
-      .min(3)
-      .max(50)
-      .regex(/^[a-zA-Z\s]+$/)
-      .optional(),
-    image: customJoi.string().optional(),
-  })
-  .options({ allowUnknown: true });
+const updateCategory = customJoi.object({
+  name_ar: customJoi
+    .string()
+    .min(3)
+    .max(50)
+    .regex(/^[\u0600-\u06ff\s]+$/)
+    .optional(),
+  name_en: customJoi
+    .string()
+    .min(3)
+    .max(50)
+    .regex(/^[a-zA-Z\s]+$/)
+    .optional(),
+  image: customJoi.string().optional(),
+});
 
-module.exports.validateCategoryId = validateSchema(CategoryId);
+module.exports.validateCategoryId = validateSchema(CategoryId, "params");
 module.exports.validateCreateCategory = validateSchema(createCategory);
 module.exports.validateUpdateCategory = validateSchema(updateCategory);

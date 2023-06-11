@@ -37,42 +37,39 @@ const createProduct = customJoi.object({
   category_id: customJoi.objectId().required(),
 });
 
-const updateProduct = customJoi
-  .object({
-    name_ar: customJoi
-      .string()
-      .optional()
-      .min(3)
-      .max(50)
-      .regex(/^[\u0600-\u06ff\s]+$/),
-    name_en: customJoi
-      .string()
-      .optional()
-      .min(3)
-      .max(50)
-      .regex(/^[a-zA-Z\s]+$/),
-    desc_ar: customJoi
-      .string()
-      .optional()
-      .min(10)
-      .max(200)
-      .regex(/^[\u0600-\u06ff\s]+$/),
-    desc_en: customJoi
-      .string()
-      .optional()
-      .min(10)
-      .max(200)
-      .regex(/^[a-zA-Z\s]+$/),
-    price: customJoi.number().optional(),
-    image: customJoi.string().optional(),
-    images: customJoi.array().items(customJoi.string().optional()).optional(),
-    quantity: customJoi.number().optional().greater(-1),
-    // category_id: customJoi.objectId().optional(),
-    is_active: customJoi.boolean().optional(),
-    total_orders: customJoi.number().optional(),
-  })
-  .options({ allowUnknown: true });
+const updateProduct = customJoi.object({
+  name_ar: customJoi
+    .string()
+    .optional()
+    .min(3)
+    .max(50)
+    .regex(/^[\u0600-\u06ff\s]+$/),
+  name_en: customJoi
+    .string()
+    .optional()
+    .min(3)
+    .max(50)
+    .regex(/^[a-zA-Z\s]+$/),
+  desc_ar: customJoi
+    .string()
+    .optional()
+    .min(10)
+    .max(200)
+    .regex(/^[\u0600-\u06ff\s]+$/),
+  desc_en: customJoi
+    .string()
+    .optional()
+    .min(10)
+    .max(200)
+    .regex(/^[a-zA-Z\s]+$/),
+  price: customJoi.number().optional(),
+  image: customJoi.string().optional(),
+  images: customJoi.array().items(customJoi.string().optional()).optional(),
+  quantity: customJoi.number().optional().greater(-1),
+  is_active: customJoi.boolean().optional(),
+  total_orders: customJoi.number().optional(),
+});
 
-module.exports.validateProductId = validateSchema(productId);
+module.exports.validateProductId = validateSchema(productId, "params");
 module.exports.validateCreateProduct = validateSchema(createProduct);
 module.exports.validateUpdateProduct = validateSchema(updateProduct);
