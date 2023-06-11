@@ -10,7 +10,7 @@ const assignImage = (req, res, next) => {
   if (req.files?.logo) {
     req.body.logo = req.files.logo[0].location;
   }
-  if (req.files.banners) {
+  if (req.files?.banners) {
     req.body.banners = req.files.banners.map((img, i) => {
       return {
         image: img.location,
