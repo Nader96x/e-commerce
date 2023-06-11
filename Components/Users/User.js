@@ -37,6 +37,7 @@ const cartProductsSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
+  price: { type: Number, required: [true, "Price is required"] },
 }); // Schema For the Cart
 
 const userSchema = mongoose.Schema(
@@ -119,6 +120,7 @@ const userSchema = mongoose.Schema(
     },
     cart: {
       type: [cartProductsSchema],
+      populate: { path: "product_id" },
     },
     reset_password_token: {
       type: String,

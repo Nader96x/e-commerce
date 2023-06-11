@@ -3,17 +3,11 @@ const ApiError = require("../../../Utils/ApiError");
 const User = require("../User");
 const Product = require("../../Products/Product");
 
-exports.getCartProducts = AsyncHandler(async (req, res, next) => {
+exports.getCartProducts = AsyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id);
-  const cartProducts = user.cart;
-  if (cartProducts.length <= 0) {
-    return next(
-      new ApiError("Cart is Empty, Please add some products first", 404)
-    );
-  }
   res.status(200).json({
     status: "success",
-    data: cartProducts,
+    data: user.cart,
   });
 });
 
@@ -38,6 +32,7 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
         );
       }
       item.quantity += quantity;
+      item.price = product.price * item.quantity;
     }
     return item;
   });
@@ -45,8 +40,9 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
     (item) => item.product_id == product_id
   );
   if (!productFound) {
+    const price = product.price * quantity;
     // eslint-disable-next-line camelcase
-    updatedCart.push({ product_id, quantity });
+    updatedCart.push({ product_id, quantity, price });
   }
   user.cart = updatedCart;
   await user.save({ validateBeforeSave: false });
@@ -59,6 +55,7 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
 exports.updateQuantity = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   const { cart } = user;
+  // eslint-disable-next-line camelcase
   const { product_id, quantity } = req.body;
   const product = await Product.findById(product_id);
   if (!product) return next(new ApiError("Product Not Found", 404));
@@ -66,8 +63,10 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
   const updatedCart = await cart.map((item) => {
+    // eslint-disable-next-line camelcase
     if (item.product_id == product_id) {
       item.quantity = quantity;
+      item.price = product.price * item.quantity;
     }
     return item;
   });
@@ -80,6 +79,7 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
 });
 
 exports.removeProduct = AsyncHandler(async (req, res, next) => {
+  // eslint-disable-next-line camelcase
   const { product_id } = req.body;
   const user = await User.findById(req.user.id);
   const { cart } = user;
