@@ -13,9 +13,16 @@ function validateSchema(schema, property = `body`) {
     );
     if (process.env.NODE_ENV === "development") console.log(error, value);
     if (error) {
-      const errorMessages = error.details.map((detail) => detail.message);
-      if (process.env.NODE_ENV === "development") console.log(errorMessages);
-      return next(new ApiError(errorMessages, 422));
+      const errors = {};
+      error.details.forEach((detail) => {
+        errors[detail.context.key] = detail.message;
+      });
+      // const errorMessages = error.details.map((detail) => detail.message);
+      // console.log(errorMessages);
+      // console.log(errors);
+      if (process.env.NODE_ENV === "development") console.log(errors);
+      // return next(new ApiError(errors, 422));
+      return res.status(422).json({ status: "fail", error: errors });
     }
     next();
   });
