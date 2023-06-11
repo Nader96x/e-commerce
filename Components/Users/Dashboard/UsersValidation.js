@@ -53,10 +53,9 @@ const updateUser = customJoi.object({
     .pattern(/^01[0125][0-9]{8}$/),
   image: customJoi.string().optional(),
   bio: customJoi.string().optional(),
-  id: customJoi.objectId().required(),
 });
 
-module.exports.validateUserId = validateSchema(userID);
-module.exports.validateGetAddress = validateSchema(getOneAddress);
+module.exports.validateUserId = validateSchema(userID, "params");
+module.exports.validateGetAddress = validateSchema(getOneAddress, "params");
 module.exports.validateCreateUser = validateSchema(createUser);
 module.exports.validateUpdateUser = validateSchema(updateUser);
