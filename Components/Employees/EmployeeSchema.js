@@ -119,14 +119,15 @@ EmployeeSchema.pre("save", async function (next) {
   next();
 });
 
-/*EmployeeSchema.post("save", (err, doc, next) => {
+EmployeeSchema.post("save", (err, doc, next) => {
   // console.log("post save", err);
   if (err.name === "MongoError" && err.code === 11000) {
-    next(new Error("Email already exists"));
+    // console.log(err);
+    next(new Error(`${Object.keys(err.keyPattern)} already exists`));
   } else {
     next(err);
   }
-});*/
+});
 
 // Methods
 EmployeeSchema.methods = {
