@@ -36,6 +36,20 @@ app.use("/", UserAuthRouter);
 app.use("/profile", WebUsersRouter);
 
 // V1 Routes
+v1Router.get("/routes", (req, res) => {
+  const routes = [
+    "categories",
+    "products",
+    "users",
+    "roles",
+    "employees",
+    "orders",
+  ];
+  res.json({
+    message: "success",
+    data: { routes, ban: ["users", "employees"] },
+  });
+});
 v1Router.use("/employees", EmployeeRouter);
 v1Router.use("/categories", CategoriesRouter);
 v1Router.use("/products", ProductsRouter);
