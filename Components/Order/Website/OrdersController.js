@@ -1,17 +1,9 @@
 const AsyncHandler = require("express-async-handler");
-const Pusher = require("pusher");
 const Order = require("../Order");
 const User = require("../../Users/User");
 const ApiError = require("../../../Utils/ApiError");
 const ApiFeatures = require("../../../Utils/ApiFeatures");
-
-const pusher = new Pusher({
-  appId: "1618578",
-  key: "0fc4fc03768ac1db6774",
-  secret: "04a7344b0bc8b36670db",
-  cluster: "eu",
-  useTLS: true,
-});
+const pusher = require("../../../helpers/Pusher");
 
 exports.getOrders = AsyncHandler(async (req, res, next) => {
   const documentsCount = await Order.find({

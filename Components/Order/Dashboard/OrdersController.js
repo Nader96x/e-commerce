@@ -3,6 +3,8 @@ const OrderModel = require("../Order");
 const Factory = require("../../../Utils/Factory");
 const ApiError = require("../../../Utils/ApiError");
 const Order = require("../Order");
+const pusher = require("../../../helpers/Pusher");
+
 /*
  * @description get all orders in the system for admin / get all orders for specific user by userID
  * @route GET /api/v1/orders
@@ -23,6 +25,13 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
     { status: "Processing" },
     { new: true }
   );
+
+  pusher.trigger(`user-${order.user_id}`, "my-order", {
+    message: "Your order is being processed",
+    order_id: order._id,
+    status: order.status,
+  });
+
   res.status(200).json({
     status: "success",
     data: {
@@ -41,6 +50,13 @@ module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
     { status: "Cancelled" },
     { new: true }
   );
+
+  pusher.trigger(`user-${order.user_id}`, "my-order", {
+    message: "Your order has been cancelled",
+    order_id: order._id,
+    status: order.status,
+  });
+
   res.status(200).json({
     status: "success",
     data: {
@@ -63,6 +79,13 @@ module.exports.completeOrder = AsyncHandler(async (req, res, next) => {
   order.status = "Completed";
   order.payment_status = "Paid";
   await order.save({ validateBeforeSave: false });
+
+  pusher.trigger(`user-${order.user_id}`, "my-order", {
+    message: "Your order has been completed",
+    order_id: order._id,
+    status: order.status,
+  });
+
   res.status(200).json({
     status: "success",
     data: {
