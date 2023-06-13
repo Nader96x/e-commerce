@@ -3,6 +3,7 @@ const Order = require("../Order");
 const User = require("../../Users/User");
 const Product = require("../../Products/Product");
 const ApiError = require("../../../Utils/ApiError");
+const pusher = require("../../../helpers/Pusher");
 const Factory = require("../../../Utils/Factory");
 
 exports.getOrders = Factory.getAll(Order);
@@ -35,6 +36,14 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
   await order.save();
   user.cart = [];
   await user.save({ validateBeforeSave: false });
+
+  // Notify admins using Pusher
+  const notificationMessage = "New order received";
+  pusher.trigger("admin-channel", "new-order", {
+    message: notificationMessage,
+    order: order,
+  });
+
   res.status(201).json({
     status: "success",
     data: order,
