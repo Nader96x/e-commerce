@@ -73,7 +73,8 @@ const productSchema = mongoose.Schema(
       trim: true,
     },
     price: {
-      type: mongoose.SchemaTypes.Decimal128,
+      type: Number,
+      min: [0.01, "Product Price cannot be less than 0.01"],
       required: [true, "Product Price is Required"],
     },
     image: {

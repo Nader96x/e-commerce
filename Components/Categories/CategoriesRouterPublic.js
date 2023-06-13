@@ -11,6 +11,7 @@ router.get(
   },
   CategoriesController.getPublicCategories
 );
+router.get("/:slug/products", CategoriesController.getProductsByCategory);
 router.get("/:slug", CategoriesController.getOneCategoryBySlug);
 
 module.exports = router;

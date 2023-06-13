@@ -21,6 +21,7 @@ const product = mongoose.Schema({
 });
 
 const address = mongoose.Schema({
+  _id: false,
   area: {
     type: String,
     required: [true, "area is required"],
@@ -40,6 +41,8 @@ const OrderSchema = mongoose.Schema(
     products: [product],
     total_price: {
       type: Number,
+      min: [1, " invaild price should be positive number"],
+      // currency: "EGP",
       required: [true, "total price is required"],
     },
     status: {
@@ -50,6 +53,7 @@ const OrderSchema = mongoose.Schema(
     status_history: {
       type: [
         {
+          _id: false,
           status: {
             type: String,
             enum: ["Pending", "Processing", "Complete", "Cancelled"],
