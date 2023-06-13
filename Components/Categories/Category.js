@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
 const ApiError = require("../../Utils/ApiError");
+const Product = require("../Products/Product");
 
 const categorySchema = mongoose.Schema(
   {
@@ -72,9 +73,12 @@ categorySchema.pre("findByIdAndUpdate", async function (next) {
   next();
 });
 
-categorySchema.pre("remove", async function (next) {
-  const products = await this.getProductByCategoryId(this._id);
-  if (products.length > 0 && products.some((product) => product.category_id)) {
+categorySchema.pre("findOneAndDelete", async (next) => {
+  const products = await Product.find({
+    category_id: this._id,
+  }).countDocuments();
+  console.log(products);
+  if (products > 0) {
     return next(
       new ApiError("Category Cannot Be Deleted, It Has Products", 400)
     );
@@ -82,10 +86,10 @@ categorySchema.pre("remove", async function (next) {
   next();
 });
 
-categorySchema.methods.getProductByCategoryId = function (id) {
+categorySchema.methods.getProductByCategoryId = async function (id) {
   // eslint-disable-next-line global-require
-  const Product = require("../Products/Product");
-  return Product.find({ category_id: id }).populate("category_id");
+
+  return await Product.find({ category_id: id }).countDocuments();
 };
 
 const Category = mongoose.model("Category", categorySchema);

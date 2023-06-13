@@ -35,6 +35,7 @@ const createProduct = customJoi.object({
   images: customJoi.array().items(customJoi.string().required()).required(),
   quantity: customJoi.number().required().greater(-1),
   category_id: customJoi.objectId().required(),
+  total_orders: customJoi.number().optional(),
 });
 
 const updateProduct = customJoi.object({
