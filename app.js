@@ -2,6 +2,12 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const refresh = require("./Components/github_refresh/refresh");
+
+//Middlewares
+const ErrorWare = require("./MiddelWares/errorWare");
+
+//Routers
+const WebsiteRouter = require("./Routes/Website");
 const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const UserAuthRouter = require("./Components/Users/Website/Auth/AuthRouter");
 const EmployeeRouter = require("./Components/Employees/EmployeeRouter");
@@ -27,9 +33,9 @@ app.use(express.static(process.env.PUBLIC_FOLDER || "public"));
 // Refresh Route
 app.use("/refresh", refresh);
 
-// Routes
+// Website Routes
 app.use("/settings", SettingsRouter);
-
+app.use("/", WebsiteRouter);
 // Dashboard Route
 app.use("/admin", AuthRouter);
 app.use("/", UserAuthRouter);
@@ -66,24 +72,6 @@ app.use((req, res, next) => {
 });
 
 // Error Handler
-app.use((err, req, res, next) => {
-  // if (err?.keyPattern?.email) err.message = "Email already exists";
-  if (err.name === "ValidationError") {
-    err.message = {};
-    Object.values(err.errors).forEach((e) => {
-      err.message[e.path] = e.message;
-    });
-    err.statusCode = 422;
-  }
-  if (err.name === "CastError") {
-    err.message = `Invalid ${err.path}: ${err.value}`;
-    err.statusCode = 422;
-  }
-
-  const statusCode = err.statusCode || 500;
-  res
-    .status(statusCode)
-    .json({ status: "fail", error: err.message, stack: err.stack });
-});
+app.use(ErrorWare);
 
 module.exports = app;

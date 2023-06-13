@@ -119,7 +119,7 @@ EmployeeSchema.pre("save", async function (next) {
   next();
 });
 
-EmployeeSchema.post("save", (err, doc, next) => {
+/*EmployeeSchema.post("save", (err, doc, next) => {
   // console.log("post save", err);
   if (err.name === "MongoError" && err.code === 11000) {
     // console.log(err);
@@ -127,7 +127,7 @@ EmployeeSchema.post("save", (err, doc, next) => {
   } else {
     next(err);
   }
-});
+});*/
 
 // Methods
 EmployeeSchema.methods = {
@@ -150,7 +150,10 @@ EmployeeSchema.methods = {
     // console.log("isAuthorized");
     // console.log(method, routes);
     // console.log(this.role_id);
+    const externalRoutes = ["ban", "unban", "active", "deactive"];
     if (!this.role_id || routes.length < 3) return false;
+    if (this.role_id.name == "super admin") return true;
+    if (!this.role_id.is_active) return false;
     const entityObj = this.role_id.permissions.find(
       (perm) =>
         // console.log(perm.entity, routes[2]);
@@ -161,13 +164,14 @@ EmployeeSchema.methods = {
     if (
       routes.length == 5 &&
       method == "POST" &&
-      (routes[4] == "ban" || routes[4] == "ban")
+      // (routes[4] == "ban" || routes[4] == "ban")
+      externalRoutes.includes(routes[4])
     ) {
       // console.log("ban");
       if (
-        (routes[4] == "ban" && entityObj.access.ban) ||
-        routes[4] == "unban" ||
-        entityObj.access.unban
+        entityObj.access[routes[4].toLowerCase()]
+        // (routes[4] == "ban" && entityObj.access.ban) ||
+        // (routes[4] == "unban" && entityObj.access.unban)
       )
         return true;
     } else if (entityObj.access.all || entityObj.access[method.toLowerCase()]) {

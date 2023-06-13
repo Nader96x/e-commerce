@@ -20,11 +20,17 @@ const RoleSchema = mongoose.Schema(
       type: "string",
       trim: true,
       required: [true, "role name is required"],
+      minLength: [3, "role name can't be less than 3 characters"],
+      maxLength: [50, "role name can't be more than 50 characters"],
       unique: true,
     },
     permissions: {
       type: [Permission],
       required: [true, "permissions  are required"],
+    },
+    is_active: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }
