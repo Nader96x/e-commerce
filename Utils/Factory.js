@@ -39,6 +39,18 @@ module.exports.getOne = (Model) =>
 
     res.status(200).json({ status: "success", data: document });
   });
+module.exports.getOneBySlug = (Model) =>
+  asyncHandler(async ({ params }, res, next) => {
+    const { slug } = params;
+    const query = Model.findOne({ slug: slug });
+    const document = await query;
+    if (!document)
+      return next(
+        new ApiError(`no ${Model.modelName} for this slug ${slug}`, 404)
+      );
+
+    res.status(200).json({ status: "success", data: document });
+  });
 
 /*
  create one handler for endpoint

@@ -42,6 +42,10 @@ const categorySchema = mongoose.Schema(
       trim: true,
     },
     slug: String,
+    is_active: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );

@@ -25,17 +25,4 @@ exports.getProductsByCategory = AsyncHandler(async (req, res, next) => {
 });
 
 exports.getPublicProducts = Factory.getAll(Product);
-exports.getOneProductBySlug = async (req, res, next) => {
-  try {
-    const product = await Product.findOne({ slug: req.params.slug });
-    if (!product) {
-      return next(new ApiError("No Product Found", 400));
-    }
-    res.status(200).json({
-      status: "success",
-      data: product,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+exports.getOneProductBySlug = Factory.getOneBySlug(Product);

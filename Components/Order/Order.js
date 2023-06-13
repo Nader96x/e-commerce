@@ -12,11 +12,11 @@ const product = mongoose.Schema({
     required: [true, "quantity  is required"],
     min: [1, " minimum quantity should be  1 "],
   },
-  price: {
+  /*price: {
     type: Number,
     min: [1, " invaild price should be positive number"],
     required: [true, "price  is requires"],
-  },
+  },*/
 });
 
 const address = mongoose.Schema({
@@ -46,19 +46,22 @@ const OrderSchema = mongoose.Schema(
       enum: ["Pending", "Processing", "Complete", "Cancelled"],
       default: "Pending",
     },
-    status_history: [
-      {
-        status: {
-          type: String,
-          enum: ["Pending", "Processing", "Complete", "Cancelled"],
-          // required: [true, "status is required"],
+    status_history: {
+      type: [
+        {
+          status: {
+            type: String,
+            enum: ["Pending", "Processing", "Complete", "Cancelled"],
+            // required: [true, "status is required"],
+          },
+          date: {
+            type: Date,
+            default: Date.now(),
+          },
         },
-        date: {
-          type: Date,
-          default: Date.now(),
-        },
-      },
-    ],
+      ],
+      default: [{ status: "Pending", date: Date.now() }],
+    },
     address: {
       type: address,
       required: [true, "address is required"],
@@ -102,7 +105,7 @@ OrderSchema.virtual("products.product", {
 });
 // update status history
 OrderSchema.pre("save", function (next) {
-  if (this.isModified("status")) {
+  if (this.isModified("status") && this.status !== "Pending") {
     this.status_history.push({
       status: this.status,
     });
