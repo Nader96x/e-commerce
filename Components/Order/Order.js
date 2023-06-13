@@ -12,11 +12,11 @@ const product = mongoose.Schema({
     required: [true, "quantity  is required"],
     min: [1, " minimum quantity should be  1 "],
   },
-  /*price: {
+  price: {
     type: Number,
     min: [1, " invaild price should be positive number"],
     required: [true, "price  is requires"],
-  },*/
+  },
 });
 
 const address = mongoose.Schema({
@@ -147,7 +147,7 @@ OrderSchema.pre("findOneAndUpdate", function (next) {
   next();
 });
 // increase total_orders by quantity for each product and decrease quantity
-OrderSchema.pre("save", async function (next) {
+OrderSchema.post("save", async function (next) {
   try {
     for (let i = 0; i < this.products.length; i++) {
       const product = await Product.findById(this.products[i].product_id);

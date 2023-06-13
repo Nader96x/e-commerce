@@ -1,4 +1,4 @@
-module.exports = (err, req, res, next) => {
+module.exports._500 = (err, req, res, next) => {
   // if (err?.keyPattern?.email) err.message = "Email already exists";
   console.log(err);
   if (err.name === "ValidationError") {
@@ -29,4 +29,8 @@ module.exports = (err, req, res, next) => {
   res
     .status(statusCode)
     .json({ status: "fail", error: err.message, stack: err.stack });
+};
+
+module.exports._404 = (req, res, next) => {
+  res.status(404).json({ status: "fail", error: "Page not found." });
 };
