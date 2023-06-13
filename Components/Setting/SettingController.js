@@ -25,3 +25,13 @@ module.exports.updateSetting = async (req, res) => {
     res.status(400).json({ status: "fail", error });
   }
 };
+
+module.exports.banners = async (req, res) => {
+  try {
+    const settings = await Setting.setting();
+    console.log("settings", settings.setting);
+    res.status(200).json({ status: "success", data: settings.setting.banners });
+  } catch (error) {
+    res.status(400).json({ status: "fail", error });
+  }
+};

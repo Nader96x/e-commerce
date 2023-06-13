@@ -4,7 +4,7 @@ const User = require("../User");
 const Product = require("../../Products/Product");
 
 exports.getCartProducts = AsyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate("cart.product_id");
   res.status(200).json({
     status: "success",
     data: user.cart,
