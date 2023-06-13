@@ -73,11 +73,13 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     if (!orderAddress) return next(new ApiError("Address Not Found", 404));
   }
   const products = [];
+  let total_price = 0;
   for (const product of order.products) {
     const { product_id, quantity, price } = product;
     const availableProduct = await Product.findOne({
       _id: product_id,
       quantity: { $gte: quantity },
+      is_active: true,
     });
     if (!availableProduct) {
       return next(new ApiError(`Some Products Are Not Available`, 400));
@@ -85,13 +87,14 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     products.push({
       product_id,
       quantity,
-      price,
+      price: availableProduct.price,
     });
+    total_price += quantity * availableProduct.price;
   }
   const newOrder = new Order({
     user_id: req.user._id,
     products,
-    total_price: order.total_price,
+    total_price: total_price,
     address: orderAddress,
   });
   await newOrder.save();
