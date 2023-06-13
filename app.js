@@ -16,8 +16,9 @@ const SettingsRouter = require("./Components/Setting/SettingRouter");
 const ProductsRouter = require("./Components/Products/ProductsRouter");
 const DashUsersRouter = require("./Components/Users/Dashboard/UsersRouter");
 const WebUsersRouter = require("./Components/Users/Website/UsersRouter");
-const OrderRouter = require("./Components/Order/OrdersRouter");
+const OrderRouter = require("./Components/Order/Dashboard/OrdersRouter");
 const RolesRouter = require("./Components/Roles/RolesRouter");
+const WebOrdersRouter = require("./Components/Order/Website/OrdersRouter");
 
 const app = express();
 const v1Router = express.Router();
@@ -36,6 +37,7 @@ app.use("/refresh", refresh);
 // Website Routes
 app.use("/settings", SettingsRouter);
 app.use("/", WebsiteRouter);
+app.use("/orders", WebOrdersRouter);
 // Dashboard Route
 app.use("/admin", AuthRouter);
 app.use("/", UserAuthRouter);
