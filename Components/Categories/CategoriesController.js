@@ -10,4 +10,8 @@ exports.createCategory = Factory.createOne(Category);
 
 exports.updateCategory = Factory.updateOne(Category);
 
-exports.deleteCategory = Factory.deleteOne(Category, Product, "category_id");
+exports.deleteCategory = Factory.deleteOne(Category);
+
+exports.getPublicCategories = Factory.getAll(Category);
+
+exports.getOneCategoryBySlug = Factory.getOneBySlug(Category);
