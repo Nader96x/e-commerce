@@ -9,6 +9,7 @@ const { _404, _500 } = require("./MiddelWares/errorsWare");
 //Routers
 const WebsiteRouter = require("./Routes/Website");
 const DashboardRouter = require("./Routes/Dashboard");
+const DispatchSystemChangeStatusAPIroutes = require("./Routes/DispatchSystemChangeStatusAPIroutes");
 
 const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const UserAuthRouter = require("./Components/Users/Website/Auth/AuthRouter");
@@ -27,6 +28,9 @@ app.use(express.static(process.env.PUBLIC_FOLDER || "public"));
 
 //  Github Refresh Route
 app.use("/refresh", refresh);
+
+// Dispatch System Change Status API
+app.use("/dispatch", DispatchSystemChangeStatusAPIroutes);
 
 // Dashboard
 app.use("/admin", AuthRouter); // Auth Routes
