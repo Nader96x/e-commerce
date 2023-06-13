@@ -1,27 +1,11 @@
 const AsyncHandler = require("express-async-handler");
 const Order = require("../Order");
 const User = require("../../Users/User");
+const Product = require("../../Products/Product");
 const ApiError = require("../../../Utils/ApiError");
-const ApiFeatures = require("../../../Utils/ApiFeatures");
+const Factory = require("../../../Utils/Factory");
 
-exports.getOrders = AsyncHandler(async (req, res, next) => {
-  const documentsCount = await Order.find({
-    user_id: req.user.id,
-  }).countDocuments();
-  const apiFeatures = new ApiFeatures(
-    req.query,
-    Order.find({ user_id: req.user.id })
-  );
-  // else apiFeatures = new ApiFeatures(query, Model.find(filter));
-  apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
-
-  const { mongooseQuery, paginationResult: pagination } = apiFeatures;
-  /** execute query  */
-  const documents = await mongooseQuery;
-  res
-    .status(200)
-    .json({ result: documents.length, pagination, data: documents });
-});
+exports.getOrders = Factory.getAll(Order);
 
 exports.createOrder = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -60,9 +44,50 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
 exports.cancelOrder = AsyncHandler(async (req, res, next) => {
   const filter = { user_id: req.user.id };
   await Order.findOneAndUpdate(filter, { status: "Cancelled" });
-
-  res.status(200).json({
+  res.status(204).json({
     status: "success",
-    data: order,
+    data: null,
+  });
+});
+
+exports.reorder = AsyncHandler(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+  if (!order || order.status !== "Completed") {
+    return next(new ApiError("Order not found or Not Completed", 404));
+  }
+  let orderAddress = order.address;
+  if (req.body.address_id) {
+    const user = await User.findById(req.user.id);
+    orderAddress = await user.address.find((address) =>
+      address._id.equals(req.body.address_id)
+    );
+    if (!orderAddress) return next(new ApiError("Address Not Found", 404));
+  }
+  const products = [];
+  for (const product of order.products) {
+    const { product_id, quantity, price } = product;
+    const availableProduct = await Product.findOne({
+      _id: product_id,
+      quantity: { $gte: quantity },
+    });
+    if (!availableProduct) {
+      return next(new ApiError(`Some Products Are Not Available`, 400));
+    }
+    products.push({
+      product_id,
+      quantity,
+      price,
+    });
+  }
+  const newOrder = new Order({
+    user_id: req.user._id,
+    products,
+    total_price: order.total_price,
+    address: orderAddress,
+  });
+  await newOrder.save();
+  res.status(201).json({
+    status: "success",
+    data: newOrder,
   });
 });

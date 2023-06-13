@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Product = require("../Products/Product");
 const ApiError = require("../../Utils/ApiError");
+const User = require("../Users/User");
 
 const product = mongoose.Schema({
   _id: false,
@@ -48,7 +49,7 @@ const OrderSchema = mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Processing", "Complete", "Cancelled"],
+      enum: ["Pending", "Processing", "Completed", "Cancelled"],
       default: "Pending",
     },
     status_history: {
@@ -57,7 +58,7 @@ const OrderSchema = mongoose.Schema(
           _id: false,
           status: {
             type: String,
-            enum: ["Pending", "Processing", "Complete", "Cancelled"],
+            enum: ["Pending", "Processing", "Completed", "Cancelled"],
             // required: [true, "status is required"],
           },
           date: {
@@ -126,7 +127,7 @@ OrderSchema.pre("findOneAndUpdate", async function (next) {
   const filter = this.getFilter();
   const order = await this.model.findOne(filter);
   if (!order) {
-    return next(new Error("Order not found"));
+    return next(new ApiError("Order not found", 404));
   }
   if (order.status !== "Pending") {
     return next(
@@ -140,7 +141,7 @@ OrderSchema.pre("findOneAndUpdate", async function (next) {
 });
 // increase total_orders by quantity for each product and decrease quantity
 
-OrderSchema.post("create", async function (next) {
+OrderSchema.post("save", async function (next) {
   try {
     for (let i = 0; i < this.products.length; i++) {
       const product = await Product.findById(this.products[i].product_id);

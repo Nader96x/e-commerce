@@ -38,16 +38,6 @@ router
     validateUpdateCategory,
     categoryController.updateCategory
   )
-  .delete(async (req, res, next) => {
-    const products = await Product.find({
-      category_id: req.params.id,
-    }).countDocuments();
-    if (products > 0) {
-      return next(
-        new ApiError("Category Cannot Be Deleted, It Has Products", 400)
-      );
-    }
-    next();
-  }, categoryController.deleteCategory);
+  .delete(categoryController.deleteCategory);
 
 module.exports = router;

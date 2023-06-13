@@ -1,7 +1,6 @@
 const asyncHandler = require("express-async-handler");
 const ApiError = require("./ApiError");
 const ApiFeatures = require("./ApiFeatures");
-const Category = require("../Components/Categories/Category");
 
 module.exports.getAll = (Model) =>
   asyncHandler(async ({ body, query }, res, next) => {
@@ -10,12 +9,8 @@ module.exports.getAll = (Model) =>
 
     /** BUILD query*/
     const documentsCount = await Model.countDocuments();
-    // let apiFeatures = "";
-    // if (populateOption)
     const apiFeatures = new ApiFeatures(query, Model.find(filter));
-    // else apiFeatures = new ApiFeatures(query, Model.find(filter));
     apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
-
     const { mongooseQuery, paginationResult: pagination } = apiFeatures;
     /** execute query  */
     const documents = await mongooseQuery;
@@ -48,7 +43,6 @@ module.exports.getOneBySlug = (Model) =>
       return next(
         new ApiError(`no ${Model.modelName} for this slug ${slug}`, 404)
       );
-
     res.status(200).json({ status: "success", data: document });
   });
 

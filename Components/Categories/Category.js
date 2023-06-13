@@ -73,24 +73,14 @@ categorySchema.pre("findByIdAndUpdate", async function (next) {
   next();
 });
 
-/*categorySchema.pre("findOneAndDelete", async (next) => {
-  const products = await Product.find({
-    category_id: this._id,
-  }).countDocuments();
-  console.log(products);
-  if (products > 0) {
-    return next(
-      new ApiError("Category Cannot Be Deleted, It Has Products", 400)
-    );
+categorySchema.pre("findOneAndDelete", async function (next) {
+  const filter = this.getFilter();
+  const products = await Product.find({ category_id: filter._id });
+  if (products) {
+    return next(new ApiError("Category Has Products, Cannot be deleted", 400));
   }
   next();
 });
-
-categorySchema.methods.getProductByCategoryId = async function (id) {
-  // eslint-disable-next-line global-require
-
-  return await Product.find({ category_id: id }).countDocuments();
-};*/
 
 const Category = mongoose.model("Category", categorySchema);
 
