@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const refresh = require("./Components/github_refresh/refresh");
-
+require("./helpers/Seeder")();
 //Middlewares
 const { _404, _500 } = require("./MiddelWares/errorsWare");
 
