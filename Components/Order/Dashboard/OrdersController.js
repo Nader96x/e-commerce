@@ -2,6 +2,7 @@ const AsyncHandler = require("express-async-handler");
 const OrderModel = require("../Order");
 const Factory = require("../../../Utils/Factory");
 const ApiError = require("../../../Utils/ApiError");
+const Order = require("../Order");
 /*
  * @description get all orders in the system for admin / get all orders for specific user by userID
  * @route GET /api/v1/orders
@@ -16,15 +17,12 @@ module.exports.getOrders = Factory.getAll(OrderModel);
 module.exports.getOrder = Factory.getOne(OrderModel);
 
 module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
-  const order = await OrderModel.findById(req.params.id);
-  if (!order) {
-    return next(new ApiError("Order is not found.", 404));
-  }
-  if (order.status !== "Pending") {
-    return next(new ApiError(`${order.status} Order cannot be confirmed`, 400));
-  }
-  order.status = "Processing";
-  await order.save({ validateBeforeSave: false });
+  const filter = { _id: req.params.id };
+  const order = await Order.findOneAndUpdate(
+    filter,
+    { status: "Processing" },
+    { new: true }
+  );
   res.status(200).json({
     status: "success",
     data: {
@@ -37,15 +35,12 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
 });
 
 module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
-  const order = await OrderModel.findById(req.params.id);
-  if (!order) {
-    return next(new ApiError("Order is not found.", 404));
-  }
-  if (order.status !== "Pending") {
-    return next(new ApiError(`${order.status} Order cannot be canceled`, 400));
-  }
-  order.status = "Cancelled";
-  await order.save({ validateBeforeSave: false });
+  const filter = { _id: req.params.id };
+  const order = await Order.findOneAndUpdate(
+    filter,
+    { status: "Cancelled" },
+    { new: true }
+  );
   res.status(200).json({
     status: "success",
     data: {

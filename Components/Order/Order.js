@@ -120,11 +120,8 @@ OrderSchema.pre("save", function (next) {
   }
   next();
 });
-// validate if order is not empty
 
-// validate if order is not complete or cancelled
-
-// validate if order is not complete or cancelled
+// validate if order is not Pending
 OrderSchema.pre("findOneAndUpdate", async function (next) {
   const filter = this.getFilter();
   const order = await this.model.findOne(filter);
@@ -132,7 +129,12 @@ OrderSchema.pre("findOneAndUpdate", async function (next) {
     return next(new Error("Order not found"));
   }
   if (order.status !== "Pending") {
-    return next(new ApiError("Sorry, this order cannot be Cancelled", 400));
+    return next(
+      new ApiError(
+        `Sorry, ${order.status} order cannot be changed To ${this._update.status}`,
+        400
+      )
+    );
   }
   next();
 });
