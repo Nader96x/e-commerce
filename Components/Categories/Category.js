@@ -73,7 +73,7 @@ categorySchema.pre("findByIdAndUpdate", async function (next) {
   next();
 });
 
-categorySchema.pre("findOneAndDelete", async (next) => {
+/*categorySchema.pre("findOneAndDelete", async (next) => {
   const products = await Product.find({
     category_id: this._id,
   }).countDocuments();
@@ -90,7 +90,7 @@ categorySchema.methods.getProductByCategoryId = async function (id) {
   // eslint-disable-next-line global-require
 
   return await Product.find({ category_id: id }).countDocuments();
-};
+};*/
 
 const Category = mongoose.model("Category", categorySchema);
 

@@ -38,8 +38,7 @@ router
     validateUpdateCategory,
     categoryController.updateCategory
   )
-  .delete(
-    /*async (req, res, next) => {
+  .delete(async (req, res, next) => {
     const products = await Product.find({
       category_id: this._id,
     }).countDocuments();
@@ -50,7 +49,6 @@ router
       );
     }
     next();
-  },*/ categoryController.deleteCategory
-  );
+  }, categoryController.deleteCategory);
 
 module.exports = router;
