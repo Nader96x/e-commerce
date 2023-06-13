@@ -41,8 +41,8 @@ router
   .delete(usersController.deleteUser);
 
 // User Status Routes
-router.post("/:id/activate", validateUserId, usersController.activateUser);
-router.post("/:id/deactivate", validateUserId, usersController.deActivateUser);
+router.post("/:id/ban", validateUserId, usersController.activateUser);
+router.post("/:id/unban", validateUserId, usersController.deActivateUser);
 
 // Addresses Route
 router.get("/:id/address", validateUserId, addressesController.getAllAddresses);

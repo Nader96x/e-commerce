@@ -68,7 +68,6 @@ const updateProduct = customJoi.object({
   quantity: customJoi.number().optional().greater(-1),
   is_active: customJoi.boolean().optional(),
   total_orders: customJoi.number().optional(),
-  category_id: customJoi.objectId().optional(),
 });
 
 module.exports.validateProductId = validateSchema(productId, "params");

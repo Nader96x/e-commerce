@@ -1,9 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
-const Product = require("../Products/Product");
 const ApiError = require("../../Utils/ApiError");
-
-const updateSlug = function () {};
 
 const categorySchema = mongoose.Schema(
   {
@@ -48,7 +45,7 @@ const categorySchema = mongoose.Schema(
   },
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
-let slug;
+
 // Document MiddleWare: runs before save(), create()
 categorySchema.pre("save", function (next) {
   this.slug = slugify(this.name_en, {
@@ -60,8 +57,8 @@ categorySchema.pre("save", function (next) {
   next();
 });
 
-categorySchema.pre("update", function (next) {
-  this.slug = slugify(this.name_en, {
+categorySchema.pre("update", async function (next) {
+  this.slug = await slugify(this.name_en, {
     lower: true,
     replacement: "-",
     remove: /[*+~.()'"!:@]/g,

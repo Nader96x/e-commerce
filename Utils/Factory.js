@@ -3,7 +3,7 @@ const ApiError = require("./ApiError");
 const ApiFeatures = require("./ApiFeatures");
 const Category = require("../Components/Categories/Category");
 
-module.exports.getAll = (Model, populateOption) =>
+module.exports.getAll = (Model) =>
   asyncHandler(async ({ body, query }, res, next) => {
     let filter = {};
     if (body.filterObject) filter = body.filterObject;
@@ -12,10 +12,7 @@ module.exports.getAll = (Model, populateOption) =>
     const documentsCount = await Model.countDocuments();
     // let apiFeatures = "";
     // if (populateOption)
-    const apiFeatures = new ApiFeatures(
-      query,
-      Model.find(filter).populate(populateOption)
-    );
+    const apiFeatures = new ApiFeatures(query, Model.find(filter));
     // else apiFeatures = new ApiFeatures(query, Model.find(filter));
     apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
 
@@ -32,11 +29,10 @@ module.exports.getAll = (Model, populateOption) =>
   @param {Model} model
   @return {response} response {document<model>}
 */
-module.exports.getOne = (Model, populateOption) =>
+module.exports.getOne = (Model) =>
   asyncHandler(async ({ params }, res, next) => {
     const { id } = params;
-    let query = Model.findById(id);
-    if (populateOption) query = query.populate(populateOption);
+    const query = Model.findById(id);
     const document = await query;
     if (!document)
       return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
@@ -49,20 +45,8 @@ module.exports.getOne = (Model, populateOption) =>
  @param {Model} model
  @return {response} response {document<model>}
 */
-module.exports.createOne = (Model, subModel, conditionKey) =>
+module.exports.createOne = (Model) =>
   asyncHandler(async ({ body }, res, next) => {
-    if (subModel && conditionKey) {
-      const id = body[conditionKey];
-      const subDocument = await subModel.findById(id);
-      if (!subDocument) {
-        return next(
-          new ApiError(
-            `No ${subModel.modelName} was Found for this ID ${id}`,
-            404
-          )
-        );
-      }
-    }
     const document = await Model.create(body);
     if (!document) return next(new ApiError(` bad request`, 400));
     res.status(201).json({
@@ -76,14 +60,14 @@ module.exports.createOne = (Model, subModel, conditionKey) =>
  @param {Model} model
  @return {response} response {document<model>}
 */
-module.exports.updateOne = (Model, populateOption) =>
+module.exports.updateOne = (Model) =>
   asyncHandler(async ({ body, params }, res, next) => {
     const { id } = params;
     const document = await Model.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
       skipInvalidation: true,
-    }).populate(populateOption);
+    });
     if (!document)
       return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
     // tiger save event in mongoose to call handler

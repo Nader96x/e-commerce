@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+const ApiError = require("../../Utils/ApiError");
 
 const productSchema = mongoose.Schema(
   {
@@ -108,8 +109,18 @@ const productSchema = mongoose.Schema(
     },
     slug: String,
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    skipVersioning: { dontVersionMe: true },
+  }
 );
+
+productSchema.pre(/^find/, function (next) {
+  this.populate("category_id");
+  next();
+});
 
 productSchema.pre("save", function (next) {
   this.slug = slugify(this.name_en, {
@@ -121,10 +132,33 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+productSchema.pre("save", async function (next) {
+  const id = this.category_id;
+  const category = await this.getCategoryById(id);
+  if (!category) {
+    return next(new ApiError(`No Category was Found for this ID ${id}`, 404));
+  }
+  next();
+});
+
+productSchema.pre("findOneAndDelete", async function (next) {
+  const product = await this.model.findOne(this.getFilter());
+  if (product && product.total_orders > 0) {
+    return next(new ApiError("Product Cannot Be Deleted", 400));
+  }
+  next();
+});
+
 productSchema.pre("update", function (next) {
   this.updatedAt = Date.now();
   next();
 });
+
+productSchema.methods.getCategoryById = function (id) {
+  // eslint-disable-next-line global-require
+  const Category = require("../Categories/Category");
+  return Category.findById(id);
+};
 
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;
