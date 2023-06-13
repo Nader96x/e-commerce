@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Product = require("../Products/Product");
 
 const product = mongoose.Schema({
-  _id: false,
   product_id: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Product",
@@ -13,11 +12,11 @@ const product = mongoose.Schema({
     required: [true, "quantity  is required"],
     min: [1, " minimum quantity should be  1 "],
   },
-  price: {
+  /*price: {
     type: Number,
     min: [1, " invaild price should be positive number"],
     required: [true, "price  is requires"],
-  },
+  },*/
 });
 
 const address = mongoose.Schema({
@@ -104,18 +103,51 @@ OrderSchema.virtual("products.product", {
   foreignField: "_id",
   justOne: true,
 });
+// update status history
+OrderSchema.post("save", function (next) {
+  if (this.isModified("status") && this.status !== "Pending") {
+    this.status_history.push({
+      status: this.status,
+    });
+  }
+  next();
+});
 
 // update status history
-
-// validate if order is not empty
-
-// validate if order is not complete or cancelled
-
-// validate if order is not complete or cancelled
-
+OrderSchema.post("findOneAndUpdate", function (next) {
+  if (this._update.status) {
+    this._update.status_history.push({
+      status: this._update.status,
+    });
+  }
+  next();
+});
+// validate if ordrer is not empty
+OrderSchema.pre("save", function (next) {
+  if (this.products.length === 0) {
+    return next(new Error("order is empty"));
+  }
+  next();
+});
+// validate if ordrer is not complete or cancelled
+OrderSchema.pre("save", function (next) {
+  if (this.status === "Complete" || this.status === "Cancelled") {
+    return next(new Error("order is complete or cancelled"));
+  }
+  next();
+});
+// validate if ordrer is not complete or cancelled
+OrderSchema.pre("findOneAndUpdate", function (next) {
+  if (
+    this._update.status === "Complete" ||
+    this._update.status === "Cancelled"
+  ) {
+    return next(new Error("order is complete or cancelled"));
+  }
+  next();
+});
 // increase total_orders by quantity for each product and decrease quantity
-
-OrderSchema.post("create", async function (next) {
+OrderSchema.pre("save", async function (next) {
   try {
     for (let i = 0; i < this.products.length; i++) {
       const product = await Product.findById(this.products[i].product_id);
@@ -123,10 +155,10 @@ OrderSchema.post("create", async function (next) {
       product.quantity -= this.products[i].quantity;
       await product.save();
     }
+    next();
   } catch (err) {
-    console.log(err);
+    next(err);
   }
 });
-
 const OrderModel = mongoose.model("Order", OrderSchema);
 module.exports = OrderModel;

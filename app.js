@@ -13,8 +13,6 @@ const DashboardRouter = require("./Routes/Dashboard");
 const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const UserAuthRouter = require("./Components/Users/Website/Auth/AuthRouter");
 
-const WebUsersRouter = require("./Components/Users/Website/UsersRouter");
-
 const app = express();
 const v1Router = express.Router();
 // MiddleWares
@@ -38,7 +36,6 @@ v1Router.use(DashboardRouter); // Dashboard Routes
 // Website Routes
 app.use("/", WebsiteRouter); // Website Routes
 app.use("/", UserAuthRouter); // User Auth Routes
-app.use("/profile", WebUsersRouter); // User Profile Routes
 
 // Error Handlers
 app.use(_404); // Not Found Handlers

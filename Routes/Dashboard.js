@@ -5,7 +5,7 @@ const EmployeeRouter = require("../Components/Employees/EmployeeRouter");
 const CategoriesRouter = require("../Components/Categories/CategoriesRouter");
 const ProductsRouter = require("../Components/Products/ProductsRouter");
 const RolesRouter = require("../Components/Roles/RolesRouter");
-const OrderRouter = require("../Components/Order/OrdersRouter");
+const OrderRouter = require("../Components/Order/Dashboard/OrdersRouter");
 const DashUsersRouter = require("../Components/Users/Dashboard/UsersRouter");
 
 const {

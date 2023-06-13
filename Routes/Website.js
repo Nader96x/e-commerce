@@ -2,10 +2,15 @@ const express = require("express");
 const ProductsRouter = require("../Components/Products/ProductRouterPublic");
 const CategoriesRouter = require("../Components/Categories/CategoriesRouterPublic");
 const SettingsRouter = require("../Components/Setting/SettingsRouterPublic");
+const OrdersRouter = require("../Components/Order/Website/OrdersRouter");
+const UsersRouter = require("../Components/Users/Website/UsersRouter");
 
 const Router = express.Router();
 Router.use("/products", ProductsRouter);
 Router.use("/categories", CategoriesRouter);
+
+Router.use("/orders", OrdersRouter);
+Router.use("/profile", UsersRouter);
 
 Router.use("/", SettingsRouter);
 module.exports = Router;
