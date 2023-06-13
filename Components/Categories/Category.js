@@ -57,7 +57,7 @@ categorySchema.pre("save", function (next) {
   next();
 });
 
-categorySchema.pre("update", async function (next) {
+categorySchema.pre("findByIdAndUpdate", async function (next) {
   this.slug = await slugify(this.name_en, {
     lower: true,
     replacement: "-",
@@ -67,6 +67,22 @@ categorySchema.pre("update", async function (next) {
   this.updatedAt = Date.now();
   next();
 });
+
+categorySchema.pre("remove", async function (next) {
+  const products = await this.getProductByCategoryId(this._id);
+  if (products.length > 0 && products.some((product) => product.category_id)) {
+    return next(
+      new ApiError("Category Cannot Be Deleted, It Has Products", 400)
+    );
+  }
+  next();
+});
+
+categorySchema.methods.getProductByCategoryId = function (id) {
+  // eslint-disable-next-line global-require
+  const Product = require("../Products/Product");
+  return Product.find({ category_id: id }).populate("category_id");
+};
 
 const Category = mongoose.model("Category", categorySchema);
 
