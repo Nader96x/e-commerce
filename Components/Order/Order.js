@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Product = require("../Products/Product");
+const ApiError = require("../../Utils/ApiError");
 
 const product = mongoose.Schema({
   _id: false,
@@ -106,13 +107,31 @@ OrderSchema.virtual("products.product", {
 });
 
 // update status history
-
+OrderSchema.pre("save", function (next) {
+  if (this.isModified("status")) {
+    this.status_history.push({
+      status: this.status,
+      date: Date.now(),
+    });
+  }
+  next();
+});
 // validate if order is not empty
 
 // validate if order is not complete or cancelled
 
 // validate if order is not complete or cancelled
-
+OrderSchema.pre("findOneAndUpdate", async function (next) {
+  const filter = this.getFilter();
+  const order = await this.model.findOne(filter);
+  if (!order) {
+    return next(new Error("Order not found"));
+  }
+  if (order.status !== "Pending") {
+    return next(new ApiError("Sorry, this order cannot be Cancelled", 400));
+  }
+  next();
+});
 // increase total_orders by quantity for each product and decrease quantity
 
 OrderSchema.post("create", async function (next) {
