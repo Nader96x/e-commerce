@@ -104,7 +104,7 @@ OrderSchema.virtual("products.product", {
   justOne: true,
 });
 // update status history
-OrderSchema.pre("save", function (next) {
+OrderSchema.post("save", function (next) {
   if (this.isModified("status") && this.status !== "Pending") {
     this.status_history.push({
       status: this.status,
@@ -114,7 +114,7 @@ OrderSchema.pre("save", function (next) {
 });
 
 // update status history
-OrderSchema.pre("findOneAndUpdate", function (next) {
+OrderSchema.post("findOneAndUpdate", function (next) {
   if (this._update.status) {
     this._update.status_history.push({
       status: this._update.status,

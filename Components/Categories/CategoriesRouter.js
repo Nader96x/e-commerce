@@ -40,9 +40,8 @@ router
   )
   .delete(async (req, res, next) => {
     const products = await Product.find({
-      category_id: this._id,
+      category_id: req.params.id,
     }).countDocuments();
-    console.log(products);
     if (products > 0) {
       return next(
         new ApiError("Category Cannot Be Deleted, It Has Products", 400)
