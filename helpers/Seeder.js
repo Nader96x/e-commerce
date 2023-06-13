@@ -33,7 +33,7 @@ module.exports = async () => {
     console.log("seeding roles");
     // const roles = await RoleModel.find().exec();
     // if (roles.length === 0) {
-    const role = await RoleModel.updateOne(
+    const role = await RoleModel.findOneAndUpdate(
       { name: "super-admin" },
       {
         name: "super-admin",
@@ -41,10 +41,17 @@ module.exports = async () => {
         is_active: true,
       },
       { upsert: true, new: true }
-    );
+    ).exec();
     console.log("super-admin role created");
-    console.log(role);
-    const admin = await Employee.create({
+    // console.log(role);
+    const admin = await Employee.findOne({ email: "admin@admin.com" }).exec();
+    if (admin) {
+      console.log("super-admin already created");
+      admin.role_id = role._id;
+      await admin.save();
+      return;
+    }
+    await Employee.create({
       name: "super-admin",
       email: "admin@admin.com",
       password: "12345678",
@@ -52,6 +59,7 @@ module.exports = async () => {
       role_id: role._id,
     });
     console.log("super-admin created");
+
     // }
   } catch (error) {
     console.log(error);
