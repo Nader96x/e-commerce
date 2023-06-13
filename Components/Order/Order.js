@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Product = require("../Products/Product");
 
 const product = mongoose.Schema({
   _id: false,
@@ -106,24 +107,26 @@ OrderSchema.virtual("products.product", {
 
 // update status history
 
-// update status history
-
 // validate if order is not empty
 
 // validate if order is not complete or cancelled
-OrderSchema.pre("findOneAndUpdate", function (next) {
-  const update = this.model.findOne(this.getFilter());
-  if (
-    update.status &&
-    (update.status === "Cancelled" || update.status === "Complete")
-  ) {
-    return next(new Error("Order is already cancelled or complete"));
-  }
-  next();
-});
+
 // validate if order is not complete or cancelled
 
 // increase total_orders by quantity for each product and decrease quantity
+
+OrderSchema.post("create", async function (next) {
+  try {
+    for (let i = 0; i < this.products.length; i++) {
+      const product = await Product.findById(this.products[i].product_id);
+      product.total_orders += this.products[i].quantity;
+      product.quantity -= this.products[i].quantity;
+      await product.save();
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 const OrderModel = mongoose.model("Order", OrderSchema);
 module.exports = OrderModel;

@@ -2,23 +2,16 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const refresh = require("./Components/github_refresh/refresh");
-
+require("./helpers/Seeder")();
 //Middlewares
-const ErrorWare = require("./MiddelWares/errorWare");
+const { _404, _500 } = require("./MiddelWares/errorsWare");
 
 //Routers
 const WebsiteRouter = require("./Routes/Website");
+const DashboardRouter = require("./Routes/Dashboard");
+
 const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const UserAuthRouter = require("./Components/Users/Website/Auth/AuthRouter");
-const EmployeeRouter = require("./Components/Employees/EmployeeRouter");
-const CategoriesRouter = require("./Components/Categories/CategoriesRouter");
-const SettingsRouter = require("./Components/Setting/SettingRouter");
-const ProductsRouter = require("./Components/Products/ProductsRouter");
-const DashUsersRouter = require("./Components/Users/Dashboard/UsersRouter");
-const WebUsersRouter = require("./Components/Users/Website/UsersRouter");
-const OrderRouter = require("./Components/Order/Dashboard/OrdersRouter");
-const RolesRouter = require("./Components/Roles/RolesRouter");
-const WebOrdersRouter = require("./Components/Order/Website/OrdersRouter");
 
 const app = express();
 const v1Router = express.Router();
@@ -31,49 +24,21 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(process.env.PUBLIC_FOLDER || "public"));
-// Refresh Route
+
+//  Github Refresh Route
 app.use("/refresh", refresh);
 
+// Dashboard
+app.use("/admin", AuthRouter); // Auth Routes
+app.use("/api/v1", v1Router); // versioning Routes
+v1Router.use(DashboardRouter); // Dashboard Routes
+
 // Website Routes
-app.use("/settings", SettingsRouter);
-app.use("/", WebsiteRouter);
-app.use("/orders", WebOrdersRouter);
-// Dashboard Route
-app.use("/admin", AuthRouter);
-app.use("/", UserAuthRouter);
-app.use("/profile", WebUsersRouter);
+app.use("/", WebsiteRouter); // Website Routes
+app.use("/", UserAuthRouter); // User Auth Routes
 
-// V1 Routes
-v1Router.get("/routes", (req, res) => {
-  const routes = [
-    "categories",
-    "products",
-    "users",
-    "roles",
-    "employees",
-    "orders",
-  ];
-  res.json({
-    message: "success",
-    data: { routes, ban: ["users", "employees"] },
-  });
-});
-v1Router.use("/employees", EmployeeRouter);
-v1Router.use("/categories", CategoriesRouter);
-v1Router.use("/products", ProductsRouter);
-v1Router.use("/users", DashUsersRouter);
-v1Router.use("/orders", OrderRouter);
-v1Router.use("/roles", RolesRouter);
-
-// versioning Routes
-app.use("/api/v1", v1Router);
-
-// Not Found Handler
-app.use((req, res, next) => {
-  res.status(404).json({ status: "fail", error: "Not Found" });
-});
-
-// Error Handler
-app.use(ErrorWare);
+// Error Handlers
+app.use(_404); // Not Found Handlers
+app.use(_500); // Error Handler
 
 module.exports = app;

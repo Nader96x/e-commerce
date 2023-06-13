@@ -17,9 +17,13 @@ module.exports.getOrder = Factory.getOne(OrderModel);
 
 module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
   const order = await OrderModel.findById(req.params.id);
-  if (!order || order.status === "Complete" || order.status === "Cancelled") {
-    return next(new ApiError("Order Cannot Be Updated", 400));
+  if (!order) {
+    return next(new ApiError("Order Not Found", 404));
   }
+  if (order.status !== "Pending") {
+    return next(new ApiError("Order cannot be updated", 400));
+  }
+  order.status = "Processing";
   await order.save({ validateBeforeSave: false });
   res.status(200).json({
     status: "success",
@@ -28,12 +32,14 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
 });
 
 module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
-  const order = await OrderModel.findByIdAndUpdate(req.params.id, {
-    status: "Cancelled",
-  });
+  const order = await OrderModel.findById(req.params.id);
   if (!order) {
     return next(new ApiError("Order Not Found", 404));
   }
+  if (order.status !== "Pending") {
+    return next(new ApiError("Order cannot be updated", 400));
+  }
+  order.status = "Cancelled";
   await order.save({ validateBeforeSave: false });
   res.status(200).json({
     status: "success",

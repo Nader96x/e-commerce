@@ -104,10 +104,8 @@ module.exports.resetPasswordToken = async (req, res, next) => {
   }
   // console.log(req.body);
   const token = await user.createResetPasswordToken();
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/employees/reset-password/${token}`;
-
+  // const resetURL = `${req.protocol}://${req.get("host")}/api/v1/employees/reset-password/${token}`;
+  const resetURL = `http://localhost:3000/auth/reset-password/${token}`;
   const email = new Email(user, resetURL);
   await email.sendPasswordReset();
   if (process.env.NODE_ENV === "development")

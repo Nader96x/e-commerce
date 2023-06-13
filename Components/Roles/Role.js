@@ -4,7 +4,15 @@ const Permission = mongoose.Schema({
   _id: false,
   entity: {
     type: String,
-    enum: ["categories", "products", "users", "roles", "employees", "orders"],
+    enum: [
+      "categories",
+      "products",
+      "users",
+      "roles",
+      "employees",
+      "orders",
+      "settings",
+    ],
   },
   access: {
     get: Boolean,
@@ -12,6 +20,9 @@ const Permission = mongoose.Schema({
     patch: Boolean,
     delete: Boolean,
     ban: Boolean,
+    unban: Boolean,
+    activate: Boolean,
+    deactivate: Boolean,
   },
 });
 const RoleSchema = mongoose.Schema(
