@@ -1,4 +1,5 @@
 const { verify } = require("jsonwebtoken");
+const url = require("url");
 const Employee = require("../EmployeeSchema");
 const Email = require("../../../Utils/emailSender");
 
@@ -86,7 +87,8 @@ module.exports.authorized = async (req, res, next) => {
 
   const employee = req.user;
   const { method } = req;
-  const routes = req.originalUrl.split("/").slice(1);
+  // const routes = req.originalUrl.split("/").slice(1);
+  const routes = url.parse(req.originalUrl, true).pathname.split("/").splice(1);
   // console.log(method, routes, employee.role, employee.role_id, req.originalUrl);
   const isAuthorized = await employee.isAuthorized(method, routes);
   if (!isAuthorized) {

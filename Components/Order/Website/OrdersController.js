@@ -43,7 +43,7 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     message: notificationMessage,
     order: order,
   });
-
+  console.log(notificationMessage);
   res.status(201).json({
     status: "success",
     data: order,

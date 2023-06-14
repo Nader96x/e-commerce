@@ -6,6 +6,17 @@ const OrdersRouter = require("../Components/Order/Website/OrdersRouter");
 const UsersRouter = require("../Components/Users/Website/UsersRouter");
 
 const Router = express.Router();
+
+/*Router.use((req, res, next) => {
+  // console.log(req.headers["Accept-Language"]);
+  if (!["ar", "en"].includes(req.headers["Accept-Language"]?.toLowerCase()))
+    req.headers["Accept-Language"] = "ar";
+
+  req.lang = req.headers["Accept-Language"]?.toLowerCase() || "ar";
+
+  next();
+});*/
+
 Router.use("/products", ProductsRouter);
 Router.use("/categories", CategoriesRouter);
 

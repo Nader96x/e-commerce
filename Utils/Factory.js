@@ -1,9 +1,10 @@
 const asyncHandler = require("express-async-handler");
+const { del } = require("express/lib/application");
 const ApiError = require("./ApiError");
 const ApiFeatures = require("./ApiFeatures");
 
 module.exports.getAll = (Model) =>
-  asyncHandler(async ({ body, query }, res, next) => {
+  asyncHandler(async ({ body, query, lang }, res, next) => {
     let filter = {};
     if (body.filterObject) filter = body.filterObject;
 
@@ -14,6 +15,24 @@ module.exports.getAll = (Model) =>
     const { mongooseQuery, paginationResult: pagination } = apiFeatures;
     /** execute query  */
     const documents = await mongooseQuery;
+    /*if (lang) {
+      documents = documents.map((document) => {
+        const doc = { ...document.toJSON() };
+        doc.name = document[`name_${lang}`];
+        doc.desc = document[`desc_${lang}`];
+        if (doc.category_id) {
+          doc.category_id.name = document.category_id[`name_${lang}`];
+          delete doc.category_id.name_en;
+          delete doc.category_id.name_ar;
+        }
+        delete doc.name_en;
+        delete doc.desc_en;
+        delete doc.name_ar;
+        delete doc.desc_ar;
+        console.log(doc);
+        return doc;
+      });
+    }*/
     res
       .status(200)
       .json({ result: documents.length, pagination, data: documents });
@@ -35,7 +54,7 @@ module.exports.getOne = (Model) =>
     res.status(200).json({ status: "success", data: document });
   });
 module.exports.getOneBySlug = (Model) =>
-  asyncHandler(async ({ params }, res, next) => {
+  asyncHandler(async ({ params, lang }, res, next) => {
     const { slug } = params;
     const query = Model.findOne({ slug: slug });
     const document = await query;
@@ -43,6 +62,20 @@ module.exports.getOneBySlug = (Model) =>
       return next(
         new ApiError(`no ${Model.modelName} for this slug ${slug}`, 404)
       );
+    /*if (lang) {
+      document = document.toJSON();
+      document.name = document[`name_${lang}`];
+      document.desc = document[`desc_${lang}`];
+      if (document.category_id) {
+        document.category_id.name = document.category_id[`name_${lang}`];
+        delete document.category_id.name_en;
+        delete document.category_id.name_ar;
+      }
+      delete document.name_en;
+      delete document.desc_en;
+      delete document.name_ar;
+      delete document.desc_ar;
+    }*/
     res.status(200).json({ status: "success", data: document });
   });
 
