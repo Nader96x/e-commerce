@@ -105,12 +105,12 @@ EmployeeSchema.pre(/^find/, function (next) {
 
 // Document Middleware
 EmployeeSchema.pre("save", async function (next) {
-  console.log(
+  /*console.log(
     "pre save",
     this.password,
     this.isModified("password"),
     this.isNew
-  );
+  );*/
   if (this.isModified("password") || this.isNew) {
     this.password = await bcrypt.hash(this.password, 10);
     this.password_changed_at = Date.now() - 1000;

@@ -51,6 +51,10 @@ const categorySchema = mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+categorySchema.virtual("name").get(function () {
+  return { en: this.name_en, ar: this.name_ar };
+});
+
 // Document MiddleWare: runs before save(), create()
 categorySchema.pre("save", function (next) {
   this.slug = slugify(this.name_en, {

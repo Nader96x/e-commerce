@@ -118,6 +118,14 @@ const productSchema = mongoose.Schema(
   }
 );
 
+productSchema.virtual("name").get(function () {
+  return { en: this.name_en, ar: this.name_ar };
+});
+
+productSchema.virtual("desc").get(function () {
+  return { en: this.desc_en, ar: this.desc_ar };
+});
+
 productSchema.pre(/^find/, function (next) {
   this.populate("category_id");
   next();
