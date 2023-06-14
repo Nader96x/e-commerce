@@ -26,6 +26,7 @@ router.post(
 );
 
 router.post("/login", validateLogin, authController.login);
+
 router.post(
   "/forgot-password",
   validateForgotPassword,
@@ -43,5 +44,7 @@ router.patch(
   validateUpdatePassword,
   authController.updatePassword
 );
+
+router.delete("/logout", authController.protect, authController.logout);
 
 module.exports = router;

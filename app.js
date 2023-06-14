@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const hpp = require("hpp");
 const refresh = require("./Components/github_refresh/refresh");
 require("./helpers/Seeder")();
 //Middlewares
@@ -15,6 +16,11 @@ const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const UserAuthRouter = require("./Components/Users/Website/Auth/AuthRouter");
 
 const app = express();
+app.use(
+  hpp({
+    whitelist: ["total_price", "status", "is_active"],
+  })
+);
 const v1Router = express.Router();
 // MiddleWares
 if (process.env.NODE_ENV === "development") {

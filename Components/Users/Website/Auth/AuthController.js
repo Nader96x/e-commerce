@@ -22,6 +22,17 @@ const createSendToken = (user, statusCode, res, next) => {
   });
 };
 
+const createLogoutToken = (statusCode, res, next) => {
+  const token = createToken(Date.now());
+  if (!token) {
+    return next(new ApiError("Error creating JWT token", 500));
+  }
+  res.status(statusCode).json({
+    status: "success",
+    data: { token },
+  });
+};
+
 exports.signup = AsyncHandler(async (req, res, next) => {
   const newUser = await User.create(req.body);
   createSendToken(newUser, 201, res, next);
@@ -113,4 +124,9 @@ exports.updatePassword = AsyncHandler(async (req, res, next) => {
   user.confirmPassword = req.body.confirmPassword;
   await user.save();
   createSendToken(user, 200, res, next);
+});
+
+exports.logout = AsyncHandler(async (req, res, next) => {
+  process.env.JWT_EXPIRES_IN = 120;
+  createLogoutToken(200, res, next);
 });
