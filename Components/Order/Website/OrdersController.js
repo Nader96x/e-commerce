@@ -74,8 +74,10 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
   }
   const products = [];
   let total_price = 0;
+  // eslint-disable-next-line no-restricted-syntax
   for (const product of order.products) {
-    const { product_id, quantity, price } = product;
+    const { product_id, quantity } = product;
+    // eslint-disable-next-line no-await-in-loop
     const availableProduct = await Product.findOne({
       _id: product_id,
       quantity: { $gte: quantity },

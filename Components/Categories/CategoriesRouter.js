@@ -6,8 +6,6 @@ const {
   validateCreateCategory,
   validateUpdateCategory,
 } = require("./CategoriesValidation");
-const Product = require("../Products/Product");
-const ApiError = require("../../Utils/ApiError");
 
 const router = express.Router();
 

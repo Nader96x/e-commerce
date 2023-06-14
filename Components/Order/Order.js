@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Product = require("../Products/Product");
 const ApiError = require("../../Utils/ApiError");
-const User = require("../Users/User");
 
 const product = mongoose.Schema({
   _id: false,
@@ -17,7 +16,7 @@ const product = mongoose.Schema({
   },
   price: {
     type: Number,
-    min: [1, " invaild price should be positive number"],
+    min: [1, " invalid price should be positive number"],
     required: [true, "price  is requires"],
   },
 });
@@ -43,7 +42,7 @@ const OrderSchema = mongoose.Schema(
     products: [product],
     total_price: {
       type: Number,
-      min: [1, " invaild price should be positive number"],
+      min: [1, " invalid price should be positive number"],
       // currency: "EGP",
       required: [true, "total price is required"],
     },
@@ -59,7 +58,6 @@ const OrderSchema = mongoose.Schema(
           status: {
             type: String,
             enum: ["Pending", "Processing", "Completed", "Cancelled"],
-            // required: [true, "status is required"],
           },
           date: {
             type: Date,
@@ -119,6 +117,7 @@ OrderSchema.pre("save", function (next) {
       date: Date.now(),
     });
   }
+  this.updatedAt = Date.now();
   next();
 });
 
@@ -137,6 +136,7 @@ OrderSchema.pre("findOneAndUpdate", async function (next) {
       )
     );
   }
+  this.updatedAt = Date.now();
   next();
 });
 // increase total_orders by quantity for each product and decrease quantity
@@ -144,9 +144,11 @@ OrderSchema.pre("findOneAndUpdate", async function (next) {
 OrderSchema.post("save", async function (next) {
   try {
     for (let i = 0; i < this.products.length; i++) {
+      // eslint-disable-next-line no-shadow,no-await-in-loop
       const product = await Product.findById(this.products[i].product_id);
       product.total_orders += this.products[i].quantity;
       product.quantity -= this.products[i].quantity;
+      // eslint-disable-next-line no-await-in-loop
       await product.save();
     }
   } catch (err) {
