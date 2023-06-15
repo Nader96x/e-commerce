@@ -21,11 +21,13 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     return next(new ApiError("Cart is Empty", 400));
   }
   const products = cart.map((product) => {
-    const { product_id, quantity, price } = product;
+    const { product_id, quantity, price, name_en, image } = product;
     return {
       product_id,
       quantity,
       price,
+      name_en,
+      image,
     };
   });
   const total_price = products.reduce((acc, product) => acc + product.price, 0);
@@ -92,6 +94,8 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
       product_id,
       quantity,
       price: availableProduct.price,
+      name_en: availableProduct.name_en,
+      image: availableProduct.image,
     });
     total_price += quantity * availableProduct.price;
   }

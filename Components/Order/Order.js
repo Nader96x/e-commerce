@@ -17,7 +17,15 @@ const product = mongoose.Schema({
   price: {
     type: Number,
     min: [1, " invalid price should be positive number"],
-    required: [true, "price  is requires"],
+    required: [true, "price  is Missing"],
+  },
+  name_en: {
+    type: String,
+    required: [true, "Name  is Missing"],
+  },
+  image: {
+    type: String,
+    required: [true, "image is Missing"],
   },
 });
 
@@ -106,7 +114,6 @@ OrderSchema.virtual("products.product", {
   ref: "Product",
   localField: "products.product_id",
   foreignField: "_id",
-  justOne: true,
 });
 
 // update status history
