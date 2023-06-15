@@ -35,7 +35,7 @@ const createProduct = customJoi.object({
   images: customJoi.array().items(customJoi.string().required()).required(),
   quantity: customJoi.number().required().greater(-1),
   category_id: customJoi.objectId().required(),
-  total_orders: customJoi.number().optional(),
+  // total_orders: customJoi.number().optional(),
 });
 
 const updateProduct = customJoi.object({
@@ -68,7 +68,8 @@ const updateProduct = customJoi.object({
   images: customJoi.array().items(customJoi.string().optional()).optional(),
   quantity: customJoi.number().optional().greater(-1),
   is_active: customJoi.boolean().optional(),
-  total_orders: customJoi.number().optional(),
+  category_id: customJoi.objectId().optional(),
+  // total_orders: customJoi.number().optional(),
 });
 
 module.exports.validateProductId = validateSchema(productId, "params");
