@@ -57,7 +57,7 @@ const productSchema = mongoose.Schema(
     desc_ar: {
       type: String,
       required: [true, "Product English Description is Required"],
-      minLength: [20, "Product Description cannot be less than 20 characters"],
+      minLength: [10, "Product Description cannot be less than 20 characters"],
       maxLength: [
         200,
         "Product Description cannot be more than 200 characters",

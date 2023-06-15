@@ -10,13 +10,14 @@ const {
 const router = express.Router();
 
 const assignImages = (req, res, next) => {
+  // console.log("files", req.files);
   if (req.files) {
-    if (req.files.image?.location)
+    if (req.files.image?.length && req.files.image[0]?.location)
       req.body.image = req.files.image[0].location;
     else {
-      delete req.body.image
+      delete req.body.image;
     }
-    if (req.files.images && req.files.images.length) {
+    if (req.files.images?.length) {
       req.body.images = [];
       // eslint-disable-next-line array-callback-return
       req.files.images.map((file) => {
