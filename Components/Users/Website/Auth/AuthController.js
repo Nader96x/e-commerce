@@ -31,8 +31,7 @@ const createVerifyToken = async (user, req, res, next) => {
   const email = new Email(user, verifyUrl);
   try {
     await email.sendWelcome();
-    res.message = "Signed Up Successfully, please verify your email";
-    createSendToken(user, 201, res, next);
+    return user;
   } catch (err) {
     user.email_token = undefined;
     return next(new ApiError("Failed to send email", 500));
@@ -50,9 +49,14 @@ const createLogoutToken = (statusCode, res, next) => {
   });
 };
 
+const createHashedToken = function (token) {
+  return crypto.createHash("sha256").update(token).digest("hex");
+};
+
 exports.signup = AsyncHandler(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  createVerifyToken(newUser, req, res, next);
+  const user = await createVerifyToken(newUser, req, res, next);
+  createSendToken(user, 201, res, next);
 });
 
 exports.login = AsyncHandler(async (req, res, next) => {
@@ -113,10 +117,7 @@ exports.forgotPassword = AsyncHandler(async (req, res, next) => {
 });
 
 exports.resetPassword = AsyncHandler(async (req, res, next) => {
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
+  const hashedToken = createHashedToken(req.params.token);
   const user = await User.findOne({
     reset_password_token: hashedToken,
     reset_password_token_expire: { $gt: Date.now() },
@@ -149,10 +150,7 @@ exports.logout = AsyncHandler(async (req, res, next) => {
 });
 
 exports.verifyEmail = AsyncHandler(async (req, res, next) => {
-  const hashedToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
+  const hashedToken = createHashedToken(req.params.token);
   const user = await User.findOne({
     email_token: hashedToken,
   });
@@ -162,5 +160,13 @@ exports.verifyEmail = AsyncHandler(async (req, res, next) => {
   user.verified_at = Date.now();
   user.email_token = undefined;
   await user.save({ validateBeforeSave: false });
+  createSendToken(user, 200, res, next);
+});
+
+exports.sendNewVerificationCode = AsyncHandler(async (req, res, next) => {
+  let user = await User.findById(req.user.id);
+  if (user.verified_at)
+    return next(new ApiError("This Email Already Verified", 400));
+  user = await createVerifyToken(user, req, res, next);
   createSendToken(user, 200, res, next);
 });

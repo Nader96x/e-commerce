@@ -8,6 +8,7 @@ const {
   login,
   signup,
   verifyEmail,
+  sendNewVerificationCode,
 } = require("./AuthController");
 const upload = require("../../../../helpers/upload.helper");
 const {
@@ -39,7 +40,8 @@ router.post("/login", validateLogin, login);
 
 router.post("/forgot-password", validateForgotPassword, forgotPassword);
 router.patch("/reset-password/:token", validateResetPassword, resetPassword);
-router.get("/verify-email/:token", validateVerifyEmail, verifyEmail);
+router.get("/verify-email/:token", protect, validateVerifyEmail, verifyEmail);
+router.post("/resend-verification-code", protect, sendNewVerificationCode);
 
 router.patch(
   "/update-password",

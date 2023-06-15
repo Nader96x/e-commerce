@@ -14,6 +14,8 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
   const orderAddress = await user.address.find((address) =>
     address._id.equals(req.body.address_id)
   );
+  if (!user.verified_at)
+    return next(new ApiError("Please Verify your Email First", 400));
   if (!orderAddress) return next(new ApiError("Address Not Found", 404));
   if (cart.length < 1) {
     return next(new ApiError("Cart is Empty", 400));
