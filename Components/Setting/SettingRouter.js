@@ -6,11 +6,18 @@ const { validateSetting } = require("./SettingValidation");
 const assignImage = (req, res, next) => {
   console.log("body", req.body);
   console.log("req.files", req.files);
+  console.log("req.file", req.file);
 
+  if (req.file?.location) {
+    req.body.logo = req.file.location;
+    // console.log("here");
+  } else {
+    delete req.body.logo;
+  }
   if (req.files?.logo) {
     req.body.logo = req.files.logo[0].location;
   }
-  if (req.files?.banners) {
+  /*if (req.files?.banners) {
     req.body.banners = req.files.banners.map((img, i) => {
       return {
         image: img.location,
@@ -19,7 +26,7 @@ const assignImage = (req, res, next) => {
       };
     });
     req.body.banners = req.body.banners.filter((obj) => obj.link);
-  }
+  }*/
   next();
 };
 
@@ -28,12 +35,12 @@ const SettingRouter = Router();
 SettingRouter.get("/", SettingController.getSettings);
 SettingRouter.patch(
   "/",
-  // upload.single("logo"),
+  upload.single("logo"),
   // field logo and array banners
-  upload.fields([
+  /*upload.fields([
     { name: "logo", maxCount: 1 },
     { name: "banners", maxCount: 10 },
-  ]),
+  ]),*/
   // upload.any(),
   assignImage,
   validateSetting,
