@@ -23,6 +23,8 @@ const assignImages = (req, res, next) => {
       req.files.images.map((file) => {
         req.body.images.push(file.location);
       });
+    } else {
+      delete req.body.images;
     }
   }
   next();
