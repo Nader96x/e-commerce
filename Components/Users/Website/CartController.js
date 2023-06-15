@@ -24,6 +24,7 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
+  const { name_en, image } = product;
   const updatedCart = await cart.map((item) => {
     if (item.product_id == product_id) {
       if (item.quantity >= product.quantity) {
@@ -33,6 +34,8 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
       }
       item.quantity += quantity;
       item.price = product.price * item.quantity;
+      item.name_en = product.name_en;
+      item.image = product.image;
     }
     return item;
   });
@@ -42,7 +45,7 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
   if (!productFound) {
     const price = product.price * quantity;
     // eslint-disable-next-line camelcase
-    updatedCart.push({ product_id, quantity, price });
+    updatedCart.push({ product_id, quantity, price, name_en, image });
   }
   user.cart = updatedCart;
   await user.save({ validateBeforeSave: false });
@@ -59,6 +62,7 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
   const { product_id, quantity } = req.body;
   const product = await Product.findById(product_id);
   if (!product) return next(new ApiError("Product Not Found", 404));
+  const { name_en, image } = product;
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
@@ -67,6 +71,8 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
     if (item.product_id == product_id) {
       item.quantity = quantity;
       item.price = product.price * item.quantity;
+      item.name_en = name_en;
+      item.image = image;
     }
     return item;
   });
