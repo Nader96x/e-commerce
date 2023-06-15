@@ -21,6 +21,9 @@ module.exports._500 = (err, req, res, next) => {
     // console.log(err.message);
     // err.message = `${Object.keys(err.keyPattern)} already exists`;
     err.statusCode = 422;
+  } else if (err.name === "TokenExpiredError") {
+    err.message = "Session has expired, Please Login Again";
+    err.statusCode = 401;
   } else {
     console.log("err");
   }
