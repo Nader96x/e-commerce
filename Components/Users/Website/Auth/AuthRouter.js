@@ -1,5 +1,14 @@
 const express = require("express");
-const authController = require("./AuthController");
+const {
+  forgotPassword,
+  logout,
+  protect,
+  updatePassword,
+  resetPassword,
+  login,
+  signup,
+  verifyEmail,
+} = require("./AuthController");
 const upload = require("../../../../helpers/upload.helper");
 const {
   validateRegister,
@@ -7,6 +16,7 @@ const {
   validateForgotPassword,
   validateResetPassword,
   validateUpdatePassword,
+  validateVerifyEmail,
 } = require("../UsersValidation");
 
 const router = express.Router();
@@ -22,29 +32,22 @@ router.post(
   upload.single("image"),
   assignImage,
   validateRegister,
-  authController.signup
+  signup
 );
 
-router.post("/login", validateLogin, authController.login);
+router.post("/login", validateLogin, login);
 
-router.post(
-  "/forgot-password",
-  validateForgotPassword,
-  authController.forgotPassword
-);
-router.patch(
-  "/reset-password/:token",
-  validateResetPassword,
-  authController.resetPassword
-);
+router.post("/forgot-password", validateForgotPassword, forgotPassword);
+router.patch("/reset-password/:token", validateResetPassword, resetPassword);
+router.get("/verify-email/:token", validateVerifyEmail, verifyEmail);
 
 router.patch(
   "/update-password",
-  authController.protect,
+  protect,
   validateUpdatePassword,
-  authController.updatePassword
+  updatePassword
 );
 
-router.delete("/logout", authController.protect, authController.logout);
+router.delete("/logout", protect, logout);
 
 module.exports = router;

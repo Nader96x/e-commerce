@@ -43,7 +43,10 @@ module.exports = class Email {
   }
 
   async sendWelcome() {
-    await this.send("welcome", "Welcome to the E-commerce Family!");
+    await this.send(
+      "verify-email",
+      "Welcome to the E-commerce Family!, please Verify your email"
+    );
   }
 
   async sendPasswordReset() {

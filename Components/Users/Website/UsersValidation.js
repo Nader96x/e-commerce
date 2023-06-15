@@ -71,9 +71,18 @@ const updatePassword = customJoi.object({
   confirmPassword: customJoi.ref("password"),
 });
 
+const verifyEmail = customJoi.object({
+  token: customJoi
+    .string()
+    .length(64)
+    .pattern(/^[a-f0-9]+$/)
+    .required(),
+});
+
 module.exports.validateUpdateProfile = validateSchema(updateProfile);
 module.exports.validateRegister = validateSchema(register);
 module.exports.validateLogin = validateSchema(login);
 module.exports.validateForgotPassword = validateSchema(forgotPassword);
 module.exports.validateResetPassword = validateSchema(resetPassword);
 module.exports.validateUpdatePassword = validateSchema(updatePassword);
+module.exports.validateVerifyEmail = validateSchema(verifyEmail, "params");

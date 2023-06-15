@@ -22,6 +22,23 @@ const createSendToken = (user, statusCode, res, next) => {
   });
 };
 
+const createVerifyToken = async (user, req, res, next) => {
+  const token = await user.createEmailVerificationToken();
+  user.save({ validateBeforeSave: false });
+  const verifyUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/verify-email/${token}`;
+  const email = new Email(user, verifyUrl);
+  try {
+    await email.sendWelcome();
+    res.message = "Signed Up Successfully, please verify your email";
+    createSendToken(user, 201, res, next);
+  } catch (err) {
+    user.email_token = undefined;
+    return next(new ApiError("Failed to send email", 500));
+  }
+};
+
 const createLogoutToken = (statusCode, res, next) => {
   const token = createToken(Date.now());
   if (!token) {
@@ -35,7 +52,7 @@ const createLogoutToken = (statusCode, res, next) => {
 
 exports.signup = AsyncHandler(async (req, res, next) => {
   const newUser = await User.create(req.body);
-  createSendToken(newUser, 201, res, next);
+  createVerifyToken(newUser, req, res, next);
 });
 
 exports.login = AsyncHandler(async (req, res, next) => {
@@ -129,4 +146,21 @@ exports.updatePassword = AsyncHandler(async (req, res, next) => {
 exports.logout = AsyncHandler(async (req, res, next) => {
   process.env.JWT_EXPIRES_IN = 120;
   createLogoutToken(200, res, next);
+});
+
+exports.verifyEmail = AsyncHandler(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+  const user = await User.findOne({
+    email_token: hashedToken,
+  });
+  if (!user) {
+    return next(new ApiError("Token is Invalid or has Expired", 400));
+  }
+  user.verified_at = Date.now();
+  user.email_token = undefined;
+  await user.save({ validateBeforeSave: false });
+  createSendToken(user, 200, res, next);
 });
