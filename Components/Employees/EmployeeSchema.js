@@ -143,7 +143,7 @@ EmployeeSchema.methods = {
       createdAt: this.createdAt,
       last_password_changed_at: this.password_changed_at,
       // updatedAt: this.updatedAt,
-      // role_id: this.role_id._id,
+      role_id: this.role_id._id,
     };
   },
   async isAuthorized(method, routes) {
