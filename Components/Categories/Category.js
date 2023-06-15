@@ -80,7 +80,7 @@ categorySchema.pre("findByIdAndUpdate", async function (next) {
 categorySchema.pre("findOneAndDelete", async function (next) {
   const filter = this.getFilter();
   const products = await Product.find({ category_id: filter._id });
-  if (products) {
+  if (products.length > 0) {
     return next(new ApiError("Category Has Products, Cannot be deleted", 400));
   }
   next();

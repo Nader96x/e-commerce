@@ -10,8 +10,10 @@ const {
 const router = express.Router();
 
 const assignImage = (req, res, next) => {
-  if (req.file) {
+  if (req.file?.location) {
     req.body.image = req.file.location;
+  } else {
+    delete req.body.image;
   }
   next();
 };
