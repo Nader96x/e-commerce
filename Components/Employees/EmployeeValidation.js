@@ -41,7 +41,7 @@ const UpdateEmployee = customJoi.object({
   phone: customJoi.string().regex(/^01[0125][0-9]{8}$/),
   // password: customJoi.string().min(8),
   // passwordConfirm: customJoi.string().min(8).valid(customJoi.ref("password")),
-  role: customJoi.objectId(),
+  role_id: customJoi.objectId(),
   // is_banned: customJoi.boolean(),
 });
 
