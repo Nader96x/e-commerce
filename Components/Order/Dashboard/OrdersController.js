@@ -36,7 +36,12 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
     Governate: order.address.governorate,
     Country: order.address.country,
   };
-
+  const dispatchingProducts = order.products.map((product) => ({
+    product_id: product.product_id,
+    quantity: product.quantity,
+    price: product.price,
+    name_en: product.name_en,
+  }));
   axios
     .post(process.env.DISPATCHING_URL, {
       _id: order.id,
@@ -44,7 +49,7 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
       CustomerName: order.user.name,
       CustomerEmail: order.user.email,
       Address: updatedAddress,
-      Product: order.products,
+      Product: dispatchingProducts,
       PaymentMethod: order.payment_method,
       TotalPrice: order.total_price,
     })

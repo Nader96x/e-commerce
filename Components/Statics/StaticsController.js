@@ -3,7 +3,6 @@ const Product = require("../Products/Product");
 const Category = require("../Categories/Category");
 const Order = require("../Order/Order");
 const User = require("../Users/User");
-const ApiError = require("../../Utils/ApiError");
 
 module.exports.getStatics = AsyncHandler(async (req, res, next) => {
   const topProducts = await Product.getTopProducts();

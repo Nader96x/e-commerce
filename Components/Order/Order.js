@@ -99,6 +99,11 @@ const OrderSchema = mongoose.Schema(
   }
 );
 
+OrderSchema.pre(/^find/, function (next) {
+  this.populate("user");
+  next();
+});
+
 OrderSchema.virtual("order_id").get(function () {
   return this._id;
 });
