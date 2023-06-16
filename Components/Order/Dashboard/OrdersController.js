@@ -25,27 +25,25 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
     { new: true }
   ).populate("user", "name email");
 
-  const orderData = {
-    _id: order.id,
-    CustomerID: order.user._id,
-    CustomerName: order.user.name,
-    CustomerEmail: order.user.email,
-    Address: order.address,
-    Product: order.products,
-    PaymentMethod: order.payment_method,
-    TotalPrice: order.total_price,
-  };
-  const headers = {
-    "Content-Type": "application/json",
-  };
   pusher.trigger(`user-${order.user_id}`, "my-order", {
     message: "Your order is being processed",
     order_id: order._id,
     status: order.status,
   });
+
   axios
-    .post("https://jimmy.nader-mo.tech/orders/recieve", orderData, { headers })
+    .post(process.env.DISPATCHING_URL, {
+      _id: order.id,
+      CustomerID: order.user._id,
+      CustomerName: order.user.name,
+      CustomerEmail: order.user.email,
+      Address: order.address,
+      Product: order.products,
+      PaymentMethod: order.payment_method,
+      TotalPrice: order.total_price,
+    })
     .then((response) => {
+      console.log(response);
       res.status(200).json({
         status: "success",
         data: {
