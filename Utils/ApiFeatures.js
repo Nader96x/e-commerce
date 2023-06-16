@@ -60,7 +60,7 @@ class ApiFeatures {
 
     //  pagination result
     const paginationResult = {};
-    paginationResult.currnt_page = page;
+    paginationResult.current_page = page;
     paginationResult.limit = limit;
     paginationResult.total_pages = Math.ceil(countDocuments / limit);
     paginationResult.total = countDocuments;

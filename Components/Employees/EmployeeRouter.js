@@ -42,6 +42,5 @@ EmployeeRouter.post(
   validateGetEmployeeById,
   EmployeeController.unban
 );
-// .patch("/:id/update-password", EmployeeController.updatePassword);
 
 module.exports = EmployeeRouter;

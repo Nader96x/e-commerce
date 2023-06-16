@@ -47,10 +47,12 @@ const UpdateEmployee = customJoi.object({
 
 const UpdatePassword = customJoi.object({
   password: customJoi.string().required().min(8),
-  passwordConfirm: customJoi
+  new_password: customJoi.string().required().min(8),
+  confirm_new_password: customJoi
     .string()
     .required()
-    .valid(customJoi.ref("password")),
+    .min(8)
+    .valid(customJoi.ref("new_password")),
 });
 
 const getEmployeeById = customJoi.object({
