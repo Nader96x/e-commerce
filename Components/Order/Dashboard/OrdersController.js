@@ -35,14 +35,16 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
     PaymentMethod: order.payment_method,
     TotalPrice: order.total_price,
   };
-
+  const headers = {
+    "Content-Type": "application/json",
+  };
   pusher.trigger(`user-${order.user_id}`, "my-order", {
     message: "Your order is being processed",
     order_id: order._id,
     status: order.status,
   });
   axios
-    .post("https://jimmy.nader-mo.tech/orders/recieve", orderData)
+    .post("https://jimmy.nader-mo.tech/orders/recieve", orderData, { headers })
     .then((response) => {
       res.status(200).json({
         status: "success",
@@ -87,6 +89,7 @@ module.exports.completeOrder = AsyncHandler(async (req, res, next) => {
   if (!order) {
     return next(new ApiError("Order is not found.", 404));
   }
+  console.log(req.body);
   if (order.status !== "Processing") {
     return next(new ApiError(`${order.status} Order cannot be completed`, 400));
   }
