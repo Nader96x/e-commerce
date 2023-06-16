@@ -202,6 +202,10 @@ userSchema.methods.createEmailVerificationToken = function () {
   return verificationToken;
 };
 
+userSchema.statics.countUsers = async function () {
+  return await this.countDocuments();
+};
+
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;

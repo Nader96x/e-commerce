@@ -163,5 +163,68 @@ OrderSchema.post("save", async function (next) {
   }
 });
 
+OrderSchema.statics.countOrders = async function () {
+  return await this.countDocuments();
+};
+
+OrderSchema.statics.getOrdersPerMonth = async function (orderStatus) {
+  // console.log(new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1));
+  // console.log(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  // console.log(new Date(Date.now()));
+  return await this.aggregate([
+    {
+      $match: {
+        status: orderStatus,
+        createdAt: {
+          $gte: new Date(
+            new Date().getFullYear(),
+            new Date().getMonth() - 6,
+            1
+          ),
+          $lte: new Date(Date.now()),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          month: { $month: "$createdAt" },
+        },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        month: {
+          $let: {
+            vars: {
+              months: [
+                "",
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ],
+            },
+            in: {
+              $arrayElemAt: ["$$months", "$_id.month"],
+            },
+          },
+        },
+        count: 1,
+      },
+    },
+  ]);
+};
+
 const OrderModel = mongoose.model("Order", OrderSchema);
 module.exports = OrderModel;

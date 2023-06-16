@@ -14,6 +14,7 @@ const DispatchSystemChangeStatusAPIroutes = require("./Routes/DispatchSystemChan
 
 const AuthRouter = require("./Components/Employees/Auth/AuthRouter");
 const UserAuthRouter = require("./Components/Users/Website/Auth/AuthRouter");
+const StaticsRouter = require("./Components/Statics/StaticsRouter");
 
 const app = express();
 app.use(
@@ -46,6 +47,7 @@ v1Router.use(DashboardRouter); // Dashboard Routes
 // Website Routes
 app.use("/", WebsiteRouter); // Website Routes
 app.use("/", UserAuthRouter); // User Auth Routes
+app.use("/statics", StaticsRouter); // User Auth Routes
 
 // Error Handlers
 app.use(_404); // Not Found Handlers

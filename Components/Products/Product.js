@@ -169,5 +169,16 @@ productSchema.methods.getCategoryById = function (id) {
   return Category.findById(id);
 };
 
+productSchema.statics.getTopProducts = async function () {
+  return await this.find({})
+    .sort({ total_orders: -1 })
+    .limit(10)
+    .select("name_en name_ar price image images total_orders");
+};
+
+productSchema.statics.countProducts = async function () {
+  return await this.countDocuments();
+};
+
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;

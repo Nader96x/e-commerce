@@ -30,17 +30,13 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
     order_id: order._id,
     status: order.status,
   });
-  const oldAddress = {
-    area: order.address.area,
-    city: order.address.city,
-    governorate: order.address.governorate,
-    country: order.address.country,
+  const updatedAddress = {
+    Area: order.address.area,
+    City: order.address.city,
+    Governate: order.address.governorate,
+    Country: order.address.country,
   };
-  const updatedAddress = {};
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [key, value] of Object.entries(oldAddress)) {
-    updatedAddress[key.charAt(0).toUpperCase() + key.slice(1)] = value;
-  }
+
   axios
     .post(process.env.DISPATCHING_URL, {
       _id: order.id,

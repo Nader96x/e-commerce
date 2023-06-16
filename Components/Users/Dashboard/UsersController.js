@@ -12,7 +12,7 @@ exports.createUser = Factory.createOne(User);
 
 exports.updateUser = Factory.updateOne(User);
 
-exports.deleteUser = Factory.deleteOne(User, Order, "user");
+exports.deleteUser = Factory.deleteOne(User, Order, "user_id");
 
 exports.activateUser = AsyncHandler(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(

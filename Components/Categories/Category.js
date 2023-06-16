@@ -86,6 +86,10 @@ categorySchema.pre("findOneAndDelete", async function (next) {
   next();
 });
 
+categorySchema.statics.countCategories = async function () {
+  return await this.countDocuments();
+};
+
 const Category = mongoose.model("Category", categorySchema);
 
 module.exports = Category;
