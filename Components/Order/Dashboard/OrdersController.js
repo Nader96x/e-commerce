@@ -90,6 +90,7 @@ module.exports.completeOrder = AsyncHandler(async (req, res, next) => {
     return next(new ApiError("Order is not found.", 404));
   }
   console.log(req.body);
+  console.log(req.headers);
   if (order.status !== "Processing") {
     return next(new ApiError(`${order.status} Order cannot be completed`, 400));
   }
