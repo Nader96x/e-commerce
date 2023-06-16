@@ -30,20 +30,29 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
     order_id: order._id,
     status: order.status,
   });
-
+  const oldAddress = {
+    area: order.address.area,
+    city: order.address.city,
+    governorate: order.address.governorate,
+    country: order.address.country,
+  };
+  const updatedAddress = {};
+  // eslint-disable-next-line no-restricted-syntax
+  for (const [key, value] of Object.entries(oldAddress)) {
+    updatedAddress[key.charAt(0).toUpperCase() + key.slice(1)] = value;
+  }
   axios
     .post(process.env.DISPATCHING_URL, {
       _id: order.id,
       CustomerID: order.user._id,
       CustomerName: order.user.name,
       CustomerEmail: order.user.email,
-      Address: order.address,
+      Address: updatedAddress,
       Product: order.products,
       PaymentMethod: order.payment_method,
       TotalPrice: order.total_price,
     })
     .then((response) => {
-      console.log(response);
       res.status(200).json({
         status: "success",
         data: {
