@@ -16,9 +16,10 @@ const createUser = customJoi.object({
     .string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ["com", "net", "org", "edu", "gov"] },
+      tlds: { allow: ["com", "net"] },
     })
-    .required(),
+    .required()
+    .trim(),
   password: customJoi.string().required().min(8),
   confirmPassword: customJoi.ref("password"),
   phone: customJoi
@@ -44,7 +45,7 @@ const updateUser = customJoi.object({
     .string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ["com", "net", "org", "edu", "gov"] },
+      tlds: { allow: ["com", "net"] },
     })
     .optional(),
   phone: customJoi

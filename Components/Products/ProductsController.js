@@ -14,6 +14,7 @@ exports.updateProduct = Factory.updateOne(Product);
 exports.deleteProduct = Factory.deleteOne(Product);
 
 exports.activateProduct = Factory.activate(Product);
+
 exports.deActivateProduct = Factory.deActivate(Product);
 
 exports.getProductsByCategory = AsyncHandler(async (req, res, next) => {

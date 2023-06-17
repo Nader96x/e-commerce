@@ -13,13 +13,12 @@ const addAddress = customJoi.object({
 });
 
 const updateAddress = customJoi.object({
-  id: customJoi.objectId().required(),
   area: customJoi.string().optional(),
   city: customJoi.string().optional(),
   governorate: customJoi.string().optional(),
   country: customJoi.string().optional(),
 });
 
-module.exports.validateAddressId = validateSchema(getAddressId);
+module.exports.validateAddressId = validateSchema(getAddressId, "params");
 module.exports.validateAddAddress = validateSchema(addAddress);
 module.exports.validateUpdateAddress = validateSchema(updateAddress);

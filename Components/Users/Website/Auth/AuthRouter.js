@@ -17,7 +17,7 @@ const {
   validateForgotPassword,
   validateResetPassword,
   validateUpdatePassword,
-  validateVerifyEmail,
+  validateToken,
 } = require("../UsersValidation");
 
 const router = express.Router();
@@ -39,8 +39,13 @@ router.post(
 router.post("/login", validateLogin, login);
 
 router.post("/forgot-password", validateForgotPassword, forgotPassword);
-router.patch("/reset-password/:token", validateResetPassword, resetPassword);
-router.get("/verify-email/:token", protect, validateVerifyEmail, verifyEmail);
+router.patch(
+  "/reset-password/:token",
+  validateToken,
+  validateResetPassword,
+  resetPassword
+);
+router.get("/verify-email/:token", protect, validateToken, verifyEmail);
 router.post("/resend-verification-code", protect, sendNewVerificationCode);
 
 router.patch(

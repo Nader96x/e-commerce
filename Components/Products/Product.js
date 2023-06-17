@@ -163,7 +163,12 @@ productSchema.pre("save", async function (next) {
 productSchema.pre("findOneAndDelete", async function (next) {
   const product = await this.model.findOne(this.getFilter());
   if (product && product.total_orders > 0) {
-    return next(new ApiError("Product Cannot Be Deleted", 400));
+    return next(
+      new ApiError(
+        `This Product Has ${product.total_orders} Order, You Cannot Delete it`,
+        400
+      )
+    );
   }
   next();
 });

@@ -34,8 +34,8 @@ exports.delete = AsyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new ApiError("something went wrong", 400));
   }
-  res.status(204).json({
+  res.status(200).json({
     status: "success",
-    data: null,
+    data: user,
   });
 });

@@ -107,7 +107,6 @@ const userSchema = mongoose.Schema(
     is_active: {
       type: Boolean,
       default: true,
-      select: false,
     },
     address: {
       type: [AddressSchema],
@@ -162,41 +161,62 @@ userSchema.pre("save", function (next) {
   next();
 }); // update Changed At password after reset success
 
-userSchema.methods.checkPassword = function (candidatePassword, userPassword) {
-  return bcrypt.compare(candidatePassword, userPassword);
-}; // compare passwords
-
-userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
-  if (this.passwordChangedAt) {
-    const changedTimestamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
-      10
-    );
-    return JWTTimestamp < changedTimestamp;
-  }
-}; // check last date user changed his password
-
-userSchema.methods.createPasswordResetToken = function () {
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  this.reset_password_token = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-  this.reset_password_token_expire = Date.now() + 30 * 60 * 1000;
-  return resetToken;
+userSchema.methods = {
+  toJSON() {
+    return {
+      _id: this._id.toHexString(),
+      name: this.name,
+      email: this.email,
+      phone: this.phone,
+      image: this.image,
+      bio: this.bio,
+      is_active: this.is_active,
+      address: this.address,
+      cart: this.cart,
+      password: this.password,
+      verified_at: this.verified_at,
+      reset_password_token: this.reset_password_token,
+      reset_password_token_expire: this.reset_password_token_expire,
+      email_token: this.email_token,
+      passwordChangedAt: this.passwordChangedAt,
+      id: this._id.toHexString(),
+    };
+  },
+  checkPassword(candidatePassword, userPassword) {
+    return bcrypt.compare(candidatePassword, userPassword);
+  }, // compare passwords
+  changedPasswordAfter(JWTTimestamp) {
+    if (this.passwordChangedAt) {
+      const changedTimestamp = parseInt(
+        this.passwordChangedAt.getTime() / 1000,
+        10
+      );
+      return JWTTimestamp < changedTimestamp;
+    }
+  }, // check last date user changed his password
+  createPasswordResetToken() {
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    this.reset_password_token = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+    this.reset_password_token_expire = Date.now() + 30 * 60 * 1000;
+    return resetToken;
+  },
+  createEmailVerificationToken() {
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    this.email_token = crypto
+      .createHash("sha256")
+      .update(verificationToken)
+      .digest("hex");
+    return verificationToken;
+  },
 };
 
-userSchema.methods.createEmailVerificationToken = function () {
-  const verificationToken = crypto.randomBytes(32).toString("hex");
-  this.email_token = crypto
-    .createHash("sha256")
-    .update(verificationToken)
-    .digest("hex");
-  return verificationToken;
-};
-
-userSchema.statics.countUsers = async function () {
-  return await this.countDocuments();
+userSchema.statics = {
+  async countUsers() {
+    return await this.countDocuments();
+  },
 };
 
 const User = mongoose.model("User", userSchema);

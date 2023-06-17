@@ -49,9 +49,10 @@ router
 router
   .route("/address/:id")
   .all(protect)
-  .get(validateAddressId, addressController.getAddress)
+  .all(validateAddressId)
+  .get(addressController.getAddress)
   .patch(validateUpdateAddress, addressController.updateAddress)
-  .delete(validateAddressId, addressController.deleteAddress);
+  .delete( addressController.deleteAddress);
 
 // Cart Routes
 router

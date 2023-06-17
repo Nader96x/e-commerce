@@ -18,7 +18,12 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
   // eslint-disable-next-line camelcase
   const { product_id, quantity } = req.body;
   const product = await Product.findById(product_id);
-  if (!product || !product.is_active || product.quantity <= 0) {
+  if (
+    !product ||
+    !product.category_id.is_active ||
+    !product.is_active ||
+    product.quantity <= 0
+  ) {
     return next(new ApiError("Product Cannot be Added To Cart", 400));
   }
   if (quantity > product.quantity) {
