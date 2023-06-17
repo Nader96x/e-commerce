@@ -17,6 +17,10 @@ exports.getPublicCategories = Factory.getAll(Category);
 
 exports.getOneCategoryBySlug = Factory.getOneBySlug(Category);
 
+exports.activateCategory = Factory.activate(Category);
+
+exports.deActivateCategory = Factory.deActivate(Category);
+
 exports.getProductsByCategory = async (req, res, next) => {
   const Cat = await Category.findOne({ slug: req.params.slug }).exec();
   if (!Cat) {

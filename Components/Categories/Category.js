@@ -66,28 +66,45 @@ categorySchema.pre("save", function (next) {
   next();
 });
 
-categorySchema.pre("findByIdAndUpdate", async function (next) {
-  this.slug = await slugify(this.name_en, {
+categorySchema.post("save", function () {
+  this.slug = slugify(this.name_en, {
     lower: true,
     replacement: "-",
     remove: /[*+~.()'"!:@]/g,
     strict: true,
   });
-  this.updatedAt = Date.now();
-  next();
 });
 
 categorySchema.pre("findOneAndDelete", async function (next) {
   const filter = this.getFilter();
   const products = await Product.find({ category_id: filter._id });
   if (products.length > 0) {
-    return next(new ApiError("Category Has Products, Cannot be deleted", 400));
+    return next(
+      new ApiError(
+        `Category Has ${products.length} Products, Cannot be deleted`,
+        400
+      )
+    );
   }
   next();
 });
 
-categorySchema.statics.countCategories = async function () {
-  return await this.countDocuments();
+categorySchema.methods = {
+  toJSON() {
+    return {
+      id: this._id.toHexString(),
+      name_ar: this.name_ar,
+      name_en: this.name_en,
+      image: this.image,
+      slug: this.slug,
+      is_active: this.is_active,
+    };
+  },
+};
+categorySchema.statics = {
+  async countCategories() {
+    return await this.countDocuments();
+  },
 };
 
 const Category = mongoose.model("Category", categorySchema);

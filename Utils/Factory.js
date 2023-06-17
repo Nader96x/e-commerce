@@ -1,7 +1,9 @@
 const asyncHandler = require("express-async-handler");
 const { del } = require("express/lib/application");
+const AsyncHandler = require("express-async-handler");
 const ApiError = require("./ApiError");
 const ApiFeatures = require("./ApiFeatures");
+const User = require("../Components/Users/User");
 
 module.exports.getAll = (Model) =>
   asyncHandler(async ({ body, query, lang }, res, next) => {
@@ -180,4 +182,44 @@ module.exports.unban = (Model) =>
       return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
 
     res.status(200).json({ status: "success", data: document });
+  });
+
+module.exports.activate = (Model) =>
+  AsyncHandler(async ({ params }, res, next) => {
+    const { id } = params;
+    const document = await Model.findByIdAndUpdate(
+      id,
+      { is_active: true },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!document) {
+      return next(new ApiError("Activation Went Wrong", 400));
+    }
+    res.status(200).json({
+      status: "success",
+      data: document,
+    });
+  });
+
+module.exports.deActivate = (Model) =>
+  AsyncHandler(async ({ params }, res, next) => {
+    const { id } = params;
+    const document = await Model.findByIdAndUpdate(
+      id,
+      { is_active: false },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!document) {
+      return next(new ApiError("Activation Went Wrong", 400));
+    }
+    res.status(200).json({
+      status: "success",
+      data: document,
+    });
   });
