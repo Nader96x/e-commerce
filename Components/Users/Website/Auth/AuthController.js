@@ -43,6 +43,7 @@ const createLogoutToken = (statusCode, res, next) => {
   if (!token) {
     return next(new ApiError("Error creating JWT token", 500));
   }
+  process.env.JWT_EXPIRES_IN = "30d";
   res.status(statusCode).json({
     status: "success",
     data: { token },
