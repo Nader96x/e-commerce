@@ -92,12 +92,13 @@ categorySchema.pre("findOneAndDelete", async function (next) {
 categorySchema.methods = {
   toJSON() {
     return {
-      id: this._id.toHexString(),
+      _id: this._id.toHexString(),
       name_ar: this.name_ar,
       name_en: this.name_en,
       image: this.image,
       slug: this.slug,
       is_active: this.is_active,
+      id: this._id.toHexString(),
     };
   },
 };

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
 const ApiError = require("../../Utils/ApiError");
+const Category = require("../Categories/Category");
 
 const productSchema = mongoose.Schema(
   {
@@ -141,6 +142,15 @@ productSchema.pre("save", function (next) {
   next();
 });
 
+productSchema.post("save", function () {
+  this.slug = slugify(this.name_en, {
+    lower: true,
+    replacement: "-",
+    remove: /[*+~.()'"!:@]/g,
+    strict: true,
+  });
+});
+
 productSchema.pre("save", async function (next) {
   const id = this.category_id;
   const category = await this.getCategoryById(id);
@@ -163,21 +173,42 @@ productSchema.pre("update", function (next) {
   next();
 });
 
-productSchema.methods.getCategoryById = function (id) {
-  // eslint-disable-next-line global-require
-  const Category = require("../Categories/Category");
-  return Category.findById(id);
+productSchema.methods = {
+  toJSON() {
+    return {
+      _id: this._id.toHexString(),
+      name_en: this.name_en,
+      name_ar: this.name_ar,
+      desc_en: this.desc_en,
+      desc_ar: this.desc_ar,
+      is_active: this.is_active,
+      price: this.price,
+      image: this.image,
+      images: this.images,
+      quantity: this.quantity,
+      total_orders: this.total_orders,
+      category_id: this.category_id,
+      name: this.name,
+      desc: this.desc,
+      id: this._id.toHexString(),
+    };
+  },
+  getCategoryById(id) {
+    const Category = require("../Categories/Category");
+    return Category.findById(id);
+  },
 };
 
-productSchema.statics.getTopProducts = async function () {
-  return await this.find({})
-    .sort({ total_orders: -1 })
-    .limit(10)
-    .select("name_en name_ar price image images total_orders");
-};
-
-productSchema.statics.countProducts = async function () {
-  return await this.countDocuments();
+productSchema.statics = {
+  async getTopProducts() {
+    return await this.find({})
+      .sort({ total_orders: -1 })
+      .limit(10)
+      .select("name_en name_ar price image images total_orders");
+  },
+  async countProducts() {
+    return await this.countDocuments();
+  },
 };
 
 const Product = mongoose.model("Product", productSchema);

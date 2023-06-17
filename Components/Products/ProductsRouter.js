@@ -58,4 +58,7 @@ router
   )
   .delete(productController.deleteProduct);
 
+router.patch("/:id/unban", validateProductId, productController.activateProduct)
+router.patch("/:id/ban", validateProductId, productController.deActivateProduct)
+
 module.exports = router;
