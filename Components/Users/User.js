@@ -50,13 +50,6 @@ const userSchema = mongoose.Schema(
     name: {
       type: String,
       required: [true, "User Name is Required"],
-      validate: {
-        validator: function (value) {
-          const usernameRegex = /^[A-Za-z][A-Za-z0-9_]{5,50}$/;
-          return usernameRegex.test(value);
-        },
-        message: "User name is Invalid",
-      },
       trim: true,
     },
     email: {
