@@ -40,7 +40,7 @@ router
   )
   .delete(categoryController.deleteCategory);
 
-router.patch("/:id/unban", validateCategoryId, categoryController.activateCategory)
-router.patch("/:id/ban", validateCategoryId, categoryController.deActivateCategory)
+router.post("/:id/unban", validateCategoryId, categoryController.activateCategory)
+router.post("/:id/ban", validateCategoryId, categoryController.deActivateCategory)
 
 module.exports = router;
