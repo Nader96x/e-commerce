@@ -7,6 +7,7 @@ const pusher = require("../../../helpers/Pusher");
 const Factory = require("../../../Utils/Factory");
 
 exports.getOrders = Factory.getAll(Order);
+exports.getOrder = Factory.getOne(Order);
 
 exports.createOrder = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
