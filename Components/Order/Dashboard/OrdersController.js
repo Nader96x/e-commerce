@@ -68,11 +68,9 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
         },
       });
     })
-    .catch(() =>
-      next(
-        new ApiError("Something Went Wrong, please try again in a while", 503)
-      )
-    );
+    .catch((err) => {
+      next(new ApiError(err.message, Number(err.message.split("code ")[1])));
+    });
 });
 
 module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
