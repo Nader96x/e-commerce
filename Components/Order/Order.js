@@ -130,7 +130,6 @@ OrderSchema.pre("save", function (next) {
       status: this.status,
       date: Date.now(),
     });
-    console.log(this.status_history);
     const url = `${process.env.FRONTEND_URL}/orders/OrderDetail/${this._id}`;
     // get user from this and send email
     User.findById(this.user_id)
@@ -143,6 +142,32 @@ OrderSchema.pre("save", function (next) {
       });
   }
   this.updatedAt = Date.now();
+  next();
+});
+
+OrderSchema.pre("save", async function (next) {
+  if (this.isModified("status")) {
+    if (this.status === "Cancelled") {
+      for (let i = 0; i < this.products.length; i++) {
+        // eslint-disable-next-line no-shadow,no-await-in-loop
+        const product = await Product.findById(this.products[i].product_id);
+        product.total_orders -= this.products[i].quantity;
+        product.quantity += this.products[i].quantity;
+        // eslint-disable-next-line no-await-in-loop
+        await product.save();
+      }
+    }
+  }
+  if (this.isNew) {
+    for (let i = 0; i < this.products.length; i++) {
+      // eslint-disable-next-line no-shadow,no-await-in-loop
+      const product = await Product.findById(this.products[i].product_id);
+      product.total_orders += this.products[i].quantity;
+      product.quantity -= this.products[i].quantity;
+      // eslint-disable-next-line no-await-in-loop
+      await product.save();
+    }
+  }
 
   next();
 });
@@ -166,26 +191,26 @@ OrderSchema.methods = {
       id: this._id.toHexString(),
     };
   },
-  async increaseProducts() {
-    for (let i = 0; i < this.products.length; i++) {
-      // eslint-disable-next-line no-shadow,no-await-in-loop
-      const product = await Product.findById(this.products[i].product_id);
-      product.total_orders += this.products[i].quantity;
-      product.quantity -= this.products[i].quantity;
-      // eslint-disable-next-line no-await-in-loop
-      await product.save();
-    }
-  },
-  async decreaseProducts() {
-    for (let i = 0; i < this.products.length; i++) {
-      // eslint-disable-next-line no-shadow,no-await-in-loop
-      const product = await Product.findById(this.products[i].product_id);
-      product.total_orders -= this.products[i].quantity;
-      product.quantity += this.products[i].quantity;
-      // eslint-disable-next-line no-await-in-loop
-      await product.save();
-    }
-  },
+  // async increaseProducts() {
+  //   for (let i = 0; i < this.products.length; i++) {
+  //     // eslint-disable-next-line no-shadow,no-await-in-loop
+  //     const product = await Product.findById(this.products[i].product_id);
+  //     product.total_orders += this.products[i].quantity;
+  //     product.quantity -= this.products[i].quantity;
+  //     // eslint-disable-next-line no-await-in-loop
+  //     await product.save();
+  //   }
+  // },
+  // async decreaseProducts() {
+  //   for (let i = 0; i < this.products.length; i++) {
+  //     // eslint-disable-next-line no-shadow,no-await-in-loop
+  //     const product = await Product.findById(this.products[i].product_id);
+  //     product.total_orders -= this.products[i].quantity;
+  //     product.quantity += this.products[i].quantity;
+  //     // eslint-disable-next-line no-await-in-loop
+  //     await product.save();
+  //   }
+  // },
 };
 
 OrderSchema.statics = {

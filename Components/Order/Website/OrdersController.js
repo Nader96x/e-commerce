@@ -35,7 +35,6 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     (acc, product) => acc + product.price * product.quantity,
     0
   );
-  // const total_price = products.reduce((acc, product) => acc + product.price, 0);
   const order = new Order({
     user_id: req.user.id,
     products,
@@ -43,7 +42,6 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     address: orderAddress,
   });
   await order.save();
-  order.increaseProducts();
   user.cart = [];
   await user.save({ validateBeforeSave: false });
 
@@ -70,7 +68,6 @@ exports.cancelOrder = AsyncHandler(async (req, res, next) => {
     return next(new ApiError(`${order.status} Cannot be Cancelled`));
   order.status = "Cancelled";
   await order.save();
-  order.decreaseProducts();
   res.status(200).json({
     status: "success",
     data: order,

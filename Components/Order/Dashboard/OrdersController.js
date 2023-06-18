@@ -91,7 +91,6 @@ module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
     status: order.status,
   });
   await order.save();
-  order.decreaseProducts();
   res.status(200).json({
     status: "success",
     data: {
