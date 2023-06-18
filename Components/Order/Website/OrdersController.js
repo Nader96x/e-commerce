@@ -10,7 +10,7 @@ exports.getOrders = Factory.getAll(Order);
 exports.getOrder = Factory.getOne(Order);
 
 exports.createOrder = AsyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id).populate("user", "name email");
+  const user = await User.findById(req.user.id);
   const { cart } = user;
   const orderAddress = await user.address.find((address) =>
     address._id.equals(req.body.address_id)

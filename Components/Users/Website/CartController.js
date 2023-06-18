@@ -41,7 +41,6 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
       }
       item.quantity += quantity;
       item.price = product.price;
-      // item.price = product.price * item.quantity;
       item.name_en = product.name_en;
       item.image = product.image;
     }
@@ -80,7 +79,6 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
     if (item.product_id == product_id) {
       item.quantity = quantity;
       item.price = product.price;
-      // item.price = product.price * item.quantity;
       item.name_en = name_en;
       item.image = image;
     }
