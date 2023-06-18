@@ -40,7 +40,8 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
         );
       }
       item.quantity += quantity;
-      item.price = product.price * item.quantity;
+      item.price = product.price;
+      // item.price = product.price * item.quantity;
       item.name_en = product.name_en;
       item.image = product.image;
     }
@@ -50,7 +51,8 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
     (item) => item.product_id == product_id
   );
   if (!productFound) {
-    const price = product.price * quantity;
+    const { price } = product;
+    // const price = product.price * quantity;
     // eslint-disable-next-line camelcase
     updatedCart.push({ product_id, quantity, price, name_en, image });
   }
@@ -77,7 +79,8 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
     // eslint-disable-next-line camelcase
     if (item.product_id == product_id) {
       item.quantity = quantity;
-      item.price = product.price * item.quantity;
+      item.price = product.price;
+      // item.price = product.price * item.quantity;
       item.name_en = name_en;
       item.image = image;
     }

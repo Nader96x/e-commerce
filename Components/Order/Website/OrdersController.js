@@ -31,7 +31,11 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
       image,
     };
   });
-  const total_price = products.reduce((acc, product) => acc + product.price, 0);
+  const total_price = products.reduce(
+    (acc, product) => acc + product.price * product.quantity,
+    0
+  );
+  // const total_price = products.reduce((acc, product) => acc + product.price, 0);
   const order = new Order({
     user_id: req.user.id,
     products,

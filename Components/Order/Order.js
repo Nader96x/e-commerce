@@ -173,6 +173,7 @@ OrderSchema.methods = {
     return {
       _id: this._id.toHexString(),
       user_id: this.user_id,
+      user: this.user,
       status: this.status,
       status_history: this.status_history,
       payment_status: this.payment_status,
@@ -181,6 +182,7 @@ OrderSchema.methods = {
       products: this.products,
       total_price: this.total_price,
       address: this.address,
+      createdAt: this.createdAt,
       order_id: this._id.toHexString(),
       id: this._id.toHexString(),
     };
