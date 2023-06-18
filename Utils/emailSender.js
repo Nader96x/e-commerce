@@ -44,6 +44,7 @@ module.exports = class Email {
         )
         .replaceAll("{{order_payment_method}}", this.order.payment_method)
         .replaceAll("{{order_payment_status}}", this.order.payment_status);
+      subject += ` #${this.order.status}`;
     }
     // 2) Define email options
     const mailOptions = {
