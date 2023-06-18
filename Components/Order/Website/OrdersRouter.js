@@ -6,7 +6,7 @@ const {
   reorder,
   getOrder,
 } = require("./OrdersController");
-const { validateAddressId, validateOrderId } = require("./OrderValidation");
+const { validateCheckout, validateOrderId } = require("./OrderValidation");
 const { protect } = require("../../Users/Website/Auth/AuthController");
 
 const router = express.Router();
@@ -18,13 +18,13 @@ router
     req.body.id = req.user.id;
     next();
   }, getOrders)
-  .post(validateAddressId, createOrder);
+  .post(validateCheckout, createOrder);
 
 router.post(
   "/:id/reorder",
   protect,
   validateOrderId,
-  validateAddressId,
+  validateCheckout,
   reorder
 );
 

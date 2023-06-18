@@ -18,30 +18,27 @@ module.exports.getOrders = Factory.getAll(Order);
 module.exports.getOrder = Factory.getOne(Order);
 
 module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
-  const filter = { _id: req.params.id };
-  const order = await Order.findOneAndUpdate(
-    filter,
-    { status: "Processing" },
-    { new: true }
-  ).populate("user", "name email");
+  const { id } = req.params;
+  const order = await Order.findById(id).populate("user", "name email");
 
-  pusher.trigger(`user-${order.user_id}`, "my-order", {
-    message: "Your order is being processed",
-    order_id: order._id,
-    status: order.status,
-  });
+  if (!order) {
+    return next(new ApiError("Order Not Found", 404));
+  }
+
   const updatedAddress = {
     Area: order.address.area,
     City: order.address.city,
     Governate: order.address.governorate,
     Country: order.address.country,
   };
+
   const dispatchingProducts = order.products.map((product) => ({
     product_id: product.product_id,
     quantity: product.quantity,
     price: product.price,
     name_en: product.name_en,
   }));
+
   axios
     .post(process.env.DISPATCHING_URL, {
       _id: order.id,
@@ -54,6 +51,13 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
       TotalPrice: order.total_price,
     })
     .then((response) => {
+      order.status = "Processing";
+      pusher.trigger(`user-${order.user_id}`, "my-order", {
+        message: "Your order is being processed",
+        order_id: order._id,
+        status: order.status,
+      });
+      order.save();
       res.status(200).json({
         status: "success",
         data: {
@@ -64,22 +68,24 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
         },
       });
     })
-    .catch((err) => res.send(err));
+    .catch(() =>
+      next(
+        new ApiError("Something Went Wrong, please try again in a while", 503)
+      )
+    );
 });
 
 module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
   const filter = { _id: req.params.id };
-  const order = await Order.findOneAndUpdate(
-    filter,
-    { status: "Cancelled" },
-    { new: true }
-  );
-
+  const order = await Order.findById(filter);
+  if (!order) return next(new ApiError("Order Not Found", 404));
+  order.status = "Cancelled";
   pusher.trigger(`user-${order.user_id}`, "my-order", {
     message: "Your order has been cancelled",
     order_id: order._id,
     status: order.status,
   });
+  await order.save();
 
   res.status(200).json({
     status: "success",

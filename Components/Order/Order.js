@@ -168,67 +168,105 @@ OrderSchema.post("save", async function (next) {
   }
 });
 
-OrderSchema.statics.countOrders = async function () {
-  return await this.countDocuments();
+OrderSchema.methods = {
+  toJSON() {
+    return {
+      _id: this._id.toHexString(),
+      user_id: this.user_id,
+      status: this.status,
+      status_history: this.status_history,
+      payment_status: this.payment_status,
+      payment_method: this.payment_method,
+      payment_id: this.payment_id,
+      products: this.products,
+      total_price: this.total_price,
+      address: this.address,
+      order_id: this._id.toHexString(),
+      id: this._id.toHexString(),
+    };
+  },
 };
 
-OrderSchema.statics.getOrdersPerMonth = async function (orderStatus) {
-  // console.log(new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1));
-  // console.log(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-  // console.log(new Date(Date.now()));
-  return await this.aggregate([
-    {
-      $match: {
-        status: orderStatus,
-        createdAt: {
-          $gte: new Date(
-            new Date().getFullYear(),
-            new Date().getMonth() - 6,
-            1
-          ),
-          $lte: new Date(Date.now()),
-        },
-      },
-    },
-    {
-      $group: {
-        _id: {
-          month: { $month: "$createdAt" },
-        },
-        count: { $sum: 1 },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        month: {
-          $let: {
-            vars: {
-              months: [
-                "",
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December",
-              ],
-            },
-            in: {
-              $arrayElemAt: ["$$months", "$_id.month"],
-            },
+OrderSchema.statics = {
+  async countOrders() {
+    return await this.countDocuments();
+  },
+  async getOrdersPerMonth(orderStatus) {
+    return await this.aggregate([
+      {
+        $match: {
+          status: orderStatus,
+          createdAt: {
+            $gte: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth() - 6,
+              1
+            ),
+            $lte: new Date(Date.now()),
           },
         },
-        count: 1,
       },
-    },
-  ]);
+      {
+        $group: {
+          _id: {
+            month: { $month: "$createdAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: {
+            $let: {
+              vars: {
+                months: [
+                  "",
+                  "January",
+                  "February",
+                  "March",
+                  "April",
+                  "May",
+                  "June",
+                  "July",
+                  "August",
+                  "September",
+                  "October",
+                  "November",
+                  "December",
+                ],
+              },
+              in: {
+                $arrayElemAt: ["$$months", "$_id.month"],
+              },
+            },
+          },
+          count: 1,
+        },
+      },
+    ]);
+  },
+  async totalOrdersPrice() {
+    return await this.aggregate([
+      {
+        $match: {
+          status: "Completed",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalPrice: { $sum: "$total_price" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalPrice: 1,
+        },
+      },
+    ]);
+  },
 };
 
 const OrderModel = mongoose.model("Order", OrderSchema);

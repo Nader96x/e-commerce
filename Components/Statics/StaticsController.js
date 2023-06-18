@@ -10,6 +10,7 @@ module.exports.getStatics = AsyncHandler(async (req, res, next) => {
   const numberOfCategories = await Category.countCategories();
   const numberOfUsers = await User.countUsers();
   const numberOfOrders = await Order.countOrders();
+  const sales = await Order.totalOrdersPrice();
   const completedOrdersInLastSixMonths = await Order.getOrdersPerMonth(
     "Completed"
   );
@@ -26,6 +27,7 @@ module.exports.getStatics = AsyncHandler(async (req, res, next) => {
       numberOfCategories,
       numberOfProducts,
       numberOfOrders,
+      sales: sales[0].totalPrice,
       completedOrdersInLastSixMonths,
       cancelledOrdersInLastSixMonths,
       processingOrdersFromLastSixMonths,

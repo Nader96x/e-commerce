@@ -24,7 +24,9 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
     !product.is_active ||
     product.quantity <= 0
   ) {
-    return next(new ApiError("Product Cannot be Added To Cart", 400));
+    return next(
+      new ApiError("Product Cannot be Added To Cart at the Moment", 400)
+    );
   }
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
