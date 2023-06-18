@@ -3,7 +3,6 @@ const axios = require("axios");
 const Factory = require("../../../Utils/Factory");
 const ApiError = require("../../../Utils/ApiError");
 const Order = require("../Order");
-const Product = require("../../Products/Product");
 const pusher = require("../../../helpers/Pusher");
 /*
  * @description get all orders in the system for admin / get all orders for specific user by userID
@@ -85,6 +84,7 @@ module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
     return next(new ApiError(`${order.status} Order Cannot Be Cancelled`, 404));
   }
   order.status = "Cancelled";
+  order.payment_status = "Cancelled";
   pusher.trigger(`user-${order.user_id}`, "my-order", {
     message: "Your order has been cancelled",
     order_id: order._id,

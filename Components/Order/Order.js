@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Product = require("../Products/Product");
 const User = require("../Users/User");
-const ApiError = require("../../Utils/ApiError");
 const EmailSender = require("../../Utils/emailSender");
 
 const product = mongoose.Schema({
@@ -83,7 +82,7 @@ const OrderSchema = mongoose.Schema(
     },
     payment_status: {
       type: String,
-      enum: ["Pending", "Paid"],
+      enum: ["Pending", "Paid", "Cancelled"],
       default: "Pending",
     },
     payment_method: {
@@ -103,6 +102,7 @@ const OrderSchema = mongoose.Schema(
 
 OrderSchema.pre(/^find/, function (next) {
   this.populate("user");
+  this.populate("products.product_details");
   next();
 });
 
@@ -117,7 +117,7 @@ OrderSchema.virtual("user", {
   justOne: true,
 });
 
-OrderSchema.virtual("products.product", {
+OrderSchema.virtual("products.product_details", {
   ref: "Product",
   localField: "products.product_id",
   foreignField: "_id",
@@ -191,26 +191,6 @@ OrderSchema.methods = {
       id: this._id.toHexString(),
     };
   },
-  // async increaseProducts() {
-  //   for (let i = 0; i < this.products.length; i++) {
-  //     // eslint-disable-next-line no-shadow,no-await-in-loop
-  //     const product = await Product.findById(this.products[i].product_id);
-  //     product.total_orders += this.products[i].quantity;
-  //     product.quantity -= this.products[i].quantity;
-  //     // eslint-disable-next-line no-await-in-loop
-  //     await product.save();
-  //   }
-  // },
-  // async decreaseProducts() {
-  //   for (let i = 0; i < this.products.length; i++) {
-  //     // eslint-disable-next-line no-shadow,no-await-in-loop
-  //     const product = await Product.findById(this.products[i].product_id);
-  //     product.total_orders -= this.products[i].quantity;
-  //     product.quantity += this.products[i].quantity;
-  //     // eslint-disable-next-line no-await-in-loop
-  //     await product.save();
-  //   }
-  // },
 };
 
 OrderSchema.statics = {

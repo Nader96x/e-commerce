@@ -21,16 +21,25 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
   if (cart.length < 1) {
     return next(new ApiError("Cart is Empty", 400));
   }
-  const products = cart.map((product) => {
-    const { product_id, quantity, price, name_en, image } = product;
-    return {
-      product_id,
-      quantity,
-      price,
-      name_en,
-      image,
-    };
-  });
+  const products = await Promise.all(
+    cart.map(async (product) => {
+      const { product_id, quantity, price, name_en, image } = product;
+      const prod = await Product.findById(product_id);
+      if (!prod.is_active || !prod.category_id.is_active) return null;
+      return {
+        product_id,
+        quantity,
+        price,
+        name_en,
+        image,
+      };
+    })
+  );
+  const unavailableProducts = products.filter((product) => product == null);
+  if (unavailableProducts.length > 0)
+    return next(
+      new ApiError("Some Products Are no available at The Moment", 400)
+    );
   const total_price = products.reduce(
     (acc, product) => acc + product.price * product.quantity,
     0
@@ -96,22 +105,17 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
   for (const product of order.products) {
     const { product_id, quantity } = product;
     // eslint-disable-next-line no-await-in-loop
-    const availableProduct = await Product.findOne({
-      _id: product_id,
-      quantity: { $gte: quantity },
-      is_active: true,
-    });
-    if (!availableProduct) {
-      return next(new ApiError(`Some Products Are Not Available`, 400));
-    }
+    const prod = await Product.findById(product_id);
+    if (!prod.is_active || !prod.category_id.is_active)
+      return next(new ApiError("Some Products are Not Available", 400));
     products.push({
       product_id,
       quantity,
-      price: availableProduct.price,
-      name_en: availableProduct.name_en,
-      image: availableProduct.image,
+      price: prod.price,
+      name_en: prod.name_en,
+      image: prod.image,
     });
-    total_price += quantity * availableProduct.price;
+    total_price += quantity * prod.price;
   }
   const newOrder = new Order({
     user_id: req.user._id,
