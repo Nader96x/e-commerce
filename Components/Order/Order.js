@@ -130,19 +130,20 @@ OrderSchema.pre("save", function (next) {
       status: this.status,
       date: Date.now(),
     });
+    console.log(this.status_history);
+    const url = `${process.env.FRONTEND_URL}/orders/OrderDetail/${this._id}`;
+    // get user from this and send email
+    User.findById(this.user_id)
+      .then((user) => {
+        const email = new EmailSender(user, url, this);
+        email.sendStatusChange(); // I know this is async, but I don't want to wait for it
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
   this.updatedAt = Date.now();
-  console.log(this.status_history);
-  const url = `${process.env.FRONTEND_URL}/orders/OrderDetail/${this._id}`;
-  // get user from this and send email
-  User.findById(this.user_id)
-    .then((user) => {
-      const email = new EmailSender(user, url, this);
-      email.sendStatusChange(); // I know this is async, but I don't want to wait for it
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+
   next();
 });
 
