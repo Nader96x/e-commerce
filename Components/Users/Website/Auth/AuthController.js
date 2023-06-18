@@ -25,9 +25,7 @@ const createSendToken = (user, statusCode, res, next) => {
 const createVerifyToken = async (user, req, res, next) => {
   const token = await user.createEmailVerificationToken();
   user.save({ validateBeforeSave: false });
-  const verifyUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/verify-email/${token}`;
+  const verifyUrl = `http://localhost:3000/verify-email/${token}`;
   const email = new Email(user, verifyUrl);
   try {
     await email.sendWelcome();
@@ -99,9 +97,7 @@ exports.forgotPassword = AsyncHandler(async (req, res, next) => {
   }
   const token = await user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
-  const resetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/reset-password/${token}`;
+  const resetURL = `https://localhost:3000/reset-password/${token}`;
   const email = new Email(user, resetURL);
   try {
     await email.sendPasswordReset();
