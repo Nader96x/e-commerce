@@ -31,7 +31,8 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
-  const { name_en, image } = product;
+  const { name_en, image, is_active } = product;
+  const category_is_active = product.category_id.is_active;
   const updatedCart = await cart.map((item) => {
     if (item.product_id._id == product_id) {
       if (item.quantity >= product.quantity) {
@@ -43,6 +44,8 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
       item.price = product.price;
       item.name_en = product.name_en;
       item.image = product.image;
+      item.is_active = product.is_active;
+      item.category_is_active = product.category_id.is_active;
     }
     return item;
   });
@@ -53,7 +56,15 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
     const { price } = product;
     // eslint-disable-next-line camelcase
     product_id = await Product.findById(product_id);
-    updatedCart.push({ product_id, quantity, price, name_en, image });
+    updatedCart.push({
+      product_id,
+      quantity,
+      price,
+      name_en,
+      image,
+      is_active,
+      category_is_active,
+    });
   }
   user.cart = updatedCart;
   await user.save({ validateBeforeSave: false });
@@ -70,10 +81,13 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
   const { product_id, quantity } = req.body;
   const product = await Product.findById(product_id);
   if (!product) return next(new ApiError("Product Not Found", 404));
-  const { name_en, image } = product;
+  const { name_en, image, is_active } = product;
+  const category_is_active = product.category_id.is_active;
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
+  if (!is_active || !category_is_active)
+    return next(new ApiError("Product not Available", 400));
   const updatedCart = await cart.map((item) => {
     // eslint-disable-next-line camelcase
     if (item.product_id._id == product_id) {
@@ -81,6 +95,8 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
       item.price = product.price;
       item.name_en = name_en;
       item.image = image;
+      item.is_active = product.is_active;
+      item.category_is_active = category_is_active;
     }
     return item;
   });

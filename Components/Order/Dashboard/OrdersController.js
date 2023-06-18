@@ -24,7 +24,7 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
   if (!order) {
     return next(new ApiError("Order Not Found", 404));
   }
-  if (order.status !== "Processing") {
+  if (order.status !== "Pending") {
     return next(new ApiError(`${order.status} Order Cannot Be Processed`, 404));
   }
 

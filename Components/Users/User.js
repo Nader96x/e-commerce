@@ -43,6 +43,11 @@ const cartProductsSchema = new mongoose.Schema({
     type: String,
     required: [true, "image is Missing"],
   },
+  is_active: { type: Boolean, required: [true, "Status is required"] },
+  category_is_active: {
+    type: Boolean,
+    required: [true, "Category Status is required"],
+  },
 }); // Schema For the Cart
 
 const userSchema = mongoose.Schema(
