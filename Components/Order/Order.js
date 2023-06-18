@@ -147,41 +147,6 @@ OrderSchema.pre("save", function (next) {
   next();
 });
 
-// validate if order is not Pending
-OrderSchema.pre("findOneAndUpdate", async function (next) {
-  const filter = this.getFilter();
-  const order = await this.model.findOne(filter);
-  if (!order) {
-    return next(new ApiError("Order not found", 404));
-  }
-  if (order.status !== "Pending") {
-    return next(
-      new ApiError(
-        `Sorry, ${order.status} order cannot be changed To ${this._update.status}`,
-        400
-      )
-    );
-  }
-  this.updatedAt = Date.now();
-  next();
-});
-// increase total_orders by quantity for each product and decrease quantity
-
-OrderSchema.post("save", async function (next) {
-  try {
-    for (let i = 0; i < this.products.length; i++) {
-      // eslint-disable-next-line no-shadow,no-await-in-loop
-      const product = await Product.findById(this.products[i].product_id);
-      product.total_orders += this.products[i].quantity;
-      product.quantity -= this.products[i].quantity;
-      // eslint-disable-next-line no-await-in-loop
-      await product.save();
-    }
-  } catch (err) {
-    console.log(err);
-  }
-});
-
 OrderSchema.methods = {
   toJSON() {
     return {
@@ -200,6 +165,26 @@ OrderSchema.methods = {
       order_id: this._id.toHexString(),
       id: this._id.toHexString(),
     };
+  },
+  async increaseProducts() {
+    for (let i = 0; i < this.products.length; i++) {
+      // eslint-disable-next-line no-shadow,no-await-in-loop
+      const product = await Product.findById(this.products[i].product_id);
+      product.total_orders += this.products[i].quantity;
+      product.quantity -= this.products[i].quantity;
+      // eslint-disable-next-line no-await-in-loop
+      await product.save();
+    }
+  },
+  async decreaseProducts() {
+    for (let i = 0; i < this.products.length; i++) {
+      // eslint-disable-next-line no-shadow,no-await-in-loop
+      const product = await Product.findById(this.products[i].product_id);
+      product.total_orders -= this.products[i].quantity;
+      product.quantity += this.products[i].quantity;
+      // eslint-disable-next-line no-await-in-loop
+      await product.save();
+    }
   },
 };
 

@@ -10,7 +10,7 @@ exports.getOrders = Factory.getAll(Order);
 exports.getOrder = Factory.getOne(Order);
 
 exports.createOrder = AsyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate("user", "name email");
   const { cart } = user;
   const orderAddress = await user.address.find((address) =>
     address._id.equals(req.body.address_id)
@@ -43,6 +43,7 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     address: orderAddress,
   });
   await order.save();
+  order.increaseProducts();
   user.cart = [];
   await user.save({ validateBeforeSave: false });
 
@@ -60,16 +61,27 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
 });
 
 exports.cancelOrder = AsyncHandler(async (req, res, next) => {
-  const filter = { user_id: req.user.id };
-  await Order.findOneAndUpdate(filter, { status: "Cancelled" });
-  res.status(204).json({
+  const order = await Order.findOne({
+    _id: req.params.id,
+    user_id: req.user.id,
+  }).populate("user", "name email");
+  if (!order) return next(new ApiError("Order Not Found", 404));
+  if (order.status !== "Pending")
+    return next(new ApiError(`${order.status} Cannot be Cancelled`));
+  order.status = "Cancelled";
+  await order.save();
+  order.decreaseProducts();
+  res.status(200).json({
     status: "success",
-    data: null,
+    data: order,
   });
 });
 
 exports.reorder = AsyncHandler(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+  const order = await Order.findById(req.params.id).populate(
+    "user",
+    "name email"
+  );
   if (!order || order.status !== "Completed") {
     return next(new ApiError("Order not found or Not Completed", 404));
   }

@@ -3,6 +3,7 @@ const axios = require("axios");
 const Factory = require("../../../Utils/Factory");
 const ApiError = require("../../../Utils/ApiError");
 const Order = require("../Order");
+const Product = require("../../Products/Product");
 const pusher = require("../../../helpers/Pusher");
 /*
  * @description get all orders in the system for admin / get all orders for specific user by userID
@@ -23,6 +24,9 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
 
   if (!order) {
     return next(new ApiError("Order Not Found", 404));
+  }
+  if (order.status !== "Processing") {
+    return next(new ApiError(`${order.status} Order Cannot Be Processed`, 404));
   }
 
   const updatedAddress = {
@@ -75,8 +79,11 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
 
 module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
   const filter = { _id: req.params.id };
-  const order = await Order.findById(filter);
+  const order = await Order.findById(filter).populate("user", "name email");
   if (!order) return next(new ApiError("Order Not Found", 404));
+  if (order.status !== "Pending") {
+    return next(new ApiError(`${order.status} Order Cannot Be Cancelled`, 404));
+  }
   order.status = "Cancelled";
   pusher.trigger(`user-${order.user_id}`, "my-order", {
     message: "Your order has been cancelled",
@@ -84,7 +91,7 @@ module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
     status: order.status,
   });
   await order.save();
-
+  order.decreaseProducts();
   res.status(200).json({
     status: "success",
     data: {
@@ -97,7 +104,10 @@ module.exports.cancelOrder = AsyncHandler(async (req, res, next) => {
 });
 
 module.exports.completeOrder = AsyncHandler(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+  const order = await Order.findById(req.params.id).populate(
+    "user",
+    "name email"
+  );
   if (!order) {
     return next(new ApiError("Order is not found.", 404));
   }
