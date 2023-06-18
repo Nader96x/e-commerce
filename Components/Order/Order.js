@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Product = require("../Products/Product");
+const User = require("../Users/User");
 const ApiError = require("../../Utils/ApiError");
+const EmailSender = require("../../Utils/emailSender");
 
 const product = mongoose.Schema({
   _id: false,
@@ -130,6 +132,17 @@ OrderSchema.pre("save", function (next) {
     });
   }
   this.updatedAt = Date.now();
+  console.log(this.status_history);
+  const url = `${process.env.FRONTEND_URL}/orders/OrderDetail/${this._id}`;
+  // get user from this and send email
+  User.findById(this.user_id)
+    .then((user) => {
+      const email = new EmailSender(user, url, this);
+      email.sendStatusChange(); // I know this is async, but I don't want to wait for it
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   next();
 });
 

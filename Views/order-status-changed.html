@@ -48,10 +48,43 @@
                         style="font-family:Helvetica Neue,Helvetica,Arial,Lucida Grande,sans-serif;font-weight:500;font-size:20px;color:#4f545c;letter-spacing:0.27px">
                         Hey {{name}},</h2>
 
-                      <p>Thank you <span class="il">for signing up</span> for our <span class="il">website.</span></p>
-                      <p>Please click the button below to verify your email address <span class="il">If you did not sign up</span>,
-                        please ignore
-                        this email.</p>
+                      <h3>Thank you <span class="il">for Ordering </span> form our <span
+                        class="il">website.</span></h3>
+                      <p>We are contacting you to let you know that your order status has been changed</p>
+                      <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                          <td>Order ID:</td>
+                          <td>{{order_id}}</td>
+                        </tr>
+                        <tr>
+                          <td>Order Status:</td>
+                          <td>{{order_status}}</td>
+                        </tr>
+                        <tr>
+                          <td>Order Total Price:</td>
+                          <td>{{order_total_price}}</td>
+                        </tr>
+                        <tr>
+                          <td>Order Date:</td>
+                          <td>{{order_createdAt}}</td>
+                        </tr>
+                        <tr>
+                          <td>Order Update Date:</td>
+                          <td>{{order_updatedAt}}</td>
+                        </tr>
+                        <tr>
+                          <td>Order Payment Method:</td>
+                          <td>{{order_payment_method}}</td>
+                        </tr>
+                        <tr>
+                          <td>Order Payment Status:</td>
+                          <td>{{order_payment_status}}</td>
+                        </tr>
+
+                        </tbody>
+                      </table>
+                      <h3 class="text-center">Thank you for your business.</h3>
 
                     </div>
                   </td>
@@ -67,7 +100,7 @@
                           href="{{url}}"
                           style="text-decoration:none;line-height:100%;background:#5865f2;color:white;font-family:Ubuntu,Helvetica,Arial,sans-serif;font-size:15px;font-weight:normal;text-transform:none;margin:0px"
                           target="_blank">
-                          <span class="il">Verify</span> <span class="il">Email</span>
+                          <span class="il">check your order</span>
                         </a></td>
                       </tr>
                       </tbody>
