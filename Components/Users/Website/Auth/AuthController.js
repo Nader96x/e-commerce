@@ -64,7 +64,14 @@ exports.login = AsyncHandler(async (req, res, next) => {
   if (!user || !(await user.checkPassword(password, user.password))) {
     return next(new ApiError("Incorrect email or password", 401));
   }
-  createSendToken(user, 200, res, next);
+  if (!user.is_active)
+    return next(
+      new ApiError("This account is Not Active, please contact us", 401)
+    );
+
+  const loggedUser = user.toJSON();
+  delete loggedUser.password;
+  createSendToken(loggedUser, 200, res, next);
 });
 
 exports.protect = AsyncHandler(async (req, res, next) => {
@@ -85,6 +92,11 @@ exports.protect = AsyncHandler(async (req, res, next) => {
   }
   if (user.changedPasswordAfter(decoded.iat)) {
     return next(new ApiError("Password changed recently, login again", 401));
+  }
+  if (!user.is_active) {
+    return next(
+      new ApiError("This account is Not Active, please contact us", 401)
+    );
   }
   req.user = user;
   next();
