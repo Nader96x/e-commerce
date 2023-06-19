@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const ApiError = require("../../Utils/ApiError");
 
 const Permission = mongoose.Schema({
   _id: false,
@@ -46,5 +47,14 @@ const RoleSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+RoleSchema.pre("findOneAndUpdate", async function (next) {
+  const updatedRole = await this.model.findOne(this.getQuery());
+  if (updatedRole.name === "super-admin") {
+    return next(new ApiError("Super Admin Role Status Cannot be changed", 400));
+  }
+  next();
+});
+
 const RoleModel = mongoose.model("Role", RoleSchema);
 module.exports = RoleModel;

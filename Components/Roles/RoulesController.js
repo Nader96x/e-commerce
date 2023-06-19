@@ -36,3 +36,17 @@ module.exports.updateRole = Factory.updateOne(RoleModel);
  * @access private[admin]
  */
 module.exports.deleteRole = Factory.deleteOne(RoleModel);
+
+/*
+ * @description activate specific Role by RoleID
+ * @route UNBAN /api/v1/roles/:id/unban
+ * @access private[admin]
+ */
+module.exports.activateRole = Factory.activate(RoleModel);
+
+/*
+ * @description deactivate specific Role by RoleID
+ * @route BAN /api/v1/roles/:id/ban
+ * @access private[admin]
+ */
+module.exports.deactivateRole = Factory.deActivate(RoleModel);

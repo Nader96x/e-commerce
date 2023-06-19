@@ -45,6 +45,7 @@ class ApiFeatures {
         { name_en: { $regex: this.query.keyword, $options: "i" } },
         { name_ar: { $regex: this.query.keyword, $options: "i" } },
         { name: { $regex: this.query.keyword, $options: "i" } },
+        { email: { $regex: this.query.keyword, $options: "i" } },
         { description: { $regex: this.query.keyword, $options: "i" } },
       ];
       this.mongooseQuery.find(query);
