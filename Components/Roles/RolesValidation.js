@@ -23,6 +23,7 @@ const permissionSchema = Joi.object({
     patch: Joi.boolean(),
     delete: Joi.boolean(),
     ban: Joi.boolean(),
+    unban: Joi.boolean(),
   }),
 });
 
