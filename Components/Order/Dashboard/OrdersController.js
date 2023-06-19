@@ -72,6 +72,7 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
       });
     })
     .catch((err) => {
+      err.message = `An Error Occurred While Dispatch this Order${err.message}`;
       next(new ApiError(err.message, Number(err.message.split("code ")[1])));
     });
 });
