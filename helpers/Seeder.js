@@ -33,15 +33,20 @@ module.exports = async () => {
     console.log("seeding roles");
     // const roles = await RoleModel.find().exec();
     // if (roles.length === 0) {
-    const role = await RoleModel.findOneAndUpdate(
-      { name: "super-admin" },
-      {
-        name: "super-admin",
-        permissions,
-        is_active: true,
-      },
-      { upsert: true, new: true }
-    ).exec();
+    try {
+      await RoleModel.findOneAndUpdate(
+        { name: "super-admin" },
+        {
+          name: "super-admin",
+          permissions,
+          is_active: true,
+        },
+        { upsert: true, new: true }
+      ).exec();
+    } catch (err) {
+      console.log(err);
+    }
+    const role = await RoleModel.findOne({ name: "super-admin" }).exec();
     console.log("super-admin role created");
     // console.log(role);
     const admin = await Employee.findOne({ email: "admin@admin.com" }).exec();
