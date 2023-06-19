@@ -15,8 +15,9 @@ router
   .route("/")
   .all(protect)
   .get((req, res, next) => {
-    req.body.id = req.user.id;
+    req.body.user_id = req.user.id;
     next();
+    console.log("getOrders", req.body);
   }, getOrders)
   .post(validateCheckout, createOrder);
 

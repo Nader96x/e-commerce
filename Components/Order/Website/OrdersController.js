@@ -6,8 +6,26 @@ const ApiError = require("../../../Utils/ApiError");
 const pusher = require("../../../helpers/Pusher");
 const Factory = require("../../../Utils/Factory");
 
-exports.getOrders = Factory.getAll(Order);
-exports.getOrder = Factory.getOne(Order);
+// exports.getOrders = Factory.getAll(Order);
+exports.getOrders = AsyncHandler(async (req, res, next) => {
+  const orders = await Order.find({ user_id: req.user.id });
+  res.status(200).json({
+    status: "success",
+    data: orders,
+  });
+});
+// exports.getOrder = Factory.getOne(Order);
+exports.getOrder = AsyncHandler(async (req, res, next) => {
+  const order = await Order.findOne({
+    _id: req.params.id,
+    user_id: req.user.id,
+  });
+  if (!order) return next(new ApiError("Order Not Found", 404));
+  res.status(200).json({
+    status: "success",
+    data: order,
+  });
+});
 
 exports.createOrder = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
