@@ -182,6 +182,7 @@ productSchema.methods = {
   toJSON() {
     return {
       _id: this._id.toHexString(),
+      slug: this.slug,
       name_en: this.name_en,
       name_ar: this.name_ar,
       desc_en: this.desc_en,
