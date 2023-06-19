@@ -48,6 +48,7 @@ module.exports = async () => {
     if (admin) {
       console.log("super-admin already created");
       admin.role_id = role._id;
+      admin.is_banned = false;
       await admin.save();
       return;
     }
