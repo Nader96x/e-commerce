@@ -72,6 +72,24 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
       });
     })
     .catch((err) => {
+      if (process.env.NODE_ENV === "development") {
+        order.status = "Processing";
+        pusher.trigger(`user-${order.user_id}`, "my-order", {
+          message: "Your order is being processed",
+          order_id: order._id,
+          status: order.status,
+        });
+        order.save();
+        res.status(200).json({
+          status: "success",
+          data: {
+            order_id: order._id,
+            status: order.status,
+            payment_status: order.payment_status,
+            payment_method: order.payment_method,
+          },
+        });
+      }
       err.message = `An Error Occurred While Dispatch this Order${err.message}`;
       next(new ApiError(err.message, Number(err.message.split("code ")[1])));
     });
