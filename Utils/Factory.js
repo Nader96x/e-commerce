@@ -10,11 +10,20 @@ module.exports.getAll = (Model) =>
     let filter = {};
     if (body.filterObject) filter = body.filterObject;
 
+    /* /!** BUILD query*!/
+     const documentsCount = await Model.countDocuments(filter);
+     const apiFeatures = new ApiFeatures(query, Model.find(filter));
+     apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
+     const { mongooseQuery, paginationResult: pagination } = apiFeatures;
+     */
     /** BUILD query*/
-    const documentsCount = await Model.countDocuments(filter);
+
     const apiFeatures = new ApiFeatures(query, Model.find(filter));
-    apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
-    const { mongooseQuery, paginationResult: pagination } = apiFeatures;
+    const documentsCount2 = apiFeatures.filter().sort().limitFields().search();
+    const documentsCount = await Model.countDocuments(documentsCount2);
+    const documentsCount3 = documentsCount2.paginate(documentsCount);
+    const { mongooseQuery, paginationResult: pagination } = documentsCount3;
+
     /** execute query  */
     const documents = await mongooseQuery;
     /*if (lang) {
