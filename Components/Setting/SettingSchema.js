@@ -66,7 +66,6 @@ const SettingSchema = mongoose.Schema({
   about_us: String,
   contact_us: String,
   social_media: [SocialMedia],
-
   banners: [BannerSchema],
 });
 
