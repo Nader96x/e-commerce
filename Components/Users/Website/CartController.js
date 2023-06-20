@@ -31,7 +31,7 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
-  const { name_en, image } = product;
+  const { name_en, image, name_ar } = product;
   const updatedCart = await cart.map((item) => {
     if (item.product_id._id == product_id) {
       if (item.quantity >= product.quantity) {
@@ -42,6 +42,7 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
       item.quantity += quantity;
       item.price = product.price;
       item.name_en = product.name_en;
+      item.name_ar = product.name_ar;
       item.image = product.image;
     }
     return item;
@@ -58,6 +59,7 @@ exports.addProduct = AsyncHandler(async (req, res, next) => {
       quantity,
       price,
       name_en,
+      name_ar,
       image,
     });
   }
@@ -76,11 +78,11 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
   const { product_id, quantity } = req.body;
   const product = await Product.findById(product_id);
   if (!product) return next(new ApiError("Product Not Found", 404));
-  const { name_en, image } = product;
+  const { name_en, image, name_ar } = product;
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
-  if (!is_active || !category_is_active)
+  if (!product.is_active || !product.category_is_active)
     return next(new ApiError("Product not Available", 400));
   const updatedCart = await cart.map((item) => {
     // eslint-disable-next-line camelcase
@@ -88,6 +90,7 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
       item.quantity = quantity;
       item.price = product.price;
       item.name_en = name_en;
+      item.name_ar = name_ar;
       item.image = image;
     }
     return item;

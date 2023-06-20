@@ -1,4 +1,5 @@
 const AsyncHandler = require("express-async-handler");
+const { MyFatoorah } = require("myfatoorah-toolkit");
 const Order = require("../Order");
 const User = require("../../Users/User");
 const Product = require("../../Products/Product");
@@ -6,6 +7,7 @@ const ApiError = require("../../../Utils/ApiError");
 const pusher = require("../../../helpers/Pusher");
 const Factory = require("../../../Utils/Factory");
 
+const payment = new MyFatoorah("EGY", true);
 // exports.getOrders = Factory.getAll(Order);
 exports.getOrders = AsyncHandler(async (req, res, next) => {
   const orders = await Order.find({ user_id: req.user.id });
@@ -41,7 +43,7 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
   }
   const products = await Promise.all(
     cart.map(async (product) => {
-      const { product_id, quantity, price, name_en, image } = product;
+      const { product_id, quantity, price, name_en, name_ar, image } = product;
       const prod = await Product.findById(product_id);
       if (!prod.is_active || !prod.category_id.is_active) return null;
       return {
@@ -49,6 +51,7 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
         quantity,
         price,
         name_en,
+        name_ar,
         image,
       };
     })
@@ -68,6 +71,18 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     total_price,
     address: orderAddress,
   });
+  console.log(order);
+  if (req.body.payment_method) order.payment_method = req.body.payment_method;
+  if (order.payment_method === "Credit Card") {
+    payment
+      .executePayment(order.total_price, 2, {
+        CustomerName: user.name,
+        DisplayCurrencyIso: "EGP",
+        CustomerEmail: user.email,
+      })
+      .then((data) => {})
+      .catch((err) => err);
+  }
   await order.save();
   user.cart = [];
   await user.save({ validateBeforeSave: false });
@@ -79,10 +94,27 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     order: order,
   });
   console.log(notificationMessage);
-  res.status(201).json({
-    status: "success",
-    data: order,
-  });
+  if (req.body.payment_method) order.payment_method = req.body.payment_method;
+  if (order.payment_method === "Credit Card") {
+    payment
+      .executePayment(order.total_price, 2, {
+        CustomerName: user.name,
+        DisplayCurrencyIso: "EGP",
+        CurrencyIso: "EGP",
+        CustomerEmail: user.email,
+      })
+      .then((data) => {
+        res.status(201).json({
+          status: "success",
+          data: { order, data },
+        });
+      })
+      .catch((err) => err);
+  } else
+    res.status(201).json({
+      status: "success",
+      data: order,
+    });
 });
 
 exports.cancelOrder = AsyncHandler(async (req, res, next) => {
@@ -131,6 +163,7 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
       quantity,
       price: prod.price,
       name_en: prod.name_en,
+      name_ar: prod.name_ar,
       image: prod.image,
     });
     total_price += quantity * prod.price;

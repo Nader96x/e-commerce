@@ -22,7 +22,11 @@ const product = mongoose.Schema({
   },
   name_en: {
     type: String,
-    required: [true, "Name  is Missing"],
+    required: [true, "Name English  is Missing"],
+  },
+  name_ar: {
+    type: String,
+    required: [true, "Name Arabic is Missing"],
   },
   image: {
     type: String,

@@ -27,6 +27,13 @@ module.exports.confirmOrder = AsyncHandler(async (req, res, next) => {
   if (order.status !== "Pending") {
     return next(new ApiError(`${order.status} Order Cannot Be Processed`, 404));
   }
+  if (order.payment_method === "Credit Card")
+    return next(
+      new ApiError(
+        `You Cannot confirm order that will be paid with Credit`,
+        404
+      )
+    );
 
   const updatedAddress = {
     Area: order.address.area,
