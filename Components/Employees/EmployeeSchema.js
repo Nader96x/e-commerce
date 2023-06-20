@@ -241,5 +241,8 @@ EmployeeSchema.statics = {
   async findByEmail(email) {
     return this.findOne({ email });
   },
+  async countEmployees() {
+    return await this.countDocuments();
+  },
 };
 module.exports = mongoose.model("Employee", EmployeeSchema);

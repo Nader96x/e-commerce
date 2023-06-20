@@ -248,6 +248,7 @@ OrderSchema.statics = {
             },
           },
           count: 1,
+          no: "$_id.month",
         },
       },
     ]);
