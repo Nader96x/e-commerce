@@ -6,15 +6,16 @@ const ApiError = require("../../../Utils/ApiError");
 const pusher = require("../../../helpers/Pusher");
 const Factory = require("../../../Utils/Factory");
 
-// exports.getOrders = Factory.getAll(Order);
-exports.getOrders = AsyncHandler(async (req, res, next) => {
+exports.getOrders = Factory.getAll(Order);
+/*exports.getOrders = AsyncHandler(async (req, res, next) => {
   const orders = await Order.find({ user_id: req.user.id });
   res.status(200).json({
     status: "success",
     data: orders,
   });
-});
-// exports.getOrder = Factory.getOne(Order);
+});*/
+exports.getOrder = Factory.getOne(Order);
+/*
 exports.getOrder = AsyncHandler(async (req, res, next) => {
   const order = await Order.findOne({
     _id: req.params.id,
@@ -26,6 +27,7 @@ exports.getOrder = AsyncHandler(async (req, res, next) => {
     data: order,
   });
 });
+*/
 
 exports.createOrder = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);

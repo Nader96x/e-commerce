@@ -52,9 +52,10 @@ module.exports.getAll = (Model) =>
   @return {response} response {document<model>}
 */
 module.exports.getOne = (Model) =>
-  asyncHandler(async ({ params }, res, next) => {
+  asyncHandler(async ({ params, opts }, res, next) => {
     const { id } = params;
-    const query = Model.findById(id);
+    console.log(opts);
+    const query = Model.findOne({ _id: id, ...opts });
     const document = await query;
     if (!document)
       return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
