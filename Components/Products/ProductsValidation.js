@@ -11,7 +11,7 @@ const createProduct = customJoi.object({
     .required()
     .min(3)
     .max(50)
-    .regex(/^[\u0600-\u06ff\s-0-9]+$/),
+    .regex(/^[\u0600-\u06ff\s\-0-9]+$/),
   name_en: customJoi
     .string()
     .required()
