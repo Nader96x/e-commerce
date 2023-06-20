@@ -37,7 +37,7 @@ exports.getProductsByCategory = async (req, res, next) => {
       createdAt: 0,
       updatedAt: 0,
       __v: 0,
-      category_id: 0,
+      // category_id: 0,
     }
   );
   if (!products) {
