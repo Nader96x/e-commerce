@@ -11,9 +11,14 @@ module.exports.getAll = (Model) =>
     if (body.filterObject) filter = body.filterObject;
 
     /** BUILD query*/
-    const documentsCount = await Model.countDocuments(filter);
+
     const apiFeatures = new ApiFeatures(query, Model.find(filter));
-    apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
+    apiFeatures.filter().sort().limitFields().search();
+    const documentsCount = await Model.countDocuments(
+      apiFeatures.mongooseQuery.getQuery()
+    );
+    apiFeatures.paginate(documentsCount);
+
     const { mongooseQuery, paginationResult: pagination } = apiFeatures;
 
     /** execute query  */
