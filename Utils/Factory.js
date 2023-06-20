@@ -29,7 +29,7 @@ module.exports.getAll = (Model) =>
     apiFeatures.filter().sort().limitFields().search();
     const [documentsCount, documents] = await Promise.all([
       Model.countDocuments(apiFeatures.mongooseQuery.getQuery()),
-      apiFeatures.mongooseQuery,
+      apiFeatures.paginate(0).mongooseQuery,
     ]);
 
     const { paginationResult: pagination } = new ApiFeatures(
