@@ -12,17 +12,31 @@ module.exports.getAll = (Model) =>
 
     /** BUILD query*/
 
+    // const apiFeatures = new ApiFeatures(query, Model.find(filter));
+    // apiFeatures.filter().sort().limitFields().search();
+    // const documentsCount = await Model.countDocuments(
+    //   apiFeatures.mongooseQuery.getQuery()
+    // );
+    // apiFeatures.paginate(documentsCount);
+    // const { mongooseQuery, paginationResult: pagination } = apiFeatures;
+    //
+    // /** execute query  */
+    // const documents = await mongooseQuery;
+
+    /** BUILD query*/
+
     const apiFeatures = new ApiFeatures(query, Model.find(filter));
     apiFeatures.filter().sort().limitFields().search();
-    const documentsCount = await Model.countDocuments(
-      apiFeatures.mongooseQuery.getQuery()
-    );
-    apiFeatures.paginate(documentsCount);
+    const [documentsCount, documents] = await Promise.all([
+      Model.countDocuments(apiFeatures.mongooseQuery.getQuery()),
+      apiFeatures.mongooseQuery,
+    ]);
 
-    const { mongooseQuery, paginationResult: pagination } = apiFeatures;
+    const { paginationResult: pagination } = new ApiFeatures(
+      query,
+      Model.find(filter)
+    ).paginate(documentsCount);
 
-    /** execute query  */
-    const documents = await mongooseQuery;
     /*if (lang) {
       documents = documents.map((document) => {
         const doc = { ...document.toJSON() };
@@ -41,9 +55,12 @@ module.exports.getAll = (Model) =>
         return doc;
       });
     }*/
-    res
-      .status(200)
-      .json({ result: documents.length, pagination, data: documents });
+    res.status(200).json({
+      result: documents.length,
+      // paginationResult,
+      pagination,
+      data: documents,
+    });
   });
 
 /*
