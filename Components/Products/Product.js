@@ -9,14 +9,14 @@ const productSchema = mongoose.Schema(
       type: String,
       required: [true, "Product English Name is Required"],
       unique: [true, "Product Name Already Exists"],
-      validate: {
-        validator: function (value) {
-          // Regular expression to check if the name is written in English
-          const englishRegex = /^[a-zA-Z\s]+$/;
-          return englishRegex.test(value);
-        },
-        message: "Product Name must be written in English",
-      },
+      /* validate: {
+         validator: function (value) {
+           // Regular expression to check if the name is written in English
+           const englishRegex = /^[a-zA-Z\s0-9\.,\-']+$/;
+           return englishRegex.test(value);
+         },
+         message: "Product Name must be written in English",
+       },*/
       minLength: [5, "Product Name cannot be less than 5 characters"],
       maxLength: [50, "Product Name cannot be more than 50 characters"],
       trim: true,
@@ -25,14 +25,14 @@ const productSchema = mongoose.Schema(
       type: String,
       required: [true, "Product Arabic Name is Required"],
       unique: [true, "Product Name Already Exists"],
-      validate: {
+      /*validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in Arabic
-          const arabicRegex = /^[\u0600-\u06ff\s]+$/;
+          const arabicRegex = /^[\u0600-\u06ff\s\-0-9]+$/;
           return arabicRegex.test(value);
         },
         message: "Product Name must be written in Arabic",
-      },
+      },*/
       minLength: [5, "Product Name cannot be less than 5 characters"],
       maxLength: [50, "Product Name cannot be more than 50 characters"],
       trim: true,
@@ -45,32 +45,32 @@ const productSchema = mongoose.Schema(
         200,
         "Product Description cannot be more than 200 characters",
       ],
-      validate: {
+      /*validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in English
-          const englishRegex = /^[a-zA-Z\s]+$/;
+          const englishRegex = /^[\u0600-\u06ff\s0-9\.,\-]+$/;
           return englishRegex.test(value);
         },
         message: "Product English Description must be written in English",
-      },
+      },*/
       trim: true,
     },
     desc_ar: {
       type: String,
       required: [true, "Product English Description is Required"],
-      minLength: [10, "Product Description cannot be less than 20 characters"],
+      minLength: [10, "Product Description cannot be less than 10 characters"],
       maxLength: [
         200,
         "Product Description cannot be more than 200 characters",
       ],
-      validate: {
+      /*validate: {
         validator: function (value) {
           // Regular expression to check if the name is written in Arabic
-          const arabicRegex = /^[\u0600-\u06ff\s]+$/;
+          const arabicRegex = /^[a-zA-Z\s0-9\.,\-']+$/;
           return arabicRegex.test(value);
         },
         message: "Product Arabic Description must be written in Arabic",
-      },
+      },*/
       trim: true,
     },
     price: {

@@ -11,25 +11,25 @@ const createProduct = customJoi.object({
     .required()
     .min(3)
     .max(50)
-    .regex(/^[\u0600-\u06ff\s]+$/),
+    .regex(/^[\u0600-\u06ff\s\-0-9]+$/),
   name_en: customJoi
     .string()
     .required()
     .min(3)
     .max(50)
-    .regex(/^[a-zA-Z\s]+$/),
+    .regex(/^[a-zA-Z\s0-9\.,\-']+$/),
   desc_ar: customJoi
     .string()
     .required()
     .min(10)
     .max(200)
-    .regex(/^[\u0600-\u06ff\s]+$/),
+    .regex(/^[\u0600-\u06ff\s0-9\.,\-]+$/),
   desc_en: customJoi
     .string()
     .required()
     .min(10)
     .max(200)
-    .regex(/^[a-zA-Z\s]+$/),
+    .regex(/^[a-zA-Z\s0-9\.,\-']+$/),
   price: customJoi.number().required(),
   image: customJoi.string().required(),
   images: customJoi.array().items(customJoi.string().required()).required(),
@@ -44,25 +44,25 @@ const updateProduct = customJoi.object({
     .optional()
     .min(3)
     .max(50)
-    .regex(/^[\u0600-\u06ff\s]+$/),
+    .regex(/^[\u0600-\u06ff\s-0-9]+$/),
   name_en: customJoi
     .string()
     .optional()
     .min(3)
     .max(50)
-    .regex(/^[a-zA-Z\s]+$/),
+    .regex(/^[a-zA-Z\s0-9\.,\-']+$/),
   desc_ar: customJoi
     .string()
     .optional()
     .min(10)
     .max(200)
-    .regex(/^[\u0600-\u06ff\s]+$/),
+    .regex(/^[\u0600-\u06ff\s0-9\.,\-]+$/),
   desc_en: customJoi
     .string()
     .optional()
     .min(10)
     .max(200)
-    .regex(/^[a-zA-Z\s]+$/),
+    .regex(/^[a-zA-Z\s0-9\.,\-']+$/),
   price: customJoi.number().optional(),
   image: customJoi.string().optional(),
   images: customJoi.array().items(customJoi.string().optional()).optional(),
