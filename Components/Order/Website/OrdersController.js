@@ -9,7 +9,7 @@ const Factory = require("../../../Utils/Factory");
 
 const payment = new MyFatoorah("EGY", true);
 // exports.getOrders = Factory.getAll(Order);
-exports.getOrders = AsyncHandler(async (req, res, next) => {
+// exports.getOrders = AsyncHandler(async (req, res, next) => {
 exports.getOrders = Factory.getAll(Order);
 /*exports.getOrders = AsyncHandler(async (req, res, next) => {
   const orders = await Order.find({ user_id: req.user.id });
@@ -80,7 +80,9 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     payment
       .executePayment(order.total_price, 2, {
         CustomerName: user.name,
-        DisplayCurrencyIso: "EGP",
+        DisplayCurrencyIso: "ُEG",
+        CallBackUrl: "",
+        ErrorUrl: "",
         CustomerEmail: user.email,
       })
       .then((data) => {})
