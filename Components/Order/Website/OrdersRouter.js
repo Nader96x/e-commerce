@@ -11,14 +11,17 @@ const { protect } = require("../../Users/Website/Auth/AuthController");
 
 const router = express.Router();
 
+const User_Orders = (req, res, next) => {
+  req.query.user_id = req.user.id;
+  req.opts = { user_id: req.user.id };
+  next();
+  // console.log("getOrders", req.body);
+};
+
 router
   .route("/")
   .all(protect)
-  .get((req, res, next) => {
-    req.body.user_id = req.user.id;
-    next();
-    console.log("getOrders", req.body);
-  }, getOrders)
+  .get(User_Orders, getOrders)
   .post(validateCheckout, createOrder);
 
 router.post(
@@ -30,6 +33,6 @@ router.post(
 );
 
 router.delete("/:id", protect, validateOrderId, cancelOrder);
-router.get("/:id", protect, validateOrderId, getOrder);
+router.get("/:id", protect, validateOrderId, User_Orders, getOrder);
 
 module.exports = router;

@@ -11,13 +11,32 @@ module.exports.getAll = (Model) =>
     if (body.filterObject) filter = body.filterObject;
 
     /** BUILD query*/
-    const documentsCount = await Model.countDocuments(filter);
-    const apiFeatures = new ApiFeatures(query, Model.find(filter));
-    apiFeatures.paginate(documentsCount).filter().sort().limitFields().search();
-    const { mongooseQuery, paginationResult: pagination } = apiFeatures;
 
-    /** execute query  */
-    const documents = await mongooseQuery;
+    // const apiFeatures = new ApiFeatures(query, Model.find(filter));
+    // apiFeatures.filter().sort().limitFields().search();
+    // const documentsCount = await Model.countDocuments(
+    //   apiFeatures.mongooseQuery.getQuery()
+    // );
+    // apiFeatures.paginate(documentsCount);
+    // const { mongooseQuery, paginationResult: pagination } = apiFeatures;
+    //
+    // /** execute query  */
+    // const documents = await mongooseQuery;
+
+    /** BUILD query*/
+
+    const apiFeatures = new ApiFeatures(query, Model.find(filter));
+    apiFeatures.filter().sort().limitFields().search();
+    const [documentsCount, documents] = await Promise.all([
+      Model.countDocuments(apiFeatures.mongooseQuery.getQuery()),
+      apiFeatures.paginate(0).mongooseQuery,
+    ]);
+
+    const { paginationResult: pagination } = new ApiFeatures(
+      query,
+      Model.find(filter)
+    ).paginate(documentsCount);
+
     /*if (lang) {
       documents = documents.map((document) => {
         const doc = { ...document.toJSON() };
@@ -36,9 +55,12 @@ module.exports.getAll = (Model) =>
         return doc;
       });
     }*/
-    res
-      .status(200)
-      .json({ result: documents.length, pagination, data: documents });
+    res.status(200).json({
+      result: documents.length,
+      // paginationResult,
+      pagination,
+      data: documents,
+    });
   });
 
 /*
@@ -47,9 +69,10 @@ module.exports.getAll = (Model) =>
   @return {response} response {document<model>}
 */
 module.exports.getOne = (Model) =>
-  asyncHandler(async ({ params }, res, next) => {
+  asyncHandler(async ({ params, opts }, res, next) => {
     const { id } = params;
-    const query = Model.findById(id);
+    console.log(opts);
+    const query = Model.findOne({ _id: id, ...opts });
     const document = await query;
     if (!document)
       return next(new ApiError(`no ${Model.modelName} for this id ${id}`, 404));
@@ -93,7 +116,8 @@ module.exports.createOne = (Model) =>
     if (!document) return next(new ApiError(` bad request`, 400));
     res.status(201).json({
       status: "success",
-      data: await Model.findById(document.toJSON().id),
+      // data: await Model.findById(document.toJSON().id),
+      data: document.toJSON(),
     });
   });
 
