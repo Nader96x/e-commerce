@@ -17,7 +17,9 @@ const check_minimum_view = (req, res, next) => {
     console.log(access, Object.keys(access));
     if (
       Object.keys(access).length &&
-      !Object.keys(access).some((key) => key.toLowerCase() === "get")
+      !Object.keys(access).some(
+        (key) => key.toLowerCase() === "get" && access[key]
+      )
     ) {
       access.get = true;
     }

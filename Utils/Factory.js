@@ -116,7 +116,8 @@ module.exports.createOne = (Model) =>
     if (!document) return next(new ApiError(` bad request`, 400));
     res.status(201).json({
       status: "success",
-      data: await Model.findById(document.toJSON().id),
+      // data: await Model.findById(document.toJSON().id),
+      data: document.toJSON(),
     });
   });
 
