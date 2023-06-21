@@ -5,6 +5,8 @@ const {
   cancelOrder,
   reorder,
   getOrder,
+  successOrder,
+  failOrder,
 } = require("./OrdersController");
 const { validateCheckout, validateOrderId } = require("./OrderValidation");
 const { protect } = require("../../Users/Website/Auth/AuthController");
@@ -34,5 +36,7 @@ router.post(
 
 router.delete("/:id", protect, validateOrderId, cancelOrder);
 router.get("/:id", protect, validateOrderId, User_Orders, getOrder);
+router.get("/payment/success", successOrder);
+router.get("/payment/fail", failOrder);
 
 module.exports = router;

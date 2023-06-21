@@ -1,5 +1,6 @@
 const AsyncHandler = require("express-async-handler");
 const { MyFatoorah } = require("myfatoorah-toolkit");
+const axios = require("axios");
 const Order = require("../Order");
 const User = require("../../Users/User");
 const Product = require("../../Products/Product");
@@ -8,8 +9,7 @@ const pusher = require("../../../helpers/Pusher");
 const Factory = require("../../../Utils/Factory");
 
 const payment = new MyFatoorah("EGY", true);
-// exports.getOrders = Factory.getAll(Order);
-// exports.getOrders = AsyncHandler(async (req, res, next) => {
+
 exports.getOrders = Factory.getAll(Order);
 /*exports.getOrders = AsyncHandler(async (req, res, next) => {
   const orders = await Order.find({ user_id: req.user.id });
@@ -75,19 +75,6 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     total_price,
     address: orderAddress,
   });
-  if (req.body.payment_method) order.payment_method = req.body.payment_method;
-  if (order.payment_method === "Credit Card") {
-    payment
-      .executePayment(order.total_price, 2, {
-        CustomerName: user.name,
-        DisplayCurrencyIso: "ُEG",
-        CallBackUrl: "",
-        ErrorUrl: "",
-        CustomerEmail: user.email,
-      })
-      .then((data) => {})
-      .catch((err) => err);
-  }
   await order.save();
   user.cart = [];
   await user.save({ validateBeforeSave: false });
@@ -104,14 +91,20 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     payment
       .executePayment(order.total_price, 2, {
         CustomerName: user.name,
+        DisplayCurrencyIna: "EGP",
         DisplayCurrencyIso: "EGP",
-        CurrencyIso: "EGP",
+        CallBackUrl: "http://localhost:8000/orders/payment/success",
+        ErrorUrl: "http://localhost:8000/orders/payment/fail",
         CustomerEmail: user.email,
+        Language: "ar",
       })
       .then((data) => {
+        order.payment_id = data.Data.InvoiceId;
+        order.payment_url = data.Data.PaymentURL;
+        order.save();
         res.status(201).json({
           status: "success",
-          data: { order, data },
+          data: order,
         });
       })
       .catch((err) => err);
@@ -184,3 +177,90 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     data: newOrder,
   });
 });
+
+exports.successOrder = AsyncHandler(async (req, res, next) => {
+  const token = process.env.MYFATOORAH_API_TOKEN;
+  const key = req.query.paymentId;
+  const keyType = "PaymentId";
+  payment.getPaymentStatus(key, keyType, token).then(async (data) => {
+    const order = await Order.findOne({ payment_id: data.Data.InvoiceId });
+    if (!order) {
+      return next(new ApiError("Order Not Found"));
+    }
+    if (data.IsSuccess !== true || data.Data.InvoiceStatus !== "Paid")
+      return next(new ApiError("Paid Value is Wrong"));
+    const updatedAddress = {
+      Area: order.address.area,
+      City: order.address.city,
+      Governate: order.address.governorate,
+      Country: order.address.country,
+    };
+
+    const dispatchingProducts = order.products.map((product) => ({
+      product_id: product.product_id,
+      quantity: product.quantity,
+      price: product.price,
+      name_en: product.name_en,
+    }));
+    console.log(data.Data);
+    axios
+      .post(process.env.DISPATCHING_URL, {
+        _id: order.id,
+        CustomerID: order.user._id,
+        CustomerName: order.user.name,
+        CustomerEmail: order.user.email,
+        Address: updatedAddress,
+        Product: dispatchingProducts,
+        PaymentMethod: order.payment_method,
+        TotalPrice: order.total_price,
+      })
+      .then((response) => {
+        order.status = "Processing";
+        order.payment_status = "Paid";
+        pusher.trigger(`user-${order.user_id}`, "my-order", {
+          message: "Your order is being processed",
+          order_id: order._id,
+          status: order.status,
+        });
+        order.save();
+        res.status(200).json({
+          status: "success",
+          data: {
+            order_id: order._id,
+            status: order.status,
+            payment_status: order.payment_status,
+            payment_method: order.payment_method,
+            payment_url: order.payment_url,
+          },
+        });
+      })
+      .catch((err) => {
+        if (process.env.NODE_ENV === "development") {
+          order.status = "Processing";
+          order.payment_status = "Paid";
+          pusher.trigger(`user-${order.user_id}`, "my-order", {
+            message: "Your order is being processed",
+            order_id: order._id,
+            status: order.status,
+          });
+          order.save();
+          res.status(200).json({
+            status: "success",
+            data: {
+              order_id: order._id,
+              status: order.status,
+              payment_status: order.payment_status,
+              payment_method: order.payment_method,
+              payment_url: order.payment_url,
+            },
+          });
+        }
+        err.message = `An Error Occurred While Dispatch this Order${err.message}`;
+        next(new ApiError(err.message, Number(err.message.split("code ")[1])));
+      });
+  });
+});
+
+exports.failOrder = AsyncHandler(async (req, res, next) =>
+  next(new ApiError("Payment Failed"), 401)
+);

@@ -95,6 +95,7 @@ const OrderSchema = mongoose.Schema(
       default: "Cash",
     },
     payment_id: String,
+    payment_url: String,
   },
   {
     timestamps: true,
@@ -187,6 +188,7 @@ OrderSchema.methods = {
       payment_status: this.payment_status,
       payment_method: this.payment_method,
       payment_id: this.payment_id,
+      payment_url: this.payment_url,
       products: this.products,
       total_price: this.total_price,
       address: this.address,
