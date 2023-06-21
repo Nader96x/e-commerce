@@ -140,8 +140,8 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     return next(new ApiError("Order not found or Not Completed", 404));
   }
   let orderAddress = order.address;
+  const user = await User.findById(req.user.id);
   if (req.body.address_id) {
-    const user = await User.findById(req.user.id);
     orderAddress = await user.address.find((address) =>
       address._id.equals(req.body.address_id)
     );
@@ -161,6 +161,7 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
       quantity,
       price: prod.price,
       name_en: prod.name_en,
+      name_ar: prod.name_ar,
       image: prod.image,
     });
     total_price += quantity * prod.price;
@@ -170,12 +171,37 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     products,
     total_price: total_price,
     address: orderAddress,
+    payment_method: order.payment_method,
   });
   await newOrder.save();
-  res.status(201).json({
-    status: "success",
-    data: newOrder,
-  });
+  if (req.body.payment_method)
+    newOrder.payment_method = req.body.payment_method;
+  if (newOrder.payment_method === "Credit Card") {
+    payment
+      .executePayment(newOrder.total_price, 2, {
+        CustomerName: user.name,
+        DisplayCurrencyIna: "EGP",
+        DisplayCurrencyIso: "EGP",
+        CallBackUrl: "http://localhost:8000/orders/payment/success",
+        ErrorUrl: "http://localhost:8000/orders/payment/fail",
+        CustomerEmail: user.email,
+        Language: "ar",
+      })
+      .then((data) => {
+        newOrder.payment_id = data.Data.InvoiceId;
+        newOrder.payment_url = data.Data.PaymentURL;
+        newOrder.save();
+        res.status(201).json({
+          status: "success",
+          data: newOrder,
+        });
+      })
+      .catch((err) => err);
+  } else
+    res.status(201).json({
+      status: "success",
+      data: newOrder,
+    });
 });
 
 exports.successOrder = AsyncHandler(async (req, res, next) => {
