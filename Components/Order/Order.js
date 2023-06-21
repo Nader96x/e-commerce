@@ -28,6 +28,10 @@ const product = mongoose.Schema({
     type: String,
     required: [true, "Name Arabic is Missing"],
   },
+  desc_ar: {
+    type: String,
+    required: [true, "Description is required"],
+  },
   image: {
     type: String,
     required: [true, "image is Missing"],

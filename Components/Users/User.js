@@ -40,6 +40,7 @@ const cartProductsSchema = new mongoose.Schema({
   price: { type: Number, required: [true, "Price is required"] },
   name_en: { type: String, required: [true, "Name English is required"] },
   name_ar: { type: String, required: [true, "Name Arabic is required"] },
+  desc_ar: { type: String, required: [true, "Description Arabic is required"] },
   image: {
     type: String,
     required: [true, "image is Missing"],

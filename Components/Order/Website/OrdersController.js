@@ -11,27 +11,8 @@ const Factory = require("../../../Utils/Factory");
 const payment = new MyFatoorah("EGY", true);
 
 exports.getOrders = Factory.getAll(Order);
-/*exports.getOrders = AsyncHandler(async (req, res, next) => {
-  const orders = await Order.find({ user_id: req.user.id });
-  res.status(200).json({
-    status: "success",
-    data: orders,
-  });
-});*/
+
 exports.getOrder = Factory.getOne(Order);
-/*
-exports.getOrder = AsyncHandler(async (req, res, next) => {
-  const order = await Order.findOne({
-    _id: req.params.id,
-    user_id: req.user.id,
-  });
-  if (!order) return next(new ApiError("Order Not Found", 404));
-  res.status(200).json({
-    status: "success",
-    data: order,
-  });
-});
-*/
 
 exports.createOrder = AsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -47,7 +28,8 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
   }
   const products = await Promise.all(
     cart.map(async (product) => {
-      const { product_id, quantity, price, name_en, name_ar, image } = product;
+      const { product_id, quantity, price, name_en, name_ar, desc_ar, image } =
+        product;
       const prod = await Product.findById(product_id);
       if (!prod.is_active || !prod.category_id.is_active) return null;
       return {
@@ -56,6 +38,7 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
         price,
         name_en,
         name_ar,
+        desc_ar,
         image,
       };
     })
@@ -162,6 +145,7 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
       price: prod.price,
       name_en: prod.name_en,
       name_ar: prod.name_ar,
+      desc_ar: prod.desc_ar,
       image: prod.image,
     });
     total_price += quantity * prod.price;
