@@ -82,7 +82,7 @@ exports.updateQuantity = AsyncHandler(async (req, res, next) => {
   if (quantity > product.quantity) {
     return next(new ApiError(`Max amount to Add is ${product.quantity}`, 400));
   }
-  if (!product.is_active || !product.category_is_active)
+  if (!product.is_active || !product.category_id.is_active)
     return next(new ApiError("Product not Available", 400));
   const updatedCart = await cart.map((item) => {
     // eslint-disable-next-line camelcase

@@ -6,7 +6,7 @@ const router = express.Router();
 router.get(
   "/",
   (req, res, next) => {
-    req.body.is_active = true;
+    req.query.is_active = true;
     next();
   },
   CategoriesController.getPublicCategories
