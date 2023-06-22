@@ -243,9 +243,7 @@ exports.successOrder = AsyncHandler(async (req, res, next) => {
         //     payment_url: order.payment_url,
         //   },
         // });
-        res.redirect(
-          `http://front.nader-mo.tech/orders/OrderDetail/${order._id}`
-        );
+        res.redirect(`${process.env.PAYMENT_REDIRECT_URL}/${order._id}`);
       })
       .catch((err) => {
         if (process.env.NODE_ENV === "development") {
@@ -283,6 +281,6 @@ exports.failOrder = AsyncHandler(async (req, res, next) => {
     if (!order) {
       return next(new ApiError("Order Not Found"));
     }
-    res.redirect(`http://front.nader-mo.tech/orders/OrderDetail/${order._id}`);
+    res.redirect(`${process.env.PAYMENT_REDIRECT_URL}/${order._id}`);
   });
 });
