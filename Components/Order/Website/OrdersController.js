@@ -233,16 +233,19 @@ exports.successOrder = AsyncHandler(async (req, res, next) => {
           status: order.status,
         });
         order.save();
-        res.status(200).json({
-          status: "success",
-          data: {
-            order_id: order._id,
-            status: order.status,
-            payment_status: order.payment_status,
-            payment_method: order.payment_method,
-            payment_url: order.payment_url,
-          },
-        });
+        // res.status(200).json({
+        //   status: "success",
+        //   data: {
+        //     order_id: order._id,
+        //     status: order.status,
+        //     payment_status: order.payment_status,
+        //     payment_method: order.payment_method,
+        //     payment_url: order.payment_url,
+        //   },
+        // });
+        res.redirect(
+          `http://front.nader-mo.tech/orders/OrderDetail/${order._id}`
+        );
       })
       .catch((err) => {
         if (process.env.NODE_ENV === "development") {
@@ -271,6 +274,15 @@ exports.successOrder = AsyncHandler(async (req, res, next) => {
   });
 });
 
-exports.failOrder = AsyncHandler(async (req, res, next) =>
-  next(new ApiError("Payment Failed"), 401)
-);
+exports.failOrder = AsyncHandler(async (req, res, next) => {
+  const token = process.env.MYFATOORAH_API_TOKEN;
+  const key = req.query.paymentId;
+  const keyType = "PaymentId";
+  payment.getPaymentStatus(key, keyType, token).then(async (data) => {
+    const order = await Order.findOne({ payment_id: data.Data.InvoiceId });
+    if (!order) {
+      return next(new ApiError("Order Not Found"));
+    }
+    res.redirect(`http://front.nader-mo.tech/orders/OrderDetail/${order._id}`);
+  });
+});
