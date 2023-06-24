@@ -6,10 +6,7 @@ const orderId = customJoi.object({
 });
 
 const checkout = customJoi.object({
-  address_id: customJoi.objectId().required().messages({
-    "any.required": "من فضلك يرجي اختيار عنوان",
-    "string.base": "العنوان الذي اخترته غير صالح",
-  }),
+  address_id: customJoi.objectId().required(),
   payment_method: customJoi.string().valid("Cash", "Credit Card").optional(),
 });
 
