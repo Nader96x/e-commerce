@@ -21,10 +21,18 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
     address._id.equals(req.body.address_id)
   );
   if (!user.verified_at)
-    return next(new ApiError("Please Verify your Email First", 400));
-  if (!orderAddress) return next(new ApiError("Address Not Found", 404));
+    // return next(new ApiError("Please Verify your Email First", 400));
+    return next(
+      new ApiError("من فضلك قم بتفعيل حسابك قبل اتمام عملية الشراء", 400)
+    );
+  // if (!orderAddress) return next(new ApiError("Address Not Found", 404));
+  if (!orderAddress)
+    return next(new ApiError("العنوان الذي اخترته غير موجود", 404));
   if (cart.length < 1) {
-    return next(new ApiError("Cart is Empty", 400));
+    // return next(new ApiError("Cart is Empty", 400));
+    return next(
+      new ApiError("عربة التسوق فارغة قم باضافة بعض المنتجات اولا", 400)
+    );
   }
   const products = await Promise.all(
     cart.map(async (product) => {
@@ -46,7 +54,8 @@ exports.createOrder = AsyncHandler(async (req, res, next) => {
   const unavailableProducts = products.filter((product) => product == null);
   if (unavailableProducts.length > 0)
     return next(
-      new ApiError("Some Products Are no available at The Moment", 400)
+      // new ApiError("Some Products Are no available at The Moment", 400)
+      new ApiError("عذرا, بعض المنتجات غير متاحة في الوقت الحالي", 400)
     );
   const total_price = products.reduce(
     (acc, product) => acc + product.price * product.quantity,
@@ -105,9 +114,11 @@ exports.cancelOrder = AsyncHandler(async (req, res, next) => {
     _id: req.params.id,
     user_id: req.user.id,
   }).populate("user", "name email");
-  if (!order) return next(new ApiError("Order Not Found", 404));
+  // if (!order) return next(new ApiError("Order Not Found", 404));
+  if (!order) return next(new ApiError("عذرا هذا الطلب غير موجود", 404));
   if (order.status !== "Pending")
-    return next(new ApiError(`${order.status} Cannot be Cancelled`));
+    // return next(new ApiError(`${order.status} Cannot be Cancelled`));
+    return next(new ApiError(`هذا الطلب لايمكن الغاءه`));
   order.status = "Cancelled";
   await order.save();
   res.status(200).json({
@@ -122,7 +133,9 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     "name email"
   );
   if (!order || order.status !== "Completed") {
-    return next(new ApiError("Order not found or Not Completed", 404));
+    return next(
+      new ApiError("عذرا , هذا الطلب غير موجوداو لم يتم تسليمه بعد", 404)
+    );
   }
   let orderAddress = order.address;
   const user = await User.findById(req.user.id);
@@ -130,7 +143,9 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     orderAddress = await user.address.find((address) =>
       address._id.equals(req.body.address_id)
     );
-    if (!orderAddress) return next(new ApiError("Address Not Found", 404));
+    // if (!orderAddress) return next(new ApiError("Address Not Found", 404));
+    if (!orderAddress)
+      return next(new ApiError("العنوان الذي اخترته غير موجود", 404));
   }
   const products = [];
   let total_price = 0;
@@ -140,7 +155,10 @@ exports.reorder = AsyncHandler(async (req, res, next) => {
     // eslint-disable-next-line no-await-in-loop
     const prod = await Product.findById(product_id);
     if (!prod.is_active || !prod.category_id.is_active)
-      return next(new ApiError("Some Products are Not Available", 400));
+      // return next(new ApiError("Some Products are Not Available", 400));
+      return next(
+        new ApiError("عذرا, بعض المنتجات غير متاحة في الوقت الحالي", 400)
+      );
     products.push({
       product_id,
       quantity,
@@ -199,7 +217,8 @@ exports.successOrder = AsyncHandler(async (req, res, next) => {
   payment.getPaymentStatus(key, keyType, token).then(async (data) => {
     const order = await Order.findOne({ payment_id: data.Data.InvoiceId });
     if (!order) {
-      return next(new ApiError("Order Not Found"));
+      // return next(new ApiError("Order Not Found"));
+      return next(new ApiError("هذا الطلب غير موجود"));
     }
     if (data.IsSuccess !== true || data.Data.InvoiceStatus !== "Paid")
       return next(new ApiError("Paid Value is Wrong"));
@@ -283,7 +302,8 @@ exports.failOrder = AsyncHandler(async (req, res, next) => {
   payment.getPaymentStatus(key, keyType, token).then(async (data) => {
     const order = await Order.findOne({ payment_id: data.Data.InvoiceId });
     if (!order) {
-      return next(new ApiError("Order Not Found"));
+      // return next(new ApiError("Order Not Found"));
+      return next(new ApiError("هذا الطلب غير موجود"));
     }
     res.redirect(`${process.env.PAYMENT_REDIRECT_URL}/${order._id}`);
   });
