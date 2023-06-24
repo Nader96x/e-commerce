@@ -25,7 +25,9 @@ const createSendToken = (user, statusCode, res, next) => {
 const createVerifyToken = async (user, req, res, next) => {
   const token = await user.createEmailVerificationToken();
   user.save({ validateBeforeSave: false });
-  const verifyUrl = `http://localhost:3000/verify-email/${token}`;
+  const verifyUrl = `${
+    process.env.FRONTEND_URL || "http://localhost:3000"
+  }/verify-email/${token}`;
   const email = new Email(user, verifyUrl);
   try {
     await email.sendWelcome();
