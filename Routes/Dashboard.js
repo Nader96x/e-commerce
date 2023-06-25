@@ -8,7 +8,7 @@ const RolesRouter = require("../Components/Roles/RolesRouter");
 const OrderRouter = require("../Components/Order/Dashboard/OrdersRouter");
 const DashUsersRouter = require("../Components/Users/Dashboard/UsersRouter");
 const StaticsRouter = require("../Components/Statics/StaticsRouter");
-
+const ContactUsRouter = require("../Components/Contact-Us/ContactUsRouter");
 const {
   protect,
   authorized,
@@ -36,6 +36,7 @@ Router.get("/routes", (req, res) => {
 
 Router.use(protect);
 Router.use("/statics", StaticsRouter);
+Router.use("/contact-us", ContactUsRouter);
 Router.use(authorized);
 Router.use("/employees", EmployeeRouter);
 Router.use("/categories", CategoriesRouter);
