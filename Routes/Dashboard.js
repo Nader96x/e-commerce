@@ -36,7 +36,7 @@ Router.get("/routes", (req, res) => {
 
 Router.use(protect);
 Router.use("/statics", StaticsRouter);
-Router.use("/contact-us", ContactUsRouter);
+Router.use("/customers-contact", ContactUsRouter);
 Router.use(authorized);
 Router.use("/employees", EmployeeRouter);
 Router.use("/categories", CategoriesRouter);
