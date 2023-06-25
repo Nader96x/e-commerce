@@ -273,15 +273,7 @@ OrderSchema.statics = {
       {
         $group: {
           _id: null,
-          totalPrice: {
-            $sum: {
-              $cond: {
-                if: { $gt: [{ $size: "$$ROOT" }, 0] },
-                then: "$total_price",
-                else: { $literal: 0 },
-              },
-            },
-          },
+          totalPrice: { $sum: "$total_price" },
         },
       },
       {

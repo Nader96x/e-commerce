@@ -22,6 +22,8 @@ module.exports.getStatics = AsyncHandler(async (req, res, next) => {
   const processingOrdersFromLastSixMonths = await Order.getOrdersPerMonth(
     "Processing"
   );
+  let total_sales = 0;
+  if (sales[0]?.totalPrice) total_sales = sales[0].totalPrice;
   res.status(200).json({
     status: "success",
     data: {
@@ -30,7 +32,7 @@ module.exports.getStatics = AsyncHandler(async (req, res, next) => {
       numberOfProducts,
       numberOfOrders,
       numberOfEmployees,
-      sales: sales[0].totalPrice,
+      sales: total_sales,
       completedOrdersInLastSixMonths,
       cancelledOrdersInLastSixMonths,
       processingOrdersFromLastSixMonths,
