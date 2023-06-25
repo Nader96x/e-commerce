@@ -8,5 +8,12 @@
       <jdbc-url>mongodb+srv://cluster1.o7wzswg.mongodb.net/e-commerce?retryWrites=true&amp;w=majority</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="Nader auction" uuid="3c31417b-9f0f-4f6b-b8e7-7b21a5d30e9a">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://130.61.235.70:5432/auction3</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

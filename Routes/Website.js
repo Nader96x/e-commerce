@@ -4,6 +4,7 @@ const CategoriesRouter = require("../Components/Categories/CategoriesRouterPubli
 const SettingsRouter = require("../Components/Setting/SettingsRouterPublic");
 const OrdersRouter = require("../Components/Order/Website/OrdersRouter");
 const UsersRouter = require("../Components/Users/Website/UsersRouter");
+const ContactUsController = require("../Components/Contact-Us/ContactUsController");
 
 const Router = express.Router();
 
@@ -24,4 +25,5 @@ Router.use("/orders", OrdersRouter);
 Router.use("/profile", UsersRouter);
 
 Router.use("/", SettingsRouter);
+Router.post("/contact-us", ContactUsController.createContactUs);
 module.exports = Router;
