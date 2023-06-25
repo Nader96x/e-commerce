@@ -14,6 +14,7 @@ exports.updateCategory = Factory.updateOne(Category);
 exports.deleteCategory = Factory.deleteOne(Category);
 
 exports.getPublicCategories = Factory.getAll(Category);
+exports.getPublicProducts = Factory.getAll(Product);
 
 exports.getOneCategoryBySlug = Factory.getOneBySlug(Category);
 
