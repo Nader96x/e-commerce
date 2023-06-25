@@ -305,6 +305,9 @@ exports.failOrder = AsyncHandler(async (req, res, next) => {
       // return next(new ApiError("Order Not Found"));
       return next(new ApiError("هذا الطلب غير موجود"));
     }
+    order.status = "Cancelled";
+    order.payment_status = "Cancelled";
+    order.save();
     res.redirect(`${process.env.PAYMENT_REDIRECT_URL}/${order._id}`);
   });
 });
