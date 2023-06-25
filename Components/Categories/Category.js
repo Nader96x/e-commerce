@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
 const ApiError = require("../../Utils/ApiError");
-const Product = require("../Products/Product");
 
 const categorySchema = mongoose.Schema(
   {
@@ -76,6 +75,7 @@ categorySchema.post("save", function () {
 });
 
 categorySchema.pre("findOneAndDelete", async function (next) {
+  const Product = require("../Products/Product");
   const filter = this.getFilter();
   const products = await Product.find({ category_id: filter._id });
   if (products.length > 0) {
