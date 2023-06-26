@@ -269,6 +269,7 @@ exports.successOrder = AsyncHandler(async (req, res, next) => {
         res.redirect(`${process.env.PAYMENT_REDIRECT_URL}/${order._id}`);
       })
       .catch((err) => {
+        console.log(err);
         if (process.env.NODE_ENV === "development") {
           order.status = "Processing";
           order.payment_status = "Paid";
