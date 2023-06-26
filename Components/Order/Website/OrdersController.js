@@ -278,16 +278,17 @@ exports.successOrder = AsyncHandler(async (req, res, next) => {
             status: order.status,
           });
           order.save();
-          res.status(200).json({
-            status: "success",
-            data: {
-              order_id: order._id,
-              status: order.status,
-              payment_status: order.payment_status,
-              payment_method: order.payment_method,
-              payment_url: order.payment_url,
-            },
-          });
+          // res.status(200).json({
+          //   status: "success",
+          //   data: {
+          //     order_id: order._id,
+          //     status: order.status,
+          //     payment_status: order.payment_status,
+          //     payment_method: order.payment_method,
+          //     payment_url: order.payment_url,
+          //   },
+          // });
+          res.redirect(`${process.env.PAYMENT_REDIRECT_URL}/${order._id}`);
         }
         err.message = `An Error Occurred While Dispatch this Order${err.message}`;
         next(new ApiError(err.message, Number(err.message.split("code ")[1])));
