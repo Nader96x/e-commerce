@@ -49,6 +49,7 @@ class ApiFeatures {
         { status: { $regex: this.query.keyword, $options: "i" } },
         { desc_en: { $regex: this.query.keyword, $options: "i" } },
         { desc_ar: { $regex: this.query.keyword, $options: "i" } },
+        { status: { $regex: this.query.keyword, $options: "i" } },
       ];
       this.mongooseQuery.find(query);
       return this;
